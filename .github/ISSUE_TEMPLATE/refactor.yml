@@ -1,0 +1,22 @@
+name: "🙌 개선하기"
+description: "이 기능을 개선해주세요"
+title: "[🔨 Refactor] "
+labels: "🔨 Refactor"
+body:
+  - type: textarea
+    attributes:
+      label: 🙌 개선 방향
+      description: 개선 방향을 작성해 주세요.
+      placeholder: 꼼꼼하게 적을수록 좋습니다!
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 💻 코드
+      description: 관련 코드가 있다면 복붙해 주세요.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 🏄‍♂️ 참고 자료
+      description: 참고 자료가 있다면 작성해 주세요.
