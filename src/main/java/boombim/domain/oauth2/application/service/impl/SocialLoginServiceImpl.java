@@ -1,32 +1,49 @@
 package boombim.domain.oauth2.application.service.impl;
 
-
+import boombim.domain.oauth2.application.service.CreateAccessTokenAndRefreshTokenService;
+import boombim.domain.oauth2.application.service.OAuth2Service;
 import boombim.domain.oauth2.application.service.SocialLoginService;
+import boombim.domain.oauth2.domain.entity.SocialProvider;
+import boombim.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
+import boombim.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombim.domain.user.domain.entity.Role;
+import boombim.domain.user.domain.entity.User;
+import boombim.domain.user.domain.repository.UserRepository;
+import boombim.global.infra.exception.error.BoombimException;
+import boombim.global.infra.exception.error.ErrorCode;
+import boombim.global.jwt.domain.entity.KakaoJsonWebToken;
+import boombim.global.jwt.domain.repository.KakaoJsonWebTokenRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
-@RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class SocialLoginServiceImpl implements SocialLoginService {
 
     private final Map<SocialProvider, OAuth2Service> oauth2Services;
     private final CreateAccessTokenAndRefreshTokenService tokenService;
-    private final SocialUserCreateService userCreateService;
-    private final SocialTokenRepository socialTokenRepository;
+    private final UserRepository userRepository;
+    private final KakaoJsonWebTokenRepository socialTokenRepository;
 
     @Value("${oauth2.front-uri}")
     private String frontRedirectUri;
 
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
                                   CreateAccessTokenAndRefreshTokenService tokenService,
-                                  SocialUserCreateService userCreateService,
-                                  SocialTokenRepository socialTokenRepository) {
+                                  UserRepository userRepository,
+                                  KakaoJsonWebTokenRepository socialTokenRepository) {
         this.tokenService = tokenService;
-        this.userCreateService = userCreateService;
+        this.userRepository = userRepository;
         this.socialTokenRepository = socialTokenRepository;
 
         // OAuth2Service 구현체들을 Provider별로 매핑
@@ -48,9 +65,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         OAuth2UserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
 
         // 3. 사용자 생성/업데이트 및 소셜 토큰 저장
-        Map<String, String> userInfo = userCreateService.createSocialUser(
-                provider, tokenResponse, userResponse
-        );
+        Map<String, String> userInfo = createSocialUser(provider, tokenResponse, userResponse);
 
         // 4. 자체 JWT 토큰 생성
         Map<String, String> tokens = tokenService.createAccessTokenAndRefreshToken(
@@ -75,8 +90,56 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     private OAuth2Service getOAuth2Service(SocialProvider provider) {
         OAuth2Service service = oauth2Services.get(provider);
         if (service == null) {
-            throw new BabbuddyException(ErrorCode.UNSUPPORTED_PROVIDER);
+            throw new BoombimException(ErrorCode.INVALID_PARAMETER);
         }
         return service;
+    }
+
+    private Map<String, String> createSocialUser(SocialProvider provider,
+                                                 OAuth2TokenResponse tokenResponse,
+                                                 OAuth2UserResponse userResponse) {
+        log.info("소셜 사용자 생성 시작: provider={}, userId={}", provider, userResponse.id());
+
+        if (userResponse.id() == null || userResponse.id().isEmpty()) {
+            log.error("소셜 로그인에서 반환된 사용자 ID가 null 또는 빈 문자열입니다");
+            throw new IllegalArgumentException("사용자 ID가 유효하지 않습니다");
+        }
+
+        User user = userRepository.findById(userResponse.id()).orElse(null);
+
+        if (user == null) {
+            log.info("신규 {} 사용자 생성: {}", provider, userResponse.getName());
+            user = User.builder()
+                    .id(userResponse.id())
+                    .email(userResponse.getEmail())
+                    .name(userResponse.getName())
+                    .profile(userResponse.getProfile())
+                    .role(Role.USER)
+                    .build();
+            userRepository.save(user);
+        } else {
+            user.updateEmailAndProfile(userResponse.getEmail(), userResponse.getProfile());
+        }
+
+        // 소셜 토큰 저장 (현재는 Kakao 토큰 저장소 사용, 향후 통합 필요)
+        if (provider == SocialProvider.KAKAO) {
+            LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.expiresIn());
+
+            KakaoJsonWebToken socialToken = KakaoJsonWebToken.builder()
+                    .userId(user.getId())
+                    .accessToken(tokenResponse.accessToken())
+                    .refreshToken(tokenResponse.refreshToken())
+                    .expiresIn(expiresAt)
+                    .build();
+
+            socialTokenRepository.deleteById(user.getId());
+            socialTokenRepository.save(socialToken);
+        }
+
+        return Map.of(
+                "id", user.getId(),
+                "role", user.getRole().toString(),
+                "email", user.getEmail()
+        );
     }
 }

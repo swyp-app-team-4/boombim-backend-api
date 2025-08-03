@@ -44,12 +44,15 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_EXIST(-208, "Refresh Token이 DB에 존재하지 않습니다.", 401),
     DUPLICATE_LOGIN_NOT_EXIST(-209, "중복 로그인은 허용되지 않습니다.", 401),
 
+    // OAuth2
+    INVALID_PROVIDER(-220, "지원하지 않는 소셜 로그인 제공자입니다.", 400),
+    APPLE_JWT_ERROR(-221, "Apple JWT 생성 중 오류가 발생했습니다.", 500),
+    UNSUPPORTED_PROVIDER(-222, "지원하지 않는 OAuth2 제공자입니다.", 400),
+
     // user
     INVALID_ROLE(-210, "해당 역할이 존재하지 않습니다.", 400),
     USER_NOT_EXIST(-211, "존재하지 않는 유저입니다.", 404),
     ALLERGY_NOT_EXIST(-212, "존재하지 않는 필드입니다.", 400);
-
-
 
     private final int code;
     private final String message;

@@ -57,6 +57,37 @@ logging:
 
 oauth2:
   front-uri: ${OAUTH2_FRONT_URL}
+
+  # Kakao 설정
+  kakao:
+    base-url: ${OAUTH2_BASE_URL}
+    client-name: ${OAUTH2_CLIENT_NAME}
+    client-id: ${OAUTH2_CLIENT_ID}
+    client-secret: ${OAUTH2_CLIENT_SECRET}
+    authorization-grant-type: ${OAUTH2_GRANT_TYPE}
+    client-authentication-method: ${OAUTH2_AUTH_METHOD}
+    redirect-uri: ${OAUTH2_REDIRECT_URL}
+    scope:
+      - profile_nickname
+      - profile_image
+      - account_email
+
+  # Naver 설정
+  naver:
+    base-url: ${NAVER_OAUTH2_BASE_URL:https://nid.naver.com/oauth2.0/authorize}
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
+    redirect-uri: ${NAVER_REDIRECT_URI}
+
+  # Apple 설정
+  apple:
+    client-id: ${APPLE_CLIENT_ID}
+    team-id: ${APPLE_TEAM_ID}
+    key-id: ${APPLE_KEY_ID}
+    private-key: ${APPLE_PRIVATE_KEY}
+    redirect-uri: ${APPLE_REDIRECT_URI}
+
+  # 기존 설정 (하위 호환을 위해 유지)
   base-url: ${OAUTH2_BASE_URL}
   client-name: ${OAUTH2_CLIENT_NAME}
   client-id: ${OAUTH2_CLIENT_ID}
@@ -68,14 +99,3 @@ oauth2:
     - profile_nickname
     - profile_image
     - account_email
-
-
-#
-#openai:
-#  api:
-#    url: https://api.openai.com
-#    key: ${OPENAI_API_KEY}
-#  text:
-#    model: gpt-4-turbo-preview
-
-

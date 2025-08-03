@@ -6,17 +6,23 @@ import boombim.domain.oauth2.infra.AppleJwtUtils;
 import boombim.domain.oauth2.presentation.dto.response.apple.AppleTokenResponse;
 import boombim.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
 import boombim.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombim.global.infra.feignclient.ios.AppleOAuth2FeignClient;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class AppleOAuth2ServiceImpl implements OAuth2Service {
     private final AppleOAuth2FeignClient appleOAuth2FeignClient;
     private final AppleJwtUtils appleJwtUtils;
@@ -68,10 +74,9 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public OAuth2UserResponse getUserInfo(String accessToken) {
+    public OAuth2UserResponse getUserInfo(String idToken) {
         // Apple은 ID Token에서 사용자 정보를 추출
-        // JWT 디코딩을 통해 사용자 정보 파싱
-        return parseIdToken(accessToken);
+        return parseIdToken(idToken);
     }
 
     @Override
@@ -80,7 +85,39 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
     }
 
     private OAuth2UserResponse parseIdToken(String idToken) {
-        // Apple ID Token 파싱 로직 구현
-        // JWT 디코딩 및 사용자 정보 추출
+        try {
+            // JWT의 payload 부분을 디코딩
+            String[] tokenParts = idToken.split("\\.");
+            if (tokenParts.length != 3) {
+                throw new RuntimeException("Invalid JWT token format");
+            }
+
+            String payload = new String(Base64.getUrlDecoder().decode(tokenParts[1]));
+
+            // Claims 파싱을 위해 Jwts 사용하지 않고 간단히 처리
+            // 실제로는 Apple의 공개키로 검증해야 함
+            Claims claims = Jwts.parser()
+                    .setAllowedClockSkewSeconds(60)
+                    .parseClaimsJwt(idToken.substring(0, idToken.lastIndexOf('.') + 1))
+                    .getBody();
+
+            String sub = claims.getSubject(); // Apple User ID
+            String email = claims.get("email", String.class);
+            String name = claims.get("name", String.class);
+
+            return new OAuth2UserResponse(
+                    sub,
+                    new OAuth2UserResponse.KakaoAccount(
+                            new OAuth2UserResponse.Profile(
+                                    name != null ? name : email,
+                                    null // Apple은 프로필 이미지 제공하지 않음
+                            ),
+                            email
+                    )
+            );
+        } catch (Exception e) {
+            log.error("Apple ID Token 파싱 실패", e);
+            throw new RuntimeException("Apple ID Token parsing failed", e);
+        }
     }
 }

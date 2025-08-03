@@ -1,6 +1,7 @@
 package boombim.domain.oauth2.domain.entity;
 
 import boombim.global.infra.exception.error.BoombimException;
+import boombim.global.infra.exception.error.ErrorCode;
 
 import java.util.Arrays;
 
