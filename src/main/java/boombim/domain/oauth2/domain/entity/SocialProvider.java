@@ -1,10 +1,5 @@
 package boombim.domain.oauth2.domain.entity;
 
-import boombim.global.infra.exception.error.BoombimException;
-import boombim.global.infra.exception.error.ErrorCode;
-
-import java.util.Arrays;
-
 public enum SocialProvider {
     KAKAO("kakao"),
     NAVER("naver"),
@@ -18,12 +13,5 @@ public enum SocialProvider {
 
     public String getValue() {
         return value;
-    }
-
-    public static SocialProvider from(String value) {
-        return Arrays.stream(values())
-                .filter(provider -> provider.value.equalsIgnoreCase(value))
-                .findFirst()
-                .orElseThrow(() -> new BoombimException(ErrorCode.INVALID_PROVIDER));
     }
 }

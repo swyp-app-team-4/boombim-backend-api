@@ -46,12 +46,24 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         this.userRepository = userRepository;
         this.socialTokenRepository = socialTokenRepository;
 
+        // 디버깅: 주입된 OAuth2Service들 로그 출력
+        log.info("=== OAuth2Service 목록 ===");
+        oauth2Services.forEach(service -> {
+            log.info("OAuth2Service: {}, Provider: {}", service.getClass().getSimpleName(), service.getProvider());
+        });
+
         // OAuth2Service 구현체들을 Provider별로 매핑
         this.oauth2Services = oauth2Services.stream()
                 .collect(Collectors.toMap(
                         OAuth2Service::getProvider,
                         Function.identity()
                 ));
+
+        // 디버깅: 매핑된 결과 로그 출력
+        log.info("=== OAuth2Services 매핑 결과 ===");
+        this.oauth2Services.forEach((provider, service) -> {
+            log.info("Provider: {}, Service: {}", provider, service.getClass().getSimpleName());
+        });
     }
 
     @Override
@@ -83,15 +95,25 @@ public class SocialLoginServiceImpl implements SocialLoginService {
 
     @Override
     public String getLoginUrl(SocialProvider provider) {
+        log.info("로그인 URL 요청 - Provider: {}", provider);
         OAuth2Service oauth2Service = getOAuth2Service(provider);
-        return oauth2Service.getLoginUrl();
+        String loginUrl = oauth2Service.getLoginUrl();
+        log.info("생성된 로그인 URL: {}", loginUrl);
+        return loginUrl;
     }
 
     private OAuth2Service getOAuth2Service(SocialProvider provider) {
+        log.info("OAuth2Service 조회 - Provider: {}", provider);
+        log.info("사용 가능한 Provider들: {}", oauth2Services.keySet());
+
         OAuth2Service service = oauth2Services.get(provider);
         if (service == null) {
+            log.error("Provider {}에 대한 OAuth2Service를 찾을 수 없습니다. 사용 가능한 Provider: {}",
+                    provider, oauth2Services.keySet());
             throw new BoombimException(ErrorCode.INVALID_PARAMETER);
         }
+
+        log.info("찾은 OAuth2Service: {}", service.getClass().getSimpleName());
         return service;
     }
 

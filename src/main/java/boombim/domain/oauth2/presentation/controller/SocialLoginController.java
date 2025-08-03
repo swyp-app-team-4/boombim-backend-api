@@ -1,6 +1,5 @@
 package boombim.domain.oauth2.presentation.controller;
 
-
 import boombim.domain.oauth2.application.service.SocialLoginService;
 import boombim.domain.oauth2.domain.entity.SocialProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,21 +22,21 @@ public class SocialLoginController {
 
     @Operation(summary = "소셜 로그인 URL 조회", description = "각 플랫폼별 소셜 로그인 URL을 반환합니다.")
     @GetMapping("/login/{provider}")
-    public ResponseEntity<String> getLoginUrl(@PathVariable String provider) {
-        SocialProvider socialProvider = SocialProvider.from(provider);
-        String loginUrl = socialLoginService.getLoginUrl(socialProvider);
+    public ResponseEntity<String> getLoginUrl(@PathVariable SocialProvider provider) {
+        log.info("소셜 로그인 URL 요청: {}", provider);
+        String loginUrl = socialLoginService.getLoginUrl(provider);
         return ResponseEntity.ok(loginUrl);
     }
 
     @Operation(summary = "소셜 로그인 콜백", description = "각 플랫폼에서 Authorization Code를 받아 로그인을 처리합니다.")
     @GetMapping("/callback/{provider}")
     public ResponseEntity<Void> socialLoginCallback(
-            @PathVariable String provider,
+            @PathVariable SocialProvider provider,
             @RequestParam("code") String code,
             HttpServletResponse response) {
 
-        SocialProvider socialProvider = SocialProvider.from(provider);
-        String redirectUrl = socialLoginService.login(socialProvider, code, response);
+        log.info("소셜 로그인 콜백: provider={}, code={}", provider, code);
+        String redirectUrl = socialLoginService.login(provider, code, response);
 
         return ResponseEntity.status(302)
                 .header(HttpHeaders.LOCATION, redirectUrl)
@@ -50,6 +49,7 @@ public class SocialLoginController {
             @RequestParam("code") String code,
             HttpServletResponse response) {
 
+        log.info("Apple 로그인 콜백: code={}", code);
         String redirectUrl = socialLoginService.login(SocialProvider.APPLE, code, response);
 
         return ResponseEntity.status(302)
