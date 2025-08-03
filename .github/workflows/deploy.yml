@@ -1,4 +1,4 @@
-name: babbuddy CI/CD
+name: boombim CI/CD
 
 on:
   push:
@@ -50,7 +50,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERFILE_USERNAME }}/${{ secrets.DOCKERFILE_REPO_NAME }}:latest
 
-      # (8.5) EC2에 babbuddy 디렉토리 생성
+      # (8.5) EC2에 boombim 디렉토리 생성
       - name: Create directory on EC2
         uses: appleboy/ssh-action@master
         with:
@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            mkdir -p /home/ubuntu/babbuddy
+            mkdir -p /home/ubuntu/boombim
 
       # (8.6) docker-compose.yml 파일 EC2로 복사
       - name: Copy docker-compose.yml to EC2
@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker-compose.yml"
-          target: "/home/ubuntu/babbuddy"
+          target: "/home/ubuntu/boombim"
 
       # (8.7) .env 파일 EC2로 복사
       - name: Copy .env file to EC2
@@ -78,7 +78,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "env/prod.env"
-          target: "/home/ubuntu/babbuddy/.env"
+          target: "/home/ubuntu/boombim/.env"
 
       # (9) SSH로 서버 접속 후 컨테이너 실행
       - name: Deploy to Server
@@ -88,7 +88,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/ubuntu/babbuddy
+            cd /home/ubuntu/boombim
             docker-compose down || true
             docker image prune -a -f
             docker pull ${{ secrets.DOCKERFILE_USERNAME }}/${{ secrets.DOCKERFILE_REPO_NAME }}:latest

@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: boombim-prod
+
+  config:
+    import:
+      - file:env/prod.env[.properties]
+
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 30MB
+      max-file-size: 30MB
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+#cloud:
+#  aws:
+#    stack:
+#      auto: false
+#    s3:
+#      bucket: ${S3_BUCKET}
+#    region:
+#      static: ${S3_REGION}
+#    credentials:
+#      accessKey: ${S3_ACCESS_KEY}
+#      secretKey: ${S3_SECRET_KEY}
+
+
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: ERROR
+
+oauth2:
+  front-uri: ${OAUTH2_FRONT_URL}
+  base-url: ${OAUTH2_BASE_URL}
+  client-name: ${OAUTH2_CLIENT_NAME}
+  client-id: ${OAUTH2_CLIENT_ID}
+  client-secret: ${OAUTH2_CLIENT_SECRET}
+  authorization-grant-type: ${OAUTH2_GRANT_TYPE}
+  client-authentication-method: ${OAUTH2_AUTH_METHOD}
+  redirect-uri: ${OAUTH2_REDIRECT_URL}
+  scope:
+    - profile_nickname
+    - profile_image
+    - account_email
+
+
+#openai:
+#  api:
+#    url: https://api.openai.com
+#    key: ${OPENAI_API_KEY}
+#  text:
+#    model: gpt-4-turbo-preview
+
+

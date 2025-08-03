@@ -1,4 +1,4 @@
-package com.boombim.api;
+package boombim;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
