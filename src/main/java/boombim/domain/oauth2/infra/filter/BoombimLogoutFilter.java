@@ -4,7 +4,7 @@ import boombim.global.infra.exception.error.BoombimException;
 import boombim.global.infra.exception.error.ErrorCode;
 import boombim.global.jwt.domain.entity.JsonWebToken;
 import boombim.global.jwt.domain.repository.JsonWebTokenRepository;
-import boombim.global.jwt.domain.repository.KakaoJsonWebTokenRepository;
+import boombim.global.jwt.domain.repository.SocialTokenRepository;
 import boombim.global.jwt.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ public class BoombimLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
     private final JsonWebTokenRepository jsonWebTokenRepository;
-    private final KakaoJsonWebTokenRepository KakaoJsonWebTokenRepository;
+    private final SocialTokenRepository socialTokenRepository;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -51,13 +51,14 @@ public class BoombimLogoutFilter extends GenericFilterBean {
         JsonWebToken jsonWebToken = jsonWebTokenRepository.findById(refreshToken)
                 .orElseThrow(() -> new BoombimException(ErrorCode.REFRESH_TOKEN_NOT_EXIST));
 
-        KakaoJsonWebTokenRepository.deleteById(jsonWebToken.getProviderId());
+        // 사용자의 모든 소셜 토큰 삭제
+        socialTokenRepository.deleteByUserId(jsonWebToken.getProviderId());
         jsonWebTokenRepository.delete(jsonWebToken);
 
         response.addHeader("Authorization", "Bearer ");
 
-        ResponseCookie refreshTokeCookie = jwtUtil.invalidRefreshToken();
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokeCookie.toString());
+        ResponseCookie refreshTokenCookie = jwtUtil.invalidRefreshToken();
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         response.setStatus(HttpServletResponse.SC_OK);
     }

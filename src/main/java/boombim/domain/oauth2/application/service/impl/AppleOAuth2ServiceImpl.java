@@ -7,8 +7,8 @@ import boombim.domain.oauth2.presentation.dto.response.apple.AppleTokenResponse;
 import boombim.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
 import boombim.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
 import boombim.global.infra.feignclient.ios.AppleOAuth2FeignClient;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ import java.util.Base64;
 public class AppleOAuth2ServiceImpl implements OAuth2Service {
     private final AppleOAuth2FeignClient appleOAuth2FeignClient;
     private final AppleJwtUtils appleJwtUtils;
+    private final ObjectMapper objectMapper;
 
     @Value("${oauth2.apple.client-id}")
     private String clientId;
@@ -92,18 +93,15 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
                 throw new RuntimeException("Invalid JWT token format");
             }
 
+            // Base64 URL 디코딩으로 payload 추출
             String payload = new String(Base64.getUrlDecoder().decode(tokenParts[1]));
 
-            // Claims 파싱을 위해 Jwts 사용하지 않고 간단히 처리
-            // 실제로는 Apple의 공개키로 검증해야 함
-            Claims claims = Jwts.parser()
-                    .setAllowedClockSkewSeconds(60)
-                    .parseClaimsJwt(idToken.substring(0, idToken.lastIndexOf('.') + 1))
-                    .getBody();
+            // Jackson을 사용하여 JSON 파싱
+            JsonNode claims = objectMapper.readTree(payload);
 
-            String sub = claims.getSubject(); // Apple User ID
-            String email = claims.get("email", String.class);
-            String name = claims.get("name", String.class);
+            String sub = claims.get("sub").asText(); // Apple User ID
+            String email = claims.has("email") ? claims.get("email").asText() : null;
+            String name = claims.has("name") ? claims.get("name").asText() : null;
 
             return new OAuth2UserResponse(
                     sub,

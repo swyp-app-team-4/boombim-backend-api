@@ -1,6 +1,6 @@
 package boombim.domain.user.domain.entity;
 
-
+import boombim.domain.oauth2.domain.entity.SocialProvider;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -21,17 +19,18 @@ public class User {
     @Column(unique = true, nullable = false)
     private String id;
 
-
     @Column(nullable = false)
     private String email;
 
-    // 이름
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = true)
     private String profile;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "social_provider", nullable = false)
+    private SocialProvider socialProvider;
 
     @CreationTimestamp
     @Column(nullable = false)
@@ -42,12 +41,13 @@ public class User {
     private Role role;
 
     @Builder
-    public User(String id, String email, String name,
-                String profile, Role role) {
+    public User(String id, String email, String name, String profile,
+                SocialProvider socialProvider, Role role) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.profile = profile;
+        this.socialProvider = socialProvider;
         this.role = role;
     }
 
@@ -56,9 +56,7 @@ public class User {
     }
 
     public void updateEmailAndProfile(String email, String profile) {
-
         this.email = email;
         this.profile = profile;
     }
-
 }

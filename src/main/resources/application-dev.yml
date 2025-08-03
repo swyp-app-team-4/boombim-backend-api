@@ -3,7 +3,7 @@ spring:
     name: boombim-dev
 
   aot:
-    enabled: false  # AOT 비활성화 설정 추가
+    enabled: false
 
   config:
     import:
@@ -13,6 +13,7 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -33,20 +34,6 @@ jwt:
   access-expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
 
-#cloud:
-#  aws:
-#    stack:
-#      auto: false
-#    s3:
-#      bucket: ${S3_BUCKET}
-#    region:
-#      static: ${S3_REGION}
-#    credentials:
-#      accessKey: ${S3_ACCESS_KEY}
-#      secretKey: ${S3_SECRET_KEY}
-
-
-
 logging:
   level:
     root: INFO
@@ -54,27 +41,19 @@ logging:
       springframework:
         web: ERROR
 
-
 oauth2:
   front-uri: ${OAUTH2_FRONT_URL}
 
   # Kakao 설정
   kakao:
-    base-url: ${OAUTH2_BASE_URL}
-    client-name: ${OAUTH2_CLIENT_NAME}
-    client-id: ${OAUTH2_CLIENT_ID}
-    client-secret: ${OAUTH2_CLIENT_SECRET}
-    authorization-grant-type: ${OAUTH2_GRANT_TYPE}
-    client-authentication-method: ${OAUTH2_AUTH_METHOD}
-    redirect-uri: ${OAUTH2_REDIRECT_URL}
-    scope:
-      - profile_nickname
-      - profile_image
-      - account_email
+    base-url: ${KAKAO_OAUTH2_BASE_URL}
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
 
   # Naver 설정
   naver:
-    base-url: ${NAVER_OAUTH2_BASE_URL:https://nid.naver.com/oauth2.0/authorize}
+    base-url: ${NAVER_OAUTH2_BASE_URL}
     client-id: ${NAVER_CLIENT_ID}
     client-secret: ${NAVER_CLIENT_SECRET}
     redirect-uri: ${NAVER_REDIRECT_URI}
@@ -86,16 +65,3 @@ oauth2:
     key-id: ${APPLE_KEY_ID}
     private-key: ${APPLE_PRIVATE_KEY}
     redirect-uri: ${APPLE_REDIRECT_URI}
-
-  # 기존 설정 (하위 호환을 위해 유지)
-  base-url: ${OAUTH2_BASE_URL}
-  client-name: ${OAUTH2_CLIENT_NAME}
-  client-id: ${OAUTH2_CLIENT_ID}
-  client-secret: ${OAUTH2_CLIENT_SECRET}
-  authorization-grant-type: ${OAUTH2_GRANT_TYPE}
-  client-authentication-method: ${OAUTH2_AUTH_METHOD}
-  redirect-uri: ${OAUTH2_REDIRECT_URL}
-  scope:
-    - profile_nickname
-    - profile_image
-    - account_email
