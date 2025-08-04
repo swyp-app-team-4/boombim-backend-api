@@ -1,6 +1,7 @@
-package boombimapi.domain.oauth2.application.service.impl;
+package boombimapi.domain.oauth2.application.service.impl.auth;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
+import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,9 +28,7 @@ public class ReissueServiceImpl implements ReissueService {
     private final JsonWebTokenRepository jsonWebTokenRepository;
 
     @Override
-    public void reissue(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = jwtUtil.getRefreshTokenFromCookies(request);
-
+    public LoginToken reissue(String refreshToken) {
         if(!jwtUtil.jwtVerify(refreshToken, "refresh")) {
             log.info("Refresh token not valid");
             throw new BoombimException(ErrorCode.INVALID_REFRESH_TOKEN);
@@ -48,6 +49,7 @@ public class ReissueServiceImpl implements ReissueService {
 
         JsonWebToken newJsonWebToken = JsonWebToken.builder()
                 .refreshToken(newRefreshToken)
+                .providerId(userId)
                 .email(email)
                 .role(role)
                 .build();
@@ -55,7 +57,7 @@ public class ReissueServiceImpl implements ReissueService {
         jsonWebTokenRepository.delete(jsonWebToken);
         jsonWebTokenRepository.save(newJsonWebToken);
 
-        response.addHeader("Authorization", "Bearer " + newAccessToken);
-        response.addHeader(HttpHeaders.COOKIE, jwtUtil.createRefreshTokenCookie(newRefreshToken).toString());
+
+        return LoginToken.of(newAccessToken, newRefreshToken);
     }
 }

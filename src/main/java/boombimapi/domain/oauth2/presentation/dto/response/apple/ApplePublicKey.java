@@ -7,4 +7,5 @@ public record ApplePublicKey(
         String alg,
         String n,
         String e
-) {}
+) {
+}

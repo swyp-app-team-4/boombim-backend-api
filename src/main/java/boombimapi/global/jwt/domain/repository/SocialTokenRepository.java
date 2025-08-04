@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface SocialTokenRepository extends CrudRepository<SocialToken, String> {
-
     Optional<SocialToken> findByUserIdAndProvider(String userId, SocialProvider provider);
 
     void deleteByUserIdAndProvider(String userId, SocialProvider provider);

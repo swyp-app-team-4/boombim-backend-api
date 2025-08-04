@@ -1,23 +1,30 @@
 package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Token", description = "토큰 재발급 API")
 public class ReissueController {
 
     private final ReissueService reissueService;
 
+    @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급합니다.")
     @PostMapping("/api/reissue")
-    @ResponseStatus(HttpStatus.OK)
-    public void reissue(HttpServletRequest request, HttpServletResponse response) {
-        reissueService.reissue(request, response);
+
+    public ResponseEntity<LoginToken> reissue(@RequestBody ReissueRequest request) {
+        LoginToken loginToken = reissueService.reissue(request.refreshToken());
+        return ResponseEntity.ok(loginToken);
+    }
+
+    // 요청 DTO 추가
+    public record ReissueRequest(
+            String refreshToken) {
     }
 }

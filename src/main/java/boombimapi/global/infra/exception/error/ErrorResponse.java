@@ -2,6 +2,7 @@ package boombimapi.global.infra.exception.error;
 
 import java.time.LocalDateTime;
 
+
 public record ErrorResponse(
         int status,
         int code,

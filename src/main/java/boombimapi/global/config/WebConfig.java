@@ -15,6 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
+
         // SocialProvider 대소문자 무시 변환
         registry.addConverter(String.class, SocialProvider.class, stringToSocialProviderConverter);
     }

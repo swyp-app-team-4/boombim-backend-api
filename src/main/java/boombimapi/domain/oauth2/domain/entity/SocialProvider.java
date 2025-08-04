@@ -4,7 +4,6 @@ public enum SocialProvider {
     KAKAO("kakao"),
     NAVER("naver"),
     APPLE("apple");
-
     private final String value;
 
     SocialProvider(String value) {

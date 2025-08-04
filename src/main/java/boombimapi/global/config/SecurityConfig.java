@@ -1,10 +1,7 @@
 package boombimapi.global.config;
 
 import boombimapi.domain.oauth2.infra.filter.BoombimJWTFilter;
-import boombimapi.domain.oauth2.infra.filter.BoombimLogoutFilter;
 import boombimapi.global.infra.exception.auth.BoombimAuthExceptionFilter;
-import boombimapi.global.jwt.domain.repository.JsonWebTokenRepository;
-import boombimapi.global.jwt.domain.repository.SocialTokenRepository;
 import boombimapi.global.jwt.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.filter.CorsFilter;
 
@@ -34,8 +30,6 @@ public class SecurityConfig {
 
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
-    private final JsonWebTokenRepository jsonWebTokenRepository;
-    private final SocialTokenRepository socialTokenRepository;
 
     private final List<String> excludedUrls = Arrays.asList(
             "/v3/api-docs/**",
@@ -45,6 +39,7 @@ public class SecurityConfig {
             "/api/reissue",
             "/api/oauth2/login/**",
             "/api/oauth2/callback/**",
+            "/api/oauth2/logout",
             "/api/healthcheck"
     );
 
@@ -73,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/healthcheck").permitAll()
                         .requestMatchers("/api/oauth2/login/**").permitAll()
                         .requestMatchers("/api/oauth2/callback/**").permitAll()
+                        .requestMatchers("/api/oauth2/logout").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/api/reissue").permitAll()
@@ -84,8 +80,8 @@ public class SecurityConfig {
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                         ))
                 .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
-                .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAt(new BoombimLogoutFilter(jwtUtil, jsonWebTokenRepository, socialTokenRepository), LogoutFilter.class);
+                .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

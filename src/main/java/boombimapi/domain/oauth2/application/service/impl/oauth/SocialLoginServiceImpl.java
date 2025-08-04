@@ -1,11 +1,12 @@
-package boombimapi.domain.oauth2.application.service.impl;
+package boombimapi.domain.oauth2.application.service.impl.oauth;
 
 import boombimapi.domain.oauth2.application.service.CreateAccessTokenAndRefreshTokenService;
 import boombimapi.domain.oauth2.application.service.OAuth2Service;
 import boombimapi.domain.oauth2.application.service.SocialLoginService;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.user.domain.repository.UserRepository;
@@ -13,15 +14,12 @@ import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.SocialToken;
 import boombimapi.global.jwt.domain.repository.SocialTokenRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,14 +28,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SocialLoginServiceImpl implements SocialLoginService {
 
-    private final Map<SocialProvider, OAuth2Service> oauth2Services;
+    private final java.util.Map<SocialProvider, OAuth2Service> oauth2Services;
     private final CreateAccessTokenAndRefreshTokenService tokenService;
     private final UserRepository userRepository;
     private final SocialTokenRepository socialTokenRepository;
 
-    @Value("${oauth2.front-uri}")
-    private String frontRedirectUri;
 
+    // 로그 좀 볼려고 넣었습니다.
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
                                   CreateAccessTokenAndRefreshTokenService tokenService,
                                   UserRepository userRepository,
@@ -46,20 +43,17 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         this.userRepository = userRepository;
         this.socialTokenRepository = socialTokenRepository;
 
-        // 디버깅: 주입된 OAuth2Service들 로그 출력
         log.info("=== OAuth2Service 목록 ===");
         oauth2Services.forEach(service -> {
             log.info("OAuth2Service: {}, Provider: {}", service.getClass().getSimpleName(), service.getProvider());
         });
 
-        // OAuth2Service 구현체들을 Provider별로 매핑
         this.oauth2Services = oauth2Services.stream()
                 .collect(Collectors.toMap(
                         OAuth2Service::getProvider,
                         Function.identity()
                 ));
 
-        // 디버깅: 매핑된 결과 로그 출력
         log.info("=== OAuth2Services 매핑 결과 ===");
         this.oauth2Services.forEach((provider, service) -> {
             log.info("Provider: {}, Service: {}", provider, service.getClass().getSimpleName());
@@ -67,30 +61,19 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     }
 
     @Override
-    public String login(SocialProvider provider, String code, HttpServletResponse response) {
+    public LoginToken login(SocialProvider provider, String code) {
         OAuth2Service oauth2Service = getOAuth2Service(provider);
 
-        // 1. Authorization Code로 토큰 획득
-        OAuth2TokenResponse tokenResponse = oauth2Service.getTokens(code);
+        KakaoTokenResponse tokenResponse = oauth2Service.getTokens(code);
+        KakaoUserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
 
-        // 2. Access Token으로 사용자 정보 획득
-        OAuth2UserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
+        User user = createSocialUser(provider, tokenResponse, userResponse);
 
-        // 3. 사용자 생성/업데이트 및 소셜 토큰 저장
-        Map<String, String> userInfo = createSocialUser(provider, tokenResponse, userResponse);
-
-        // 4. 자체 JWT 토큰 생성
-        Map<String, String> tokens = tokenService.createAccessTokenAndRefreshToken(
-                userInfo.get("id"),
-                Role.valueOf(userInfo.get("role")),
-                userInfo.get("email")
+        return tokenService.createAccessTokenAndRefreshToken(
+                user.getId(),
+                user.getRole(),
+                user.getEmail()
         );
-
-        // 5. 쿠키 설정
-        response.addHeader("Set-Cookie", tokens.get("refresh_token_cookie"));
-
-        // 6. 프론트엔드로 리다이렉트
-        return frontRedirectUri + "?accessToken=" + tokens.get("access_token");
     }
 
     @Override
@@ -117,9 +100,10 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         return service;
     }
 
-    private Map<String, String> createSocialUser(SocialProvider provider,
-                                                 OAuth2TokenResponse tokenResponse,
-                                                 OAuth2UserResponse userResponse) {
+
+    private User createSocialUser(SocialProvider provider,
+                                  KakaoTokenResponse tokenResponse,
+                                  KakaoUserResponse userResponse) {
         log.info("소셜 사용자 생성 시작: provider={}, userId={}", provider, userResponse.id());
 
         if (userResponse.id() == null || userResponse.id().isEmpty()) {
@@ -136,7 +120,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
                     .email(userResponse.getEmail())
                     .name(userResponse.getName())
                     .profile(userResponse.getProfile())
-                    .socialProvider(provider)  // 소셜 제공자 설정
+                    .socialProvider(provider)
                     .role(Role.USER)
                     .build();
             userRepository.save(user);
@@ -144,17 +128,11 @@ public class SocialLoginServiceImpl implements SocialLoginService {
             user.updateEmailAndProfile(userResponse.getEmail(), userResponse.getProfile());
         }
 
-        // 소셜 토큰 저장
         saveSocialToken(user.getId(), provider, tokenResponse);
-
-        return Map.of(
-                "id", user.getId(),
-                "role", user.getRole().toString(),
-                "email", user.getEmail()
-        );
+        return user;
     }
 
-    private void saveSocialToken(String userId, SocialProvider provider, OAuth2TokenResponse tokenResponse) {
+    private void saveSocialToken(String userId, SocialProvider provider, KakaoTokenResponse tokenResponse) {
         LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.expiresIn());
 
         SocialToken socialToken = SocialToken.builder()
@@ -166,7 +144,6 @@ public class SocialLoginServiceImpl implements SocialLoginService {
                 .expiresIn(expiresAt)
                 .build();
 
-        // 기존 토큰이 있다면 삭제 후 새로 저장
         socialTokenRepository.deleteByUserIdAndProvider(userId, provider);
         socialTokenRepository.save(socialToken);
     }

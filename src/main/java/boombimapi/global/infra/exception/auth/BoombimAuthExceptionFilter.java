@@ -27,14 +27,11 @@ public class BoombimAuthExceptionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        }
-        catch(BoombimException e) {
+        } catch (BoombimException e) {
             handleFlowException(response, e);
-        }
-        catch(AuthenticationException e) {
+        } catch (AuthenticationException e) {
             handleAuthenticationException(response);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             log.error("Filter에서 예상치 못한 오류 발생", e);
             handleUnexpectedException(response);
         }

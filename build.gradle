@@ -4,12 +4,13 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'boombim'
+group = 'boombimapi'
 version = '0.0.1-SNAPSHOT'
 
 ext {
 	set('springCloudVersion', "2023.0.1")
 }
+
 
 java {
 	toolchain {

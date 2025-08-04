@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "NaverOAuth", url = "https://nid.naver.com")
 public interface NaverOAuth2URLFeignClient {
-
     @PostMapping(value = "/oauth2.0/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     NaverTokenResponse getAccessToken(
             @RequestParam("grant_type") String grantType,
