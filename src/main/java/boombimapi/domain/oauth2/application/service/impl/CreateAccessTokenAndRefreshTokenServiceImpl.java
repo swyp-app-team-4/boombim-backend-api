@@ -1,6 +1,7 @@
 package boombimapi.domain.oauth2.application.service.impl;
 
 import boombimapi.domain.oauth2.application.service.CreateAccessTokenAndRefreshTokenService;
+import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.global.jwt.domain.entity.JsonWebToken;
 import boombimapi.global.jwt.domain.repository.JsonWebTokenRepository;
@@ -22,7 +23,7 @@ public class CreateAccessTokenAndRefreshTokenServiceImpl implements CreateAccess
     private final JsonWebTokenRepository jsonWebTokenRepository;
 
     @Override
-    public Map<String, String> createAccessTokenAndRefreshToken(String userId, Role role, String email) {
+    public LoginToken createAccessTokenAndRefreshToken(String userId, Role role, String email) {
         String accessToken = jwtUtil.createAccessToken(userId, role, email);
         String refreshToken = jwtUtil.createRefreshToken(userId, role, email);
 
@@ -35,8 +36,6 @@ public class CreateAccessTokenAndRefreshTokenServiceImpl implements CreateAccess
 
         jsonWebTokenRepository.save(jsonWebToken);
 
-        String refreshTokenCookie = jwtUtil.createRefreshTokenCookie(refreshToken).toString();
-
-        return Map.of("access_token", accessToken, "refresh_token_cookie", refreshTokenCookie);
+        return LoginToken.of(accessToken, refreshToken);
     }
 }

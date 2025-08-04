@@ -2,7 +2,6 @@ package boombimapi.global.infra.exception.error;
 
 
 public class BoombimException extends RuntimeException {
-
     private final ErrorCode errorCode;
 
     public BoombimException(ErrorCode errorCode) {

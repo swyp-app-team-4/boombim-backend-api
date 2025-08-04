@@ -54,6 +54,7 @@ public enum ErrorCode {
     USER_NOT_EXIST(-211, "존재하지 않는 유저입니다.", 404),
     ALLERGY_NOT_EXIST(-212, "존재하지 않는 필드입니다.", 400);
 
+
     private final int code;
     private final String message;
     private final int httpCode;

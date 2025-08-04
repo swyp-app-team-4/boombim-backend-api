@@ -1,6 +1,6 @@
 spring:
   application:
-    name: boombim-dev
+    name: boombimapi-dev
 
   aot:
     enabled: false
@@ -41,6 +41,7 @@ logging:
       springframework:
         web: ERROR
 
+# 보류
 oauth2:
   front-uri: ${OAUTH2_FRONT_URL}
 

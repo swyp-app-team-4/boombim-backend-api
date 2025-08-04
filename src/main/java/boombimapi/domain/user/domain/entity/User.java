@@ -51,10 +51,6 @@ public class User {
         this.role = role;
     }
 
-    public void updateName(String name) {
-        this.name = name;
-    }
-
     public void updateEmailAndProfile(String email, String profile) {
         this.email = email;
         this.profile = profile;

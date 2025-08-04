@@ -1,6 +1,5 @@
 package boombimapi.domain.oauth2.infra.filter;
 
-
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
@@ -34,10 +33,9 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
-        if (requestURI.contains("/api/oauth2/login") || requestURI.contains("/api/oauth2/callback")) {
-            log.info("안녕?");
+        if (requestURI.contains("/api/oauth2/login")) {
             String accessToken = jwtUtil.getAccessTokenFromHeaders(request);
-            if (jwtUtil.jwtVerify(accessToken, "access")) {
+            if (accessToken != null && jwtUtil.jwtVerify(accessToken, "access")) {
                 throw new BoombimException(ErrorCode.DUPLICATE_LOGIN_NOT_EXIST);
             }
             filterChain.doFilter(request, response);
@@ -60,7 +58,6 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
         log.info(userId);
         Role role = jwtUtil.getRole(accessToken);
 
-
         GrantedAuthority authority = new SimpleGrantedAuthority(role.getKey());
         log.info(role.getKey());
 
@@ -69,7 +66,6 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("인증 설정 완료: {}", SecurityContextHolder.getContext().getAuthentication());
         filterChain.doFilter(request, response);
-
     }
 
     @Override

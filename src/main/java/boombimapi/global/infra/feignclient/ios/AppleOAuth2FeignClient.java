@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "AppleOAuth", url = "https://appleid.apple.com")
 public interface AppleOAuth2FeignClient {
 
+
     @PostMapping(value = "/auth/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     AppleTokenResponse getAccessToken(
             @RequestParam("grant_type") String grantType,

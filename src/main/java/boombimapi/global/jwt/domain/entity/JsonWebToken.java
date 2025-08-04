@@ -18,4 +18,5 @@ public class JsonWebToken {
     private String email;
 
     private Role role;
+
 }

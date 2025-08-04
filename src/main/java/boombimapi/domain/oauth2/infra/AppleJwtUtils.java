@@ -13,7 +13,6 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
-
 @Component
 @Slf4j
 public class AppleJwtUtils {

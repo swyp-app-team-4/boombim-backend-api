@@ -1,11 +1,11 @@
-package boombimapi.domain.oauth2.application.service.impl;
+package boombimapi.domain.oauth2.application.service.impl.oauth;
 
 import boombimapi.domain.oauth2.application.service.OAuth2Service;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.oauth2.infra.AppleJwtUtils;
 import boombimapi.domain.oauth2.presentation.dto.response.apple.AppleTokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
 import boombimapi.global.infra.feignclient.ios.AppleOAuth2FeignClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,14 +45,14 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public OAuth2TokenResponse getTokens(String code) {
+    public KakaoTokenResponse getTokens(String code) {
         String clientSecret = appleJwtUtils.generateClientSecret();
 
         AppleTokenResponse appleResponse = appleOAuth2FeignClient.getAccessToken(
                 "authorization_code", clientId, clientSecret, code, redirectUri
         );
 
-        return new OAuth2TokenResponse(
+        return new KakaoTokenResponse(
                 appleResponse.accessToken(),
                 appleResponse.refreshToken(),
                 appleResponse.expiresIn()
@@ -60,14 +60,14 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public OAuth2TokenResponse refreshTokens(String refreshToken) {
+    public KakaoTokenResponse refreshTokens(String refreshToken) {
         String clientSecret = appleJwtUtils.generateClientSecret();
 
         AppleTokenResponse appleResponse = appleOAuth2FeignClient.refreshToken(
                 "refresh_token", clientId, clientSecret, refreshToken
         );
 
-        return new OAuth2TokenResponse(
+        return new KakaoTokenResponse(
                 appleResponse.accessToken(),
                 appleResponse.refreshToken(),
                 appleResponse.expiresIn()
@@ -75,7 +75,7 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public OAuth2UserResponse getUserInfo(String idToken) {
+    public KakaoUserResponse getUserInfo(String idToken) {
         // Apple은 ID Token에서 사용자 정보를 추출
         return parseIdToken(idToken);
     }
@@ -85,7 +85,7 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
         return SocialProvider.APPLE;
     }
 
-    private OAuth2UserResponse parseIdToken(String idToken) {
+    private KakaoUserResponse parseIdToken(String idToken) {
         try {
             // JWT의 payload 부분을 디코딩
             String[] tokenParts = idToken.split("\\.");
@@ -103,10 +103,10 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
             String email = claims.has("email") ? claims.get("email").asText() : null;
             String name = claims.has("name") ? claims.get("name").asText() : null;
 
-            return new OAuth2UserResponse(
+            return new KakaoUserResponse(
                     sub,
-                    new OAuth2UserResponse.KakaoAccount(
-                            new OAuth2UserResponse.Profile(
+                    new KakaoUserResponse.KakaoAccount(
+                            new KakaoUserResponse.Profile(
                                     name != null ? name : email,
                                     null // Apple은 프로필 이미지 제공하지 않음
                             ),

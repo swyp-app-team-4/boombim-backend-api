@@ -14,9 +14,4 @@ public class AuthenticationCheckController {
     @ResponseStatus(HttpStatus.OK)
     public void authcheck() {}
 
-    @PostMapping("/test")
-    public ResponseEntity<String> test(@AuthenticationPrincipal String userId) {
-        log.info(userId);
-        return ResponseEntity.ok("힝");
-    }
 }

@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SocialToken {
-
     @Id
     private String id; // userId + provider로 구성된 복합 키
 

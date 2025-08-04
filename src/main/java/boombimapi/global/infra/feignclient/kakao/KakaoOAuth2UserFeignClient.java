@@ -1,7 +1,7 @@
 package boombimapi.global.infra.feignclient.kakao;
 
 
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 )
 public interface KakaoOAuth2UserFeignClient {
 
+
     @GetMapping(value = "/v2/user/me")
-    OAuth2UserResponse getUserInfo(@RequestHeader("Authorization") String accessToken);
+    KakaoUserResponse getUserInfo(@RequestHeader("Authorization") String accessToken);
 
 }

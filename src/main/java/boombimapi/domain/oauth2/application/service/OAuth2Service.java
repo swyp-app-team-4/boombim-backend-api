@@ -1,13 +1,13 @@
 package boombimapi.domain.oauth2.application.service;
 
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
 
 public interface OAuth2Service {
     String getLoginUrl();
-    OAuth2TokenResponse getTokens(String code);
-    OAuth2TokenResponse refreshTokens(String refreshToken);
-    OAuth2UserResponse getUserInfo(String accessToken);
+    KakaoTokenResponse getTokens(String code);
+    KakaoTokenResponse refreshTokens(String refreshToken);
+    KakaoUserResponse getUserInfo(String accessToken);
     SocialProvider getProvider();
 }

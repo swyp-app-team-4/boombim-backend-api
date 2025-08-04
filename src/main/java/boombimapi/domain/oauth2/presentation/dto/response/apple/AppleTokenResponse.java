@@ -8,4 +8,5 @@ public record AppleTokenResponse(
         @JsonProperty("id_token") String idToken,
         @JsonProperty("refresh_token") String refreshToken,
         @JsonProperty("token_type") String tokenType
-) {}
+) {
+}

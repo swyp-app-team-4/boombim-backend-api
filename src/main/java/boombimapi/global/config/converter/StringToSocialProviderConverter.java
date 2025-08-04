@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StringToSocialProviderConverter implements Converter<String, SocialProvider> {
-
     @Override
     public SocialProvider convert(String source) {
         if (source == null || source.trim().isEmpty()) {
@@ -22,7 +21,7 @@ public class StringToSocialProviderConverter implements Converter<String, Social
                 return SocialProvider.KAKAO;
             case "NAVER":
                 return SocialProvider.NAVER;
-            case "APPLE":
+            case "APPLE": // apple은 상황봐서 빼야될듯
                 return SocialProvider.APPLE;
             default:
                 throw new BoombimException(ErrorCode.INVALID_PROVIDER);

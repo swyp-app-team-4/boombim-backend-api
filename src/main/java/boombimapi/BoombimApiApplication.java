@@ -8,8 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class BoombimApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BoombimApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BoombimApiApplication.class, args);
+    }
 
 }

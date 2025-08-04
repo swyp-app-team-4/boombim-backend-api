@@ -1,9 +1,9 @@
-package boombimapi.domain.oauth2.application.service.impl;
+package boombimapi.domain.oauth2.application.service.impl.oauth;
 
 import boombimapi.domain.oauth2.application.service.OAuth2Service;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2TokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.OAuth2UserResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
 import boombimapi.global.infra.feignclient.kakao.KakaoOAuth2URLFeignClient;
 import boombimapi.global.infra.feignclient.kakao.KakaoOAuth2UserFeignClient;
 import jakarta.transaction.Transactional;
@@ -43,21 +43,21 @@ public class KakaoOAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public OAuth2TokenResponse getTokens(String code) {
+    public KakaoTokenResponse getTokens(String code) {
         return kakaoOAuth2URLFeignClient.getAccessToken(
                 code, clientId, clientSecret, redirectUri, "authorization_code"
         );
     }
 
     @Override
-    public OAuth2TokenResponse refreshTokens(String refreshToken) {
+    public KakaoTokenResponse refreshTokens(String refreshToken) {
         return kakaoOAuth2URLFeignClient.refreshToken(
                 "refresh_token", refreshToken, clientId, clientSecret
         );
     }
 
     @Override
-    public OAuth2UserResponse getUserInfo(String accessToken) {
+    public KakaoUserResponse getUserInfo(String accessToken) {
         return kakaoOAuth2UserFeignClient.getUserInfo("Bearer " + accessToken);
     }
 
