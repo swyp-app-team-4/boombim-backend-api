@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @DynamicUpdate
+@Table(name = "member")
 public class User {
     @Id
     @Column(unique = true, nullable = false)
