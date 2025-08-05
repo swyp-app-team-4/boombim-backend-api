@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # (1) 깃 체크아웃
-      - name: Check out repository
+      # (1) Git Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       # (2) .env 파일 생성
-      - name: Create env files
+      - name: Create env file
         run: |
           mkdir -p env
           echo "${{ secrets.ENV_VARS }}" > env/prod.env
@@ -28,7 +28,7 @@ jobs:
           java-version: '17'
 
       # (4) gradlew 실행 권한 부여
-      - name: Grant execute permission for gradlew
+      - name: Grant execute permission to gradlew
         run: chmod +x gradlew
 
       # (5) Gradle 빌드 (테스트 제외)
@@ -50,17 +50,16 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERFILE_USERNAME }}/${{ secrets.DOCKERFILE_REPO_NAME }}:latest
 
-      # (9) NCP 인스턴스에 boombim 디렉토리 생성
+      # (9) NCP root 계정에 디렉토리 생성
       - name: Create directory on NCP Instance
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            mkdir -p /home/ubuntu/boombim
+          script: mkdir -p /root/boombim
 
-      # (10) docker-compose.yml 복사
+      # (10) docker-compose.yml 전송
       - name: Copy docker-compose.yml to NCP Instance
         uses: appleboy/scp-action@master
         with:
@@ -68,9 +67,9 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker-compose.yml"
-          target: "/home/ubuntu/boombim"
+          target: "/root/boombim"
 
-      # (11) .env 파일 복사
+      # (11) .env 파일 전송
       - name: Copy .env file to NCP Instance
         uses: appleboy/scp-action@master
         with:
@@ -78,7 +77,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "env/prod.env"
-          target: "/home/ubuntu/boombim/.env"
+          target: "/root/boombim/.env"
 
       # (12) Docker 컨테이너 실행
       - name: Deploy on NCP Instance
@@ -88,7 +87,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/ubuntu/boombim
+            cd /root/boombim
             docker-compose down || true
             docker image prune -a -f
             docker pull ${{ secrets.DOCKERFILE_USERNAME }}/${{ secrets.DOCKERFILE_REPO_NAME }}:latest
