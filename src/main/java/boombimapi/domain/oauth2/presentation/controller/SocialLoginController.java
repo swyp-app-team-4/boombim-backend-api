@@ -7,8 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/oauth2")
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
+
 
     @Operation(summary = "소셜 로그인 URL 조회", description = "각 플랫폼별 소셜 로그인 URL을 반환합니다.")
     @GetMapping("/login/{provider}")
@@ -38,15 +43,22 @@ public class SocialLoginController {
         LoginToken loginToken = socialLoginService.login(provider, code);
 
         log.info("✅✅ACToken={}", loginToken.accessToken());
+        System.out.println();
         log.info("✅✅RFToken={}", loginToken.refreshToken());
 
         return ResponseEntity.ok(loginToken);
     }
 
-
+    // Apple의 경우 POST 방식 콜백 지원 아직 미정
     @PostMapping("/callback/apple")
-    public ResponseEntity<LoginToken> appleLoginCallback(@RequestParam("code") String code) {
-        log.info("Apple 로그인 (POST): code={}", code);
-        return socialLogin(SocialProvider.APPLE, code);
+    public ResponseEntity<LoginToken> appleLogin(@RequestParam("code") String code) {
+        log.info("Apple 로그인: code={}", code);
+        LoginToken loginToken = socialLoginService.login(SocialProvider.APPLE, code);
+
+        log.info("✅✅ACToken={}", loginToken.accessToken());
+        System.out.println();
+        log.info("✅✅RFToken={}", loginToken.refreshToken());
+
+        return ResponseEntity.ok(loginToken);
     }
 }

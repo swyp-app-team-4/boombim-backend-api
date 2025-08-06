@@ -7,12 +7,16 @@ spring:
       - file:env/prod.env[.properties]
 
   datasource:
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: boombim
+
 
   servlet:
     multipart:
