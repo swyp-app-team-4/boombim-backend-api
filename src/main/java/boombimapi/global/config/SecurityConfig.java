@@ -56,7 +56,8 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOriginPatterns(List.of("http://10.245.22.230:3000", "http://localhost:3000"));
+                    config.setAllowedOriginPatterns(List.of("http://10.245.22.230:3000", "http://localhost:3000",
+                            "https://api.boombim.p-e.kr","https://appleid.apple.com"));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));

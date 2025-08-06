@@ -33,8 +33,6 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     private final UserRepository userRepository;
     private final SocialTokenRepository socialTokenRepository;
 
-
-    // 로그 좀 볼려고 넣었습니다.
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
                                   CreateAccessTokenAndRefreshTokenService tokenService,
                                   UserRepository userRepository,
@@ -64,11 +62,20 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     public LoginToken login(SocialProvider provider, String code) {
         OAuth2Service oauth2Service = getOAuth2Service(provider);
 
+        // 1. Authorization Code로 토큰 획득
         KakaoTokenResponse tokenResponse = oauth2Service.getTokens(code);
-        KakaoUserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
+        log.info("토큰 획득 완료: provider={}", provider);
 
+        // 2. 사용자 정보 획득
+        // Apple의 경우 getTokens()에서 이미 ThreadLocal에 AppleTokenResponse가 저장됨
+        // getUserInfo()에서 ThreadLocal의 idToken을 사용하여 사용자 정보 파싱
+        KakaoUserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
+        log.info("사용자 정보 획득 완료: userId={}, provider={}", userResponse.id(), provider);
+
+        // 3. 사용자 생성 또는 업데이트
         User user = createSocialUser(provider, tokenResponse, userResponse);
 
+        // 4. JWT 토큰 생성 및 반환
         return tokenService.createAccessTokenAndRefreshToken(
                 user.getId(),
                 user.getRole(),
@@ -100,7 +107,6 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         return service;
     }
 
-
     private User createSocialUser(SocialProvider provider,
                                   KakaoTokenResponse tokenResponse,
                                   KakaoUserResponse userResponse) {
@@ -125,6 +131,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
                     .build();
             userRepository.save(user);
         } else {
+            log.info("기존 {} 사용자 정보 업데이트: {}", provider, userResponse.getName());
             user.updateEmailAndProfile(userResponse.getEmail(), userResponse.getProfile());
         }
 
@@ -146,5 +153,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
 
         socialTokenRepository.deleteByUserIdAndProvider(userId, provider);
         socialTokenRepository.save(socialToken);
+
+        log.info("소셜 토큰 저장 완료: userId={}, provider={}", userId, provider);
     }
 }

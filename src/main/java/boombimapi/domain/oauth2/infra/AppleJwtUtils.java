@@ -38,7 +38,7 @@ public class AppleJwtUtils {
                     .setHeaderParam("alg", "ES256")
                     .setIssuer(teamId)
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1일
+                    .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1시간
                     .setAudience("https://appleid.apple.com")
                     .setSubject(clientId)
                     .signWith(pKey, SignatureAlgorithm.ES256)

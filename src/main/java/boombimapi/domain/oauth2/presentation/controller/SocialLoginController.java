@@ -50,10 +50,15 @@ public class SocialLoginController {
     }
 
     // Apple의 경우 POST 방식 콜백 지원 아직 미정
-    @PostMapping("/login/apple")
+    @PostMapping("/callback/apple")
     public ResponseEntity<LoginToken> appleLogin(@RequestParam("code") String code) {
         log.info("Apple 로그인: code={}", code);
         LoginToken loginToken = socialLoginService.login(SocialProvider.APPLE, code);
+
+        log.info("✅✅ACToken={}", loginToken.accessToken());
+        System.out.println();
+        log.info("✅✅RFToken={}", loginToken.refreshToken());
+
         return ResponseEntity.ok(loginToken);
     }
 }
