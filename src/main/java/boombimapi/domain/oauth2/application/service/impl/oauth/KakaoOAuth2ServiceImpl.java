@@ -5,6 +5,8 @@ import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.infra.feignclient.kakao.KakaoOAuth2URLFeignClient;
 import boombimapi.global.infra.feignclient.kakao.KakaoOAuth2UserFeignClient;
 import jakarta.transaction.Transactional;
@@ -63,7 +65,7 @@ public class KakaoOAuth2ServiceImpl implements OAuth2Service {
             return kakaoOAuth2UserFeignClient.getUserInfo("Bearer " + accessToken);
         } catch (Exception e) {
             log.error("카카오 사용자 정보 조회 실패: {}", e.getMessage());
-            throw new RuntimeException("카카오 사용자 정보 조회에 실패했습니다", e);
+            throw new BoombimException(ErrorCode.INVALID_PROVIDER);
         }
     }
 
@@ -90,6 +92,7 @@ public class KakaoOAuth2ServiceImpl implements OAuth2Service {
         return new KakaoTokenResponse(
                 tokenRequest.accessToken(),
                 tokenRequest.refreshToken(),
+                "idnull",
                 tokenRequest.expiresIn()
         );
     }

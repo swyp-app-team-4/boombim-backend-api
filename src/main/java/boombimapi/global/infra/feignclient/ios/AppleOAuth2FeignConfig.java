@@ -1,5 +1,7 @@
 package boombimapi.global.infra.feignclient.ios;
 
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import feign.Logger;
 import feign.Request;
 import feign.codec.ErrorDecoder;
@@ -41,11 +43,11 @@ public class AppleOAuth2FeignConfig {
                     methodKey, response.status(), response.reason());
 
             if (response.status() == 400) {
-                return new RuntimeException("Apple OAuth2 잘못된 요청: " + response.reason());
+                throw new BoombimException(ErrorCode.APPLE_JWT_ERROR);
             } else if (response.status() == 401) {
-                return new RuntimeException("Apple OAuth2 인증 실패: " + response.reason());
+                throw new BoombimException(ErrorCode.APPLE_JWT_ERROR);
             } else if (response.status() >= 500) {
-                return new RuntimeException("Apple 서버 오류: " + response.reason());
+                throw new BoombimException(ErrorCode.APPLE_JWT_ERROR);
             }
 
             return defaultErrorDecoder.decode(methodKey, response);

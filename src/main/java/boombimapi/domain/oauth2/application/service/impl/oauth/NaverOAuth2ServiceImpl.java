@@ -7,6 +7,8 @@ import boombimapi.domain.oauth2.presentation.dto.res.naver.NaverTokenResponse;
 import boombimapi.domain.oauth2.presentation.dto.res.naver.NaverUserResponse;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.infra.feignclient.naver.NaverOAuth2URLFeignClient;
 import boombimapi.global.infra.feignclient.naver.NaverOAuth2UserFeignClient;
 import jakarta.transaction.Transactional;
@@ -58,6 +60,7 @@ public class NaverOAuth2ServiceImpl implements OAuth2Service {
         return new KakaoTokenResponse(
                 naverResponse.accessToken(),
                 naverResponse.refreshToken(),
+                "idnull",
                 naverResponse.expiresIn()
         );
     }
@@ -71,6 +74,7 @@ public class NaverOAuth2ServiceImpl implements OAuth2Service {
         return new KakaoTokenResponse(
                 naverResponse.accessToken(),
                 naverResponse.refreshToken(),
+                "idnull",
                 naverResponse.expiresIn()
         );
     }
@@ -82,7 +86,7 @@ public class NaverOAuth2ServiceImpl implements OAuth2Service {
             return naverUser.toOAuth2UserResponse();
         } catch (Exception e) {
             log.error("네이버 사용자 정보 조회 실패: {}", e.getMessage());
-            throw new RuntimeException("네이버 사용자 정보 조회에 실패했습니다", e);
+            throw new BoombimException(ErrorCode.INVALID_PROVIDER);
         }
     }
 
@@ -109,6 +113,7 @@ public class NaverOAuth2ServiceImpl implements OAuth2Service {
         return new KakaoTokenResponse(
                 tokenRequest.accessToken(),
                 tokenRequest.refreshToken(),
+                "idnull",
                 tokenRequest.expiresIn()
         );
     }

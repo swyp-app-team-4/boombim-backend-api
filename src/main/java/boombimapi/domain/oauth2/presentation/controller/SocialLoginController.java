@@ -55,4 +55,13 @@ public class SocialLoginController {
         LoginToken loginToken = socialLoginService.login(provider, code);
         return ResponseEntity.ok(loginToken);
     }
+
+    @Operation(summary = "소셜 로그인 콜백 (테스트용)", description = "테스트용 콜백 API")
+    @PostMapping("/callback/apple")
+    public ResponseEntity<LoginToken> socialAppleLogin(
+            @RequestParam("code") String code) {
+
+        LoginToken loginToken = socialLoginService.login(SocialProvider.APPLE, code);
+        return ResponseEntity.ok(loginToken);
+    }
 }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -77,7 +78,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
             userResponse = oauth2Service.getUserInfoFromIdToken(tokenRequest.idToken());
         } else {
             // 다른 플랫폼은 Access Token으로 사용자 정보 조회
-            userResponse = oauth2Service.getUserInfo(tokenRequest.accessToken());
+            userResponse = oauth2Service.getUserInfo(tokenRequest.idToken());
         }
 
         log.info("사용자 정보 획득 완료: userId={}, provider={}", userResponse.id(), provider);
@@ -160,7 +161,14 @@ public class SocialLoginServiceImpl implements SocialLoginService {
 
         User user = userRepository.findById(userResponse.id()).orElse(null);
 
+
         if (user == null) {
+            Optional<User> existingUserByEmail = userRepository.findByEmail(userResponse.getEmail());
+            if (existingUserByEmail.isPresent()) {
+                log.error("이미 사용 중인 이메일입니다: {}", userResponse.getEmail());
+                throw new BoombimException(ErrorCode.DUPLICATE_EMAIL);
+            }
+
             log.info("신규 {} 사용자 생성: {}", provider, userResponse.getName());
             user = User.builder()
                     .id(userResponse.id())
@@ -172,6 +180,13 @@ public class SocialLoginServiceImpl implements SocialLoginService {
                     .build();
             userRepository.save(user);
         } else {
+            if (!user.getEmail().equals(userResponse.getEmail())) {
+                Optional<User> existingUserByEmail = userRepository.findByEmail(userResponse.getEmail());
+                if (existingUserByEmail.isPresent() && !existingUserByEmail.get().getId().equals(user.getId())) {
+                    log.error("변경하려는 이메일이 이미 사용 중입니다: {}", userResponse.getEmail());
+                    throw new BoombimException(ErrorCode.DUPLICATE_EMAIL);
+                }
+            }
             log.info("기존 {} 사용자 정보 업데이트: {}", provider, userResponse.getName());
             user.updateEmailAndProfile(userResponse.getEmail(), userResponse.getProfile());
         }

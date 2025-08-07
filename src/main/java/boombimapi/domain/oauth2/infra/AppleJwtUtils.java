@@ -67,7 +67,7 @@ public class AppleJwtUtils {
             return keyFactory.generatePrivate(spec);
         } catch (Exception e) {
             log.error("Apple Private Key 파싱 실패", e);
-            throw new Exception("Private key parsing failed", e);
+            throw new BoombimException(ErrorCode.APPLE_ERROR_KEY);
         }
     }
 }
