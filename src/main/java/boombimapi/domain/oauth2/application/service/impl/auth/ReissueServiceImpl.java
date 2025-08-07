@@ -1,22 +1,17 @@
 package boombimapi.domain.oauth2.application.service.impl.auth;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
-import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.JsonWebToken;
 import boombimapi.global.jwt.domain.repository.JsonWebTokenRepository;
 import boombimapi.global.jwt.util.JWTUtil;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

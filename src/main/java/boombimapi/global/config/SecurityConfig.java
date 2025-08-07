@@ -37,8 +37,8 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/favicon.ico",
             "/api/reissue",
-            "/api/oauth2/login/**",
-            "/api/oauth2/callback/**",
+            "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
+            "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
             "/api/oauth2/logout",
             "/api/healthcheck"
     );
@@ -67,8 +67,8 @@ public class SecurityConfig {
                 }))
                 .authorizeHttpRequests((url) -> url
                         .requestMatchers("/api/healthcheck").permitAll()
-                        .requestMatchers("/api/oauth2/login/**").permitAll()
-                        .requestMatchers("/api/oauth2/callback/**").permitAll()
+                        .requestMatchers("/api/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
+                        .requestMatchers("/api/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
                         .requestMatchers("/api/oauth2/logout").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
@@ -82,7 +82,6 @@ public class SecurityConfig {
                         ))
                 .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
                 .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }

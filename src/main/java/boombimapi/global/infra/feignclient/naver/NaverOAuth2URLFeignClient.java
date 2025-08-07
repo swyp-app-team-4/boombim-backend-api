@@ -1,6 +1,6 @@
 package boombimapi.global.infra.feignclient.naver;
 
-import boombimapi.domain.oauth2.presentation.dto.response.naver.NaverTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.naver.NaverTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

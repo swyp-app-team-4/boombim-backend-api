@@ -1,7 +1,7 @@
 package boombimapi.domain.oauth2.application.service.impl;
 
 import boombimapi.domain.oauth2.application.service.CreateAccessTokenAndRefreshTokenService;
-import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.global.jwt.domain.entity.JsonWebToken;
 import boombimapi.global.jwt.domain.repository.JsonWebTokenRepository;
@@ -10,8 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

@@ -1,6 +1,6 @@
 package boombimapi.global.infra.feignclient.kakao;
 
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

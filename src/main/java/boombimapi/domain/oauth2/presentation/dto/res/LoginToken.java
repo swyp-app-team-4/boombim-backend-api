@@ -1,4 +1,4 @@
-package boombimapi.domain.oauth2.presentation.dto.response;
+package boombimapi.domain.oauth2.presentation.dto.res;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

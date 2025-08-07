@@ -4,9 +4,10 @@ import boombimapi.domain.oauth2.application.service.CreateAccessTokenAndRefreshT
 import boombimapi.domain.oauth2.application.service.OAuth2Service;
 import boombimapi.domain.oauth2.application.service.SocialLoginService;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
-import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
+import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
+import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
 import boombimapi.domain.user.domain.entity.Role;
 import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.user.domain.repository.UserRepository;
@@ -59,23 +60,63 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     }
 
     @Override
-    public LoginToken login(SocialProvider provider, String code) {
+    public LoginToken loginWithToken(SocialProvider provider, SocialTokenRequest tokenRequest) {
         OAuth2Service oauth2Service = getOAuth2Service(provider);
 
-        // 1. Authorization Code로 토큰 획득
-        KakaoTokenResponse tokenResponse = oauth2Service.getTokens(code);
-        log.info("토큰 획득 완료: provider={}", provider);
+        log.info("소셜 토큰으로 로그인 시작: provider={}", provider);
+
+        // 1. 토큰 검증
+        if (!oauth2Service.validateToken(tokenRequest.accessToken())) {
+            throw new BoombimException(ErrorCode.INVALID_PARAMETER, "유효하지 않은 액세스 토큰입니다");
+        }
 
         // 2. 사용자 정보 획득
-        // Apple의 경우 getTokens()에서 이미 ThreadLocal에 AppleTokenResponse가 저장됨
-        // getUserInfo()에서 ThreadLocal의 idToken을 사용하여 사용자 정보 파싱
+        KakaoUserResponse userResponse;
+        if (provider == SocialProvider.APPLE && tokenRequest.idToken() != null) {
+            // Apple의 경우 ID Token으로 사용자 정보 파싱
+            userResponse = oauth2Service.getUserInfoFromIdToken(tokenRequest.idToken());
+        } else {
+            // 다른 플랫폼은 Access Token으로 사용자 정보 조회
+            userResponse = oauth2Service.getUserInfo(tokenRequest.accessToken());
+        }
+
+        log.info("사용자 정보 획득 완료: userId={}, provider={}", userResponse.id(), provider);
+
+        // 3. 토큰 정보를 KakaoTokenResponse 형태로 변환
+        KakaoTokenResponse tokenResponse = oauth2Service.convertToTokenResponse(tokenRequest);
+
+        // 4. 사용자 생성 또는 업데이트
+        User user = createSocialUser(provider, tokenResponse, userResponse);
+
+        // 5. JWT 토큰 생성 및 반환
+        return tokenService.createAccessTokenAndRefreshToken(
+                user.getId(),
+                user.getRole(),
+                user.getEmail()
+        );
+    }
+
+    @Override
+    public LoginToken login(SocialProvider provider, String code) {
+        // 기존 Authorization Code Flow 방식 (테스트용)
+        OAuth2Service oauth2Service = getOAuth2Service(provider);
+
+        KakaoTokenResponse tokenResponse = oauth2Service.getTokens(code);
+        log.info("====== 소셜에서 받은 토큰 정보 ======");
+        log.info("Access Token: {}", tokenResponse.accessToken());
+        log.info("Refresh Token: {}", tokenResponse.refreshToken());
+        log.info("Expires In: {}", tokenResponse.expiresIn());
+        log.info("===================================");
+
+
+        log.info("토큰 획득 완료: provider={}", provider);
+
+
         KakaoUserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
         log.info("사용자 정보 획득 완료: userId={}, provider={}", userResponse.id(), provider);
 
-        // 3. 사용자 생성 또는 업데이트
         User user = createSocialUser(provider, tokenResponse, userResponse);
 
-        // 4. JWT 토큰 생성 및 반환
         return tokenService.createAccessTokenAndRefreshToken(
                 user.getId(),
                 user.getRole(),
@@ -140,7 +181,9 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     }
 
     private void saveSocialToken(String userId, SocialProvider provider, KakaoTokenResponse tokenResponse) {
-        LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.expiresIn());
+        LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(
+                tokenResponse.expiresIn() != null ? tokenResponse.expiresIn() : 3600L
+        );
 
         SocialToken socialToken = SocialToken.builder()
                 .id(SocialToken.generateId(userId, provider))

@@ -1,4 +1,4 @@
-package boombimapi.domain.oauth2.presentation.dto.response.apple;
+package boombimapi.domain.oauth2.presentation.dto.res.apple;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
