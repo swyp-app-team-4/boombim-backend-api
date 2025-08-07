@@ -50,14 +50,6 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERFILE_USERNAME }}/${{ secrets.DOCKERFILE_REPO_NAME }}:latest
 
-      # (8.5) SSH 디버깅 - -vvv로 접속 로그 확인
-      - name: 🔍 SSH Deep Debug with -vvv
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh -vvv -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} echo "✅ SSH 연결 성공"
-
       # (9) NCP 인스턴스에 boombim 디렉토리 생성
       - name: Create directory on NCP Instance
         uses: appleboy/ssh-action@master
