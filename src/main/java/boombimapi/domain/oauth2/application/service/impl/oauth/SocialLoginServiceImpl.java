@@ -78,7 +78,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
             userResponse = oauth2Service.getUserInfoFromIdToken(tokenRequest.idToken());
         } else {
             // 다른 플랫폼은 Access Token으로 사용자 정보 조회
-            userResponse = oauth2Service.getUserInfo(tokenRequest.idToken());
+            userResponse = oauth2Service.getUserInfo(tokenRequest.accessToken());
         }
 
         log.info("사용자 정보 획득 완료: userId={}, provider={}", userResponse.id(), provider);
