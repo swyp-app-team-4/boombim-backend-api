@@ -1,6 +1,6 @@
-package boombimapi.domain.oauth2.presentation.dto.response.naver;
+package boombimapi.domain.oauth2.presentation.dto.res.naver;
 
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 public record NaverUserResponse(
         @JsonProperty("resultcode") String resultCode,

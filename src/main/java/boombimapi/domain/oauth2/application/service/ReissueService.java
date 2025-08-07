@@ -1,10 +1,6 @@
 package boombimapi.domain.oauth2.application.service;
 
-import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.Map;
+import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 
 public interface ReissueService {
     LoginToken reissue(String refreshToken);

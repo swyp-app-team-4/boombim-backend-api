@@ -32,8 +32,11 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
+        String method = request.getMethod();
 
-        if (requestURI.contains("/api/oauth2/login")) {
+        // 소셜 로그인 요청에 대한 중복 로그인 체크
+        if ((requestURI.contains("/api/oauth2/login") && "POST".equals(method)) ||
+                (requestURI.contains("/api/oauth2/callback"))) {
             String accessToken = jwtUtil.getAccessTokenFromHeaders(request);
             if (accessToken != null && jwtUtil.jwtVerify(accessToken, "access")) {
                 throw new BoombimException(ErrorCode.DUPLICATE_LOGIN_NOT_EXIST);
@@ -43,7 +46,7 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
         }
 
         String accessToken = jwtUtil.getAccessTokenFromHeaders(request);
-        log.info(accessToken);
+        log.debug("Access Token: {}", accessToken);
 
         if (accessToken == null || accessToken.equals("undefined") || accessToken.equals("null")) {
             filterChain.doFilter(request, response);
@@ -55,16 +58,15 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
         }
 
         String userId = jwtUtil.getId(accessToken);
-        log.info(userId);
+        log.debug("User ID: {}", userId);
         Role role = jwtUtil.getRole(accessToken);
 
         GrantedAuthority authority = new SimpleGrantedAuthority(role.getKey());
-        log.info(role.getKey());
+        log.debug("User Role: {}", role.getKey());
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, Collections.singleton(authority));
-        log.info(role.name());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info("인증 설정 완료: {}", SecurityContextHolder.getContext().getAuthentication());
+        log.debug("인증 설정 완료: {}", SecurityContextHolder.getContext().getAuthentication());
         filterChain.doFilter(request, response);
     }
 

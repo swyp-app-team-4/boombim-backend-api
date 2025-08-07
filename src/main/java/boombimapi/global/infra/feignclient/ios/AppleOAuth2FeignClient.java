@@ -1,6 +1,6 @@
 package boombimapi.global.infra.feignclient.ios;
 
-import boombimapi.domain.oauth2.presentation.dto.response.apple.AppleTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.apple.AppleTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

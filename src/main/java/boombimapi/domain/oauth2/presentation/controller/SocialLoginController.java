@@ -2,17 +2,14 @@ package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.SocialLoginService;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
-import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
+import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api/oauth2")
@@ -23,8 +20,7 @@ public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
 
-
-    @Operation(summary = "소셜 로그인 URL 조회", description = "각 플랫폼별 소셜 로그인 URL을 반환합니다.")
+    @Operation(summary = "소셜 로그인 URL 조회", description = "각 플랫폼별 소셜 로그인 URL을 반환합니다. (테스트용)")
     @GetMapping("/login/{provider}")
     public ResponseEntity<String> getLoginUrl(@PathVariable SocialProvider provider) {
         log.info("소셜 로그인 URL 요청: {}", provider);
@@ -32,33 +28,40 @@ public class SocialLoginController {
         return ResponseEntity.ok(loginUrl);
     }
 
-    @Operation(summary = "소셜 로그인 콜백", description = "각 플랫폼에서 Authorization Code를 받아 로그인을 처리합니다.")
+    @Operation(summary = "소셜 토큰으로 로그인", description = "앱에서 받은 소셜 토큰으로 로그인을 처리합니다.")
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<LoginToken> socialLoginWithToken(
+            @PathVariable SocialProvider provider,
+            @RequestBody SocialTokenRequest request) {
+
+        log.info("소셜 토큰 로그인: provider={}", provider);
+
+        LoginToken loginToken = socialLoginService.loginWithToken(provider, request);
+
+        log.info("✅✅ACToken={}", loginToken.accessToken());
+        log.info("✅✅RFToken={}", loginToken.refreshToken());
+
+        return ResponseEntity.ok(loginToken);
+    }
+
+    // 기존 콜백 방식은 테스트용으로 유지 (필요시 제거 가능)
+    @Operation(summary = "소셜 로그인 콜백 (테스트용)", description = "테스트용 콜백 API")
     @GetMapping("/callback/{provider}")
     public ResponseEntity<LoginToken> socialLogin(
             @PathVariable SocialProvider provider,
             @RequestParam("code") String code) {
 
         log.info("소셜 로그인: provider={}, code={}", provider, code);
-
         LoginToken loginToken = socialLoginService.login(provider, code);
-
-        log.info("✅✅ACToken={}", loginToken.accessToken());
-        System.out.println();
-        log.info("✅✅RFToken={}", loginToken.refreshToken());
-
         return ResponseEntity.ok(loginToken);
     }
 
-    // Apple의 경우 POST 방식 콜백 지원 아직 미정
+    @Operation(summary = "소셜 로그인 콜백 (테스트용)", description = "테스트용 콜백 API")
     @PostMapping("/callback/apple")
-    public ResponseEntity<LoginToken> appleLogin(@RequestParam("code") String code) {
-        log.info("Apple 로그인: code={}", code);
+    public ResponseEntity<LoginToken> socialAppleLogin(
+            @RequestParam("code") String code) {
+
         LoginToken loginToken = socialLoginService.login(SocialProvider.APPLE, code);
-
-        log.info("✅✅ACToken={}", loginToken.accessToken());
-        System.out.println();
-        log.info("✅✅RFToken={}", loginToken.refreshToken());
-
         return ResponseEntity.ok(loginToken);
     }
 }

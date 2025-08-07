@@ -3,9 +3,12 @@ package boombimapi.domain.oauth2.application.service.impl.oauth;
 import boombimapi.domain.oauth2.application.service.OAuth2Service;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.oauth2.infra.AppleJwtUtils;
-import boombimapi.domain.oauth2.presentation.dto.response.apple.AppleTokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoTokenResponse;
-import boombimapi.domain.oauth2.presentation.dto.response.oatuh.KakaoUserResponse;
+import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
+import boombimapi.domain.oauth2.presentation.dto.res.apple.AppleTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
+import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.infra.feignclient.ios.AppleOAuth2FeignClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +30,6 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
     private final AppleOAuth2FeignClient appleOAuth2FeignClient;
     private final AppleJwtUtils appleJwtUtils;
     private final ObjectMapper objectMapper;
-
-    // Apple 토큰 응답을 저장할 ThreadLocal 변수
-    private final ThreadLocal<AppleTokenResponse> currentAppleTokenResponse = new ThreadLocal<>();
 
     @Value("${oauth2.apple.client-id}")
     private String clientId;
@@ -57,17 +57,21 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
                 "authorization_code", clientId, clientSecret, code, redirectUri
         );
 
-        // Apple 토큰 응답을 ThreadLocal에 저장
-        currentAppleTokenResponse.set(appleResponse);
+        log.info("====== Apple 토큰 정보 ======");
+        log.info("Access Token: {}", appleResponse.accessToken());
+        log.info("Refresh Token: {}", appleResponse.refreshToken());
+        log.info("ID Token: {}", appleResponse.idToken());
+        log.info("Expires In: {}", appleResponse.expiresIn());
+        log.info("=============================");
 
         log.info("Apple 토큰 응답 수신 완료");
         log.debug("Access Token 존재: {}", appleResponse.accessToken() != null);
         log.debug("ID Token 존재: {}", appleResponse.idToken() != null);
-        log.debug("ID Token 길이: {}", appleResponse.idToken() != null ? appleResponse.idToken().length() : 0);
 
         return new KakaoTokenResponse(
                 appleResponse.accessToken(),
                 appleResponse.refreshToken(),
+                appleResponse.idToken(),
                 appleResponse.expiresIn()
         );
     }
@@ -83,27 +87,45 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
         return new KakaoTokenResponse(
                 appleResponse.accessToken(),
                 appleResponse.refreshToken(),
+                appleResponse.idToken(),
                 appleResponse.expiresIn()
         );
     }
 
     @Override
     public KakaoUserResponse getUserInfo(String accessToken) {
-        // ThreadLocal에서 저장된 Apple 토큰 응답 가져오기
-        AppleTokenResponse appleTokenResponse = currentAppleTokenResponse.get();
+        // Apple의 경우 Access Token으로는 사용자 정보를 가져올 수 없음
+        // ID Token을 사용해야 함
+        throw new BoombimException(ErrorCode.ID_ERROR_TOKEN);
+    }
 
-        if (appleTokenResponse == null || appleTokenResponse.idToken() == null) {
-            log.error("Apple ID Token이 없습니다. ThreadLocal에서 AppleTokenResponse를 찾을 수 없음");
-            throw new RuntimeException("Apple ID Token을 찾을 수 없습니다");
-        }
-
+    @Override
+    public KakaoUserResponse getUserInfoFromIdToken(String idToken) {
         try {
             log.info("Apple ID Token 파싱 시작");
-            return parseIdToken(appleTokenResponse.idToken());
-        } finally {
-            // ThreadLocal 정리
-            currentAppleTokenResponse.remove();
+            return parseIdToken(idToken);
+        } catch (Exception e) {
+            log.error("", e);
+            throw new BoombimException(ErrorCode.ID_ERROR_TOKEN);
         }
+    }
+
+    @Override
+    public boolean validateToken(String accessToken) {
+        // Apple의 경우 Access Token 검증은 복잡하므로 기본적으로 true 반환
+        // 실제로는 ID Token의 유효성을 검증해야 함
+        log.warn("Apple Access Token 검증은 구현되지 않았습니다. ID Token 검증을 사용하세요.");
+        return accessToken != null && !accessToken.trim().isEmpty();
+    }
+
+    @Override
+    public KakaoTokenResponse convertToTokenResponse(SocialTokenRequest tokenRequest) {
+        return new KakaoTokenResponse(
+                tokenRequest.accessToken(),
+                tokenRequest.refreshToken(),
+                tokenRequest.idToken(),
+                tokenRequest.expiresIn()
+        );
     }
 
     @Override
@@ -116,7 +138,7 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
             log.debug("파싱할 ID Token 길이: {}", idToken != null ? idToken.length() : "null");
 
             if (idToken == null || idToken.trim().isEmpty()) {
-                throw new RuntimeException("ID Token이 null이거나 비어있습니다");
+                throw new BoombimException(ErrorCode.ID_ERROR_TOKEN);
             }
 
             // JWT의 payload 부분을 디코딩
@@ -125,8 +147,7 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
 
             if (tokenParts.length != 3) {
                 log.error("JWT 토큰 형식이 잘못됨. 파트 개수: {}", tokenParts.length);
-                log.debug("토큰 앞부분: {}", idToken.length() > 100 ? idToken.substring(0, 100) + "..." : idToken);
-                throw new RuntimeException("Invalid JWT token format - expected 3 parts but got " + tokenParts.length);
+                throw new BoombimException(ErrorCode.JWT_ERROR_TOKEN);
             }
 
             // Base64 URL 디코딩으로 payload 추출
@@ -143,10 +164,9 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
                 byte[] decodedBytes = Base64.getUrlDecoder().decode(payloadPart);
                 payload = new String(decodedBytes, StandardCharsets.UTF_8);
                 log.debug("디코딩된 페이로드 길이: {}", payload.length());
-                log.debug("디코딩된 페이로드 일부: {}", payload.length() > 200 ? payload.substring(0, 200) + "..." : payload);
             } catch (Exception e) {
                 log.error("Base64 디코딩 실패", e);
-                throw new RuntimeException("Base64 decoding failed", e);
+                throw new BoombimException(ErrorCode.ID_ERROR_TOKEN);
             }
 
             // Jackson을 사용하여 JSON 파싱
@@ -168,7 +188,7 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
 
             if (sub == null) {
                 log.error("Apple User ID (sub)가 클레임에 없습니다. 사용 가능한 클레임: {}", claims.fieldNames());
-                throw new RuntimeException("Apple User ID (sub)가 없습니다");
+                throw new BoombimException(ErrorCode.ID_ERROR_TOKEN);
             }
 
             log.info("Apple 사용자 정보 파싱 완료: userId={}, email={}, name={}", sub, email, name);
@@ -185,7 +205,7 @@ public class AppleOAuth2ServiceImpl implements OAuth2Service {
             );
         } catch (Exception e) {
             log.error("Apple ID Token 파싱 실패", e);
-            throw new RuntimeException("Apple ID Token parsing failed: " + e.getMessage(), e);
+            throw new BoombimException(ErrorCode.ID_ERROR_TOKEN);
         }
     }
 }

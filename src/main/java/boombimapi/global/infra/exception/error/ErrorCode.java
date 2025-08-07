@@ -35,6 +35,8 @@ public enum ErrorCode {
     //Auth
     UNAUTHORIZED(-200, "인증 자격이 없습니다.", 401),
     FORBIDDEN(-201, "권한이 없습니다.", 403),
+    ID_ERROR_TOKEN(-202, "잘못된 ID 토큰입니다.", 401),
+    APPLE_ERROR_KEY(-202, "키 파싱 실패입니다.", 401),
     JWT_ERROR_TOKEN(-202, "잘못된 토큰입니다.", 401),
     JWT_EXPIRE_TOKEN(-203, "만료된 토큰입니다.", 401),
     AUTHORIZED_ERROR(-204, "인증 과정 중 에러가 발생했습니다.", 500),
@@ -52,7 +54,7 @@ public enum ErrorCode {
     // user
     INVALID_ROLE(-210, "해당 역할이 존재하지 않습니다.", 400),
     USER_NOT_EXIST(-211, "존재하지 않는 유저입니다.", 404),
-    ALLERGY_NOT_EXIST(-212, "존재하지 않는 필드입니다.", 400);
+    DUPLICATE_EMAIL(-213, "이미 사용 중인 이메일입니다.", 409);
 
 
     private final int code;

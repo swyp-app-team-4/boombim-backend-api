@@ -1,4 +1,4 @@
-package boombimapi.domain.oauth2.presentation.dto.response.naver;
+package boombimapi.domain.oauth2.presentation.dto.res.naver;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

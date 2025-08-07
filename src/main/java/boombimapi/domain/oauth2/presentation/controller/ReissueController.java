@@ -1,7 +1,7 @@
 package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
-import boombimapi.domain.oauth2.presentation.dto.response.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
