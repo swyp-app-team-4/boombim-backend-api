@@ -3,7 +3,7 @@ name: boombimapi CI/CD
 on:
   push:
     branches:
-      - feat#3
+      - dev
 
 jobs:
   build-and-deploy:
