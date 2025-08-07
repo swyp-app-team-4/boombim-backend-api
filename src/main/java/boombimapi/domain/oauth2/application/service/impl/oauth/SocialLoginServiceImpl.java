@@ -66,9 +66,13 @@ public class SocialLoginServiceImpl implements SocialLoginService {
 
         log.info("소셜 토큰으로 로그인 시작: provider={}", provider);
 
-        // 1. 토큰 검증
-        if (!oauth2Service.validateToken(tokenRequest.accessToken())) {
-            throw new BoombimException(ErrorCode.INVALID_PARAMETER, "유효하지 않은 액세스 토큰입니다");
+        // Apple일 경우 idToken 검증, 나머지는 accessToken 검증
+        boolean isValidToken = (provider == SocialProvider.APPLE)
+                ? oauth2Service.validateToken(tokenRequest.idToken())
+                : oauth2Service.validateToken(tokenRequest.accessToken());
+
+        if (!isValidToken) {
+            throw new BoombimException(ErrorCode.INVALID_PARAMETER, "유효하지 않은 토큰입니다");
         }
 
         // 2. 사용자 정보 획득
