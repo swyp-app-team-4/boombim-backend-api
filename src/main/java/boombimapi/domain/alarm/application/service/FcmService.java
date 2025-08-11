@@ -1,6 +1,7 @@
 package boombimapi.domain.alarm.application.service;
 
 
+import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.user.domain.entity.User;
@@ -38,7 +39,7 @@ public interface FcmService {
      * @param body 알림 내용
      * @return 전송 결과 (성공/실패 건수 포함)
      */
-    CompletableFuture<AlarmSendResult> sendNotificationToAll(String title, String body);
+    CompletableFuture<AlarmSendResult> sendNotificationToAll(String title, String body, Alarm alarm);
 
     /**
      * 오래된 비활성 토큰 정리

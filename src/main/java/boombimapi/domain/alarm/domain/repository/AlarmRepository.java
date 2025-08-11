@@ -16,8 +16,6 @@ import java.util.List;
 @Repository
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
-    // 관리자별 알림 조회
-    Page<Alarm> findBySenderUserIdOrderByCreatedAtDesc(String senderUserId, Pageable pageable);
 
     // 상태별 알림 조회
     List<Alarm> findByStatus(AlarmStatus status);

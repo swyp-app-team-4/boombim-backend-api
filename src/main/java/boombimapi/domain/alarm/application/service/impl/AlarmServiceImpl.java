@@ -4,14 +4,17 @@ package boombimapi.domain.alarm.application.service.impl;
 import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
+import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
+import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
+import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
-
+import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
 import boombimapi.domain.user.domain.entity.User;
@@ -27,6 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -38,6 +43,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final AlarmRepository alarmRepository;
     private final UserRepository userRepository;
     private final FcmService fcmService;
+    private final AlarmRecipientRepository alarmRecipientRepository;
 
     /**
      * 관리자가 알림 전송
@@ -45,8 +51,8 @@ public class AlarmServiceImpl implements AlarmService {
     @Async
     @Override
     public CompletableFuture<SendAlarmResponse> sendAlarm(String senderUserId, SendAlarmRequest request) {
-        log.info("알림 전송 요청: 발신자={}, 타입={}, 대상={}",
-                senderUserId, request.type(), request.targetUserId());
+        log.info("알림 전송 요청: 발신자={}, 타입={}",
+                senderUserId, request.type());
 
         // 발신자가 관리자인지 확인
         User sender = userRepository.findById(senderUserId)
@@ -63,8 +69,7 @@ public class AlarmServiceImpl implements AlarmService {
                 .title(request.title())
                 .message(request.message())
                 .type(request.type())
-                .senderUserId(senderUserId)
-                .targetUserId(request.targetUserId())
+                .sender(sender)
                 .build();
 
         Alarm savedAlarm = alarmRepository.save(alarm);
@@ -75,23 +80,28 @@ public class AlarmServiceImpl implements AlarmService {
         try {
             savedAlarm.updateStatus(AlarmStatus.SENDING);
 
-            if (request.targetUserId() != null) {
-                // 특정 사용자에게 전송
-                boolean success = fcmService.sendNotificationToUser(
-                        request.targetUserId(),
-                        request.title(),
-                        request.message()
-                );
-                sendResult = success ?
-                        new AlarmSendResult(1, 0, java.util.List.of()) :
-                        new AlarmSendResult(0, 1, java.util.List.of());
-            } else {
-                // 전체 사용자에게 전송
-                sendResult = fcmService.sendNotificationToAll(
-                        request.title(),
-                        request.message()
-                ).get(); // 비동기 결과 대기
-            }
+            /*** 단일 사용자인데 나중에 쓸 곳 있을거 같아서 빼겠음
+             *             if (request.targetUserId() != null) {
+             *                 // 특정 사용자에게 전송
+             *                 boolean success = fcmService.sendNotificationToUser(
+             *                         request.targetUserId(),
+             *                         request.title(),
+             *                         request.message()
+             *                 );
+             *                 sendResult = success ?
+             *                         new AlarmSendResult(1, 0, java.util.List.of()) :
+             *                         new AlarmSendResult(0, 1, java.util.List.of());
+             *             }
+             */
+
+
+            // 전체 사용자에게 전송
+            sendResult = fcmService.sendNotificationToAll(
+                    request.title(),
+                    request.message(),
+                    alarm
+            ).get(); // 비동기 결과 대기
+
 
             // 전송 결과 업데이트
             if (sendResult.failureCount() == 0) {
@@ -148,30 +158,29 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     /**
-     * 알림 내역 조회 (관리자용)
+     * 알림 내역 조회
      */
     @Override
-    public PagedAlarmHistoryResponse getAlarmHistory(String userId, GetAlarmHistoryRequest request) {
+    public List<HistoryResponse> getAlarmHistory(String userId, GetAlarmHistoryRequest req) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        if (!isAdmin(user)) {
-            throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
+        /*** // 나중에 관리자 권함 추가
+         *         if (!isAdmin(user)) {
+         *             throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
+         *         }
+         */
+
+
+        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByUserAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(req.deviceType()));
+
+        List<HistoryResponse> result = new ArrayList<>();
+
+        for (AlarmRecipient alarmHistory : alarmHistores) {
+            result.add(new HistoryResponse(alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getMessage(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus()));
         }
 
-        Pageable pageable = PageRequest.of(request.page(), request.size());
-        Page<Alarm> alarmPage = alarmRepository.findBySenderUserIdOrderByCreatedAtDesc(userId, pageable);
-
-        return new PagedAlarmHistoryResponse(
-                alarmPage.getContent().stream()
-                        .map(AlarmHistoryResponse::from)
-                        .toList(),
-                alarmPage.getNumber(),
-                alarmPage.getSize(),
-                alarmPage.getTotalPages(),
-                alarmPage.getTotalElements(),
-                alarmPage.isLast()
-        );
+        return result;
     }
 
     /**
@@ -190,11 +199,11 @@ public class AlarmServiceImpl implements AlarmService {
                 .orElseThrow(() -> new BoombimException(ErrorCode.OBJECT_NOT_FOUND, "알림을 찾을 수 없습니다."));
 
         // 본인이 발송한 알림인지 확인
-        if (!alarm.getSenderUserId().equals(userId)) {
+        if (!alarm.getSender().equals(user)) {
             throw new BoombimException(ErrorCode.FORBIDDEN, "해당 알림에 대한 권한이 없습니다.");
         }
 
-        return AlarmHistoryResponse.from(alarm);
+        return AlarmHistoryResponse.of(alarm);
     }
 
     /**

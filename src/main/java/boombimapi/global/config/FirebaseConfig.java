@@ -10,8 +10,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 
 @Configuration
 @Slf4j
@@ -21,23 +23,23 @@ public class FirebaseConfig {
     private String serviceAccountKey;
 
     @Bean
-    public FirebaseApp firebaseApp() throws IOException {
+    public FirebaseApp firebaseApp() throws Exception {
         if (FirebaseApp.getApps().isEmpty()) {
-            log.info("Firebase 초기화 시작");
+            log.info("Firebase 초기화 시작 (Base64 env)");
 
-            InputStream serviceAccount = new ClassPathResource(serviceAccountKey).getInputStream();
+            byte[] decoded = Base64.getDecoder().decode(serviceAccountKey.trim());
+            GoogleCredentials credentials =
+                    GoogleCredentials.fromStream(new ByteArrayInputStream(decoded));
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(credentials)
                     .build();
 
             FirebaseApp app = FirebaseApp.initializeApp(options);
             log.info("Firebase 초기화 완료: {}", app.getName());
             return app;
-        } else {
-            log.info("Firebase 이미 초기화됨");
-            return FirebaseApp.getInstance();
         }
+        return FirebaseApp.getInstance();
     }
 
     @Bean

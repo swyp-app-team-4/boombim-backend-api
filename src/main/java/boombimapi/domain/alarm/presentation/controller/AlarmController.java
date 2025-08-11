@@ -1,13 +1,12 @@
 package boombimapi.domain.alarm.presentation.controller;
 
-package boombimapi.domain.alarm.presentation.controller;
 
 import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
-import boombimapi.domain.alarm.presentation.dto.res.PagedAlarmHistoryResponse;
+import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -74,23 +74,14 @@ public class AlarmController {
             @ApiResponse(responseCode = "403", description = "관리자 권한 필요")
     })
     @GetMapping("/history")
-    public ResponseEntity<PagedAlarmHistoryResponse> getAlarmHistory(
+    public ResponseEntity<List<HistoryResponse>> getAlarmHistory(
             @AuthenticationPrincipal String userId,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "20") Integer size,
-            @RequestParam(required = false) String type) {
-
-        GetAlarmHistoryRequest request = new GetAlarmHistoryRequest(
-                page,
-                size,
-                type != null ? boombimapi.domain.alarm.domain.entity.AlarmType.valueOf(type.toUpperCase()) : null
-        );
-
-        PagedAlarmHistoryResponse response = alarmService.getAlarmHistory(userId, request);
-        return ResponseEntity.ok(response);
+            @RequestBody GetAlarmHistoryRequest req
+    ) {
+        return ResponseEntity.ok(alarmService.getAlarmHistory(userId, req));
     }
 
-    @Operation(summary = "알림 상세 조회 (관리자 전용)", description = "특정 알림의 상세 정보를 조회합니다.")
+    @Operation(summary = "[Test]알림 상세 조회 (관리자 전용)", description = "특정 알림의 상세 정보를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
@@ -106,7 +97,7 @@ public class AlarmController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "사용자 FCM 토큰 개수 조회", description = "현재 등록된 FCM 토큰 개수를 조회합니다.")
+    @Operation(summary = "[Test]사용자 FCM 토큰 개수 조회", description = "현재 등록된 FCM 토큰 개수를 조회합니다.")
     @GetMapping("/token-count")
     public ResponseEntity<Integer> getUserTokenCount(@AuthenticationPrincipal String userId) {
         int count = alarmService.getUserTokenCount(userId);

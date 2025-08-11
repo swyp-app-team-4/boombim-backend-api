@@ -4,6 +4,7 @@ package boombimapi.domain.alarm.domain.entity.alarm;
 
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
+import boombimapi.domain.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -21,6 +24,13 @@ public class Alarm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_user_id", nullable = false)
+    private User sender;
+
+    @OneToMany(mappedBy = "alarm", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AlarmRecipient> recipients = new ArrayList<>();
 
     @Column(nullable = false)
     private String title;
@@ -32,11 +42,7 @@ public class Alarm {
     @Column(nullable = false)
     private AlarmType type;
 
-    @Column(nullable = false)
-    private String senderUserId; // 관리자 ID
 
-    @Column(nullable = true)
-    private String targetUserId; // 특정 사용자 대상일 때, null이면 전체 사용자
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,21 +58,17 @@ public class Alarm {
     private String failureReason; // 전송 실패 시 원인
 
     @Builder
-    public Alarm(String title, String message, AlarmType type,
-                 String senderUserId, String targetUserId) {
+    public Alarm(String title, String message, AlarmType type, User sender) {
         this.title = title;
         this.message = message;
         this.type = type;
-        this.senderUserId = senderUserId;
-        this.targetUserId = targetUserId;
+        this.sender = sender;
         this.status = AlarmStatus.PENDING;
     }
 
     public void updateStatus(AlarmStatus status) {
         this.status = status;
-        if (status == AlarmStatus.SENT) {
-            this.sentAt = LocalDateTime.now();
-        }
+        if (status == AlarmStatus.SENT) this.sentAt = LocalDateTime.now();
     }
 
     public void updateFailureReason(String failureReason) {

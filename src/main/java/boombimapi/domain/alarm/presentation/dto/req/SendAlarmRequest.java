@@ -18,9 +18,7 @@ public record SendAlarmRequest(
 
         @Schema(description = "알림 타입", example = "ANNOUNCEMENT")
         @NotNull(message = "알림 타입은 필수입니다")
-        AlarmType type,
+        AlarmType type
 
-        @Schema(description = "특정 사용자 ID (없으면 전체 발송)", example = "user123")
-        String targetUserId
 
 ) {}

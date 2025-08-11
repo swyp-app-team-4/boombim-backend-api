@@ -25,8 +25,6 @@ public record AlarmHistoryResponse(
         @Schema(description = "상태", example = "SENT")
         AlarmStatus status,
 
-        @Schema(description = "대상자 (전체 발송시 null)", example = "user123")
-        String targetUserId,
 
         @Schema(description = "생성 시간")
         LocalDateTime createdAt,
@@ -45,7 +43,6 @@ public record AlarmHistoryResponse(
                 alarm.getMessage(),
                 alarm.getType(),
                 alarm.getStatus(),
-                alarm.getTargetUserId(),
                 alarm.getCreatedAt(),
                 alarm.getSentAt(),
                 alarm.getFailureReason()

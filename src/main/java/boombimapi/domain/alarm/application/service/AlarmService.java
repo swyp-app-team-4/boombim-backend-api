@@ -4,10 +4,11 @@ import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
-import boombimapi.domain.alarm.presentation.dto.res.PagedAlarmHistoryResponse;
+import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -40,7 +41,7 @@ public interface AlarmService {
      * @param request 조회 조건
      * @return 페이징된 알림 내역
      */
-    PagedAlarmHistoryResponse getAlarmHistory(String userId, GetAlarmHistoryRequest request);
+    List<HistoryResponse> getAlarmHistory(String userId, GetAlarmHistoryRequest request);
 
     /**
      * 특정 알림 상세 조회
