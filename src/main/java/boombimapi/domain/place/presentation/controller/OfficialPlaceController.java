@@ -1,10 +1,11 @@
 package boombimapi.domain.place.presentation.controller;
 
+import static boombimapi.global.response.ResponseMessage.*;
+
 import boombimapi.domain.place.application.service.impl.OfficialPlaceServiceImpl;
 import boombimapi.domain.place.presentation.dto.request.Viewport;
 import boombimapi.domain.place.presentation.dto.response.MapMarker;
 import boombimapi.global.response.ApiResponse;
-import boombimapi.global.response.ResponseMessage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class OfficialPlaceController {
         return ResponseEntity.ok(
             ApiResponse.of(
                 HttpStatus.OK,
-                ResponseMessage.GET_ALL_OFFICIAL_PLACES_CENTER_SUCCESS,
+                GET_OFFICIAL_PLACES_WITHIN_VIEWPORT_SUCCESS,
                 officialPlaceService.getMarkersInViewport(viewport)
             )
         );
