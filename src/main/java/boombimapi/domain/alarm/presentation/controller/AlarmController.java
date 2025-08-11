@@ -1,0 +1,115 @@
+package boombimapi.domain.alarm.presentation.controller;
+
+package boombimapi.domain.alarm.presentation.controller;
+
+import boombimapi.domain.alarm.application.service.AlarmService;
+import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
+import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
+import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
+import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
+import boombimapi.domain.alarm.presentation.dto.res.PagedAlarmHistoryResponse;
+import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
+import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
+
+@RestController
+@RequestMapping("/api/alarm")
+@RequiredArgsConstructor
+@Slf4j
+@Tag(name = "Alarm", description = "알림 관련 API")
+public class AlarmController {
+
+    private final AlarmService alarmService;
+
+    @Operation(summary = "FCM 토큰 등록", description = "사용자의 FCM 토큰을 등록합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "토큰 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
+    @PostMapping("/fcm-token")
+    public ResponseEntity<RegisterFcmTokenResponse> registerFcmToken(
+            @AuthenticationPrincipal String userId,
+            @Valid @RequestBody RegisterFcmTokenRequest request) {
+
+        log.info("FCM 토큰 등록 요청: userId={}, deviceType={}", userId, request.deviceType());
+
+        RegisterFcmTokenResponse response = alarmService.registerFcmToken(userId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "알림 전송 (관리자 전용)", description = "관리자가 사용자들에게 알림을 전송합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "알림 전송 시작"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 필요")
+    })
+    @PostMapping("/send")
+    public CompletableFuture<ResponseEntity<SendAlarmResponse>> sendAlarm(
+            @AuthenticationPrincipal String userId,
+            @Valid @RequestBody SendAlarmRequest request) {
+
+        log.info("알림 전송 요청: 관리자={}, 제목={}", userId, request.title());
+
+        return alarmService.sendAlarm(userId, request)
+                .thenApply(ResponseEntity::ok);
+    }
+
+    @Operation(summary = "알림 내역 조회 (관리자 전용)", description = "관리자가 발송한 알림 내역을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 필요")
+    })
+    @GetMapping("/history")
+    public ResponseEntity<PagedAlarmHistoryResponse> getAlarmHistory(
+            @AuthenticationPrincipal String userId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(required = false) String type) {
+
+        GetAlarmHistoryRequest request = new GetAlarmHistoryRequest(
+                page,
+                size,
+                type != null ? boombimapi.domain.alarm.domain.entity.AlarmType.valueOf(type.toUpperCase()) : null
+        );
+
+        PagedAlarmHistoryResponse response = alarmService.getAlarmHistory(userId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "알림 상세 조회 (관리자 전용)", description = "특정 알림의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "알림을 찾을 수 없음")
+    })
+    @GetMapping("/{alarmId}")
+    public ResponseEntity<AlarmHistoryResponse> getAlarmDetail(
+            @AuthenticationPrincipal String userId,
+            @PathVariable Long alarmId) {
+
+        AlarmHistoryResponse response = alarmService.getAlarmDetail(userId, alarmId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "사용자 FCM 토큰 개수 조회", description = "현재 등록된 FCM 토큰 개수를 조회합니다.")
+    @GetMapping("/token-count")
+    public ResponseEntity<Integer> getUserTokenCount(@AuthenticationPrincipal String userId) {
+        int count = alarmService.getUserTokenCount(userId);
+        return ResponseEntity.ok(count);
+    }
+}

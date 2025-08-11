@@ -54,8 +54,15 @@ public enum ErrorCode {
     // user
     INVALID_ROLE(-210, "해당 역할이 존재하지 않습니다.", 400),
     USER_NOT_EXIST(-211, "존재하지 않는 유저입니다.", 404),
-    DUPLICATE_EMAIL(-213, "이미 사용 중인 이메일입니다.", 409);
+    DUPLICATE_EMAIL(-213, "이미 사용 중인 이메일입니다.", 409),
 
+    // Alarm & FCM
+    FCM_TOKEN_REGISTER_FAILED(-300, "FCM 토큰 등록에 실패했습니다.", 500),
+    FCM_SEND_FAILED(-301, "알림 전송에 실패했습니다.", 500),
+    ALARM_NOT_FOUND(-302, "알림을 찾을 수 없습니다.", 404),
+    ALARM_ACCESS_DENIED(-303, "해당 알림에 대한 권한이 없습니다.", 403),
+    FIREBASE_INITIALIZATION_FAILED(-304, "Firebase 초기화에 실패했습니다.", 500),
+    INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400);
 
     private final int code;
     private final String message;
