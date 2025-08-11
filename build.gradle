@@ -70,6 +70,10 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	//alarm
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
