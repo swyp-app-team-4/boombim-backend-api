@@ -3,7 +3,7 @@ package boombimapi.domain.place.presentation.controller;
 import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.service.PlaceService;
-import boombimapi.domain.place.presentation.dto.request.Viewport;
+import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
 import boombimapi.domain.place.presentation.dto.response.MapMarker;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,13 +33,13 @@ public class OfficialPlaceController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse<List<MapMarker>>> getMarkersInViewport(
-        @RequestBody Viewport viewport
+        @RequestBody ViewportRequest viewportRequest
     ) {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_OFFICIAL_PLACES_WITHIN_VIEWPORT_SUCCESS,
-                officialPlaceService.getMarkersInViewport(viewport)
+                officialPlaceService.getMarkersInViewport(viewportRequest)
             )
         );
     }

@@ -3,7 +3,7 @@ package boombimapi.domain.place.application.service.impl;
 import boombimapi.domain.place.application.service.PlaceService;
 import boombimapi.domain.place.domain.entity.OfficialPlace;
 import boombimapi.domain.place.domain.repository.OfficialPlaceRepository;
-import boombimapi.domain.place.presentation.dto.request.Viewport;
+import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
 import boombimapi.domain.place.presentation.dto.response.MapMarker;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ public class OfficialPlaceServiceImpl implements PlaceService {
 
     @Override
     public List<MapMarker> getMarkersInViewport(
-        Viewport viewport
+        ViewportRequest viewportRequest
     ) {
 
-        double latitude1 = viewport.topLeft().latitude();
-        double longitude1 = viewport.topLeft().longitude();
-        double latitude2 = viewport.bottomRight().latitude();
-        double longitude2 = viewport.bottomRight().longitude();
+        double latitude1 = viewportRequest.topLeft().latitude();
+        double longitude1 = viewportRequest.topLeft().longitude();
+        double latitude2 = viewportRequest.bottomRight().latitude();
+        double longitude2 = viewportRequest.bottomRight().longitude();
 
         double minLatitude = Math.min(latitude1, latitude2);
         double maxLatitude = Math.max(latitude1, latitude2);
