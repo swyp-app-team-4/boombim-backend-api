@@ -1,6 +1,5 @@
 package boombimapi.domain.place.application.service.impl;
 
-import boombimapi.domain.place.application.service.PlaceService;
 import boombimapi.domain.place.domain.entity.OfficialPlace;
 import boombimapi.domain.place.domain.repository.OfficialPlaceRepository;
 import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
@@ -13,11 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class OfficialPlaceServiceImpl implements PlaceService {
+public class OfficialPlaceService {
 
     private final OfficialPlaceRepository officialPlaceRepository;
 
-    @Override
     public List<MapMarkerResponse> getMarkersInViewport(
         ViewportRequest viewportRequest
     ) {
