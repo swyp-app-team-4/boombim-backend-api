@@ -2,19 +2,19 @@ package boombimapi.global.response;
 
 import org.springframework.http.HttpStatus;
 
-public record ApiResponse<T>(
+public record BaseResponse<T>(
     int code,
     String status,
     String message,
     T data
 ) {
 
-    public static <T> ApiResponse<T> of(
+    public static <T> BaseResponse<T> of(
         HttpStatus status,
         ResponseMessage message,
         T data
     ) {
-        return new ApiResponse<>(
+        return new BaseResponse<>(
             status.value(),
             status.getReasonPhrase(),
             message.getMessage(),
