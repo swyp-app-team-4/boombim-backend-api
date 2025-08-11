@@ -1,0 +1,25 @@
+package boombimapi.global.response;
+
+import org.springframework.http.HttpStatus;
+
+public record BaseResponse<T>(
+    int code,
+    String status,
+    String message,
+    T data
+) {
+
+    public static <T> BaseResponse<T> of(
+        HttpStatus status,
+        ResponseMessage message,
+        T data
+    ) {
+        return new BaseResponse<>(
+            status.value(),
+            status.getReasonPhrase(),
+            message.getMessage(),
+            data
+        );
+    }
+
+}
