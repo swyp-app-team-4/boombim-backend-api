@@ -3,6 +3,7 @@ package boombimapi.domain.alarm.application.service;
 
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
+import boombimapi.domain.user.domain.entity.User;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,7 +19,7 @@ public interface FcmService {
      * @param token FCM 토큰
      * @param deviceType 디바이스 타입 (ANDROID, IOS, WEB)
      */
-    void registerToken(String userId, String token, DeviceType deviceType);
+    void registerToken(User user, String token, DeviceType deviceType);
 
     /**
      * 단일 사용자에게 알림 전송

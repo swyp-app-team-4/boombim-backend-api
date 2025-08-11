@@ -6,6 +6,7 @@ import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.FcmTokenRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
+import boombimapi.domain.user.domain.entity.User;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import com.google.firebase.messaging.*;
@@ -34,32 +35,32 @@ public class FcmServiceImpl implements FcmService {
      * FCM 토큰 등록
      */
     @Override
-    public void registerToken(String userId, String token, DeviceType deviceType) {
+    public void registerToken(User user, String token, DeviceType deviceType) {
         try {
             // 기존 토큰이 있는지 확인
-            Optional<FcmToken> existingToken = fcmTokenRepository.findByUserIdAndToken(userId, token);
+            Optional<FcmToken> existingToken = fcmTokenRepository.findByUserIdAndToken(user.getId(), token);
 
             if (existingToken.isPresent()) {
                 // 기존 토큰이 있으면 활성화 및 마지막 사용 시간 업데이트
                 FcmToken fcmToken = existingToken.get();
                 fcmToken.activate();
-                log.info("기존 FCM 토큰 활성화: userId={}, deviceType={}", userId, deviceType);
+                log.info("기존 FCM 토큰 활성화: userId={}, deviceType={}", user.getId(), deviceType);
             } else {
                 // 새로운 토큰 생성
                 FcmToken fcmToken = FcmToken.builder()
-                        .user(userId)
+                        .user(user)
                         .token(token)
                         .deviceType(deviceType)
                         .build();
                 fcmTokenRepository.save(fcmToken);
-                log.info("새 FCM 토큰 등록: userId={}, deviceType={}", userId, deviceType);
+                log.info("새 FCM 토큰 등록: userId={}, deviceType={}", user.getId(), deviceType);
             }
 
             // 해당 사용자의 다른 동일 디바이스 타입 토큰들을 비활성화 (선택사항)
             // fcmTokenRepository.deactivateOtherTokens(userId, token);
 
         } catch (Exception e) {
-            log.error("FCM 토큰 등록 실패: userId={}, error={}", userId, e.getMessage());
+            log.error("FCM 토큰 등록 실패: userId={}, error={}", user.getId(), e.getMessage());
             throw new BoombimException(ErrorCode.SERVER_UNTRACKED_ERROR, "FCM 토큰 등록에 실패했습니다.");
         }
     }
@@ -125,6 +126,7 @@ public class FcmServiceImpl implements FcmService {
         // 무효한 토큰들 비활성화
         deactivateInvalidTokens(invalidTokens);
 
+        // 실패 토큰 원인은 서버 문제, 잘못된 형식, 유저가 앱 삭제 등 등 여러가지 이유가 있음 이건 주기적으로 삭제할거임 스케줄러
         AlarmSendResult result = new AlarmSendResult(successCount, failureCount, invalidTokens);
         log.info("전체 알림 전송 완료: 성공={}, 실패={}", successCount, failureCount);
 

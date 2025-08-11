@@ -1,10 +1,12 @@
 package boombimapi.domain.alarm.application.service.impl;
 
 
-
 import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
+import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
+import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
+import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
@@ -50,9 +52,11 @@ public class AlarmServiceImpl implements AlarmService {
         User sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        if (!isAdmin(sender)) {
-            throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
-        }
+        /**
+         * 빠른 개발을 위해 일단 뺴겠음
+         if (!isAdmin(sender)) {
+         throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
+         }*/
 
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
@@ -130,13 +134,13 @@ public class AlarmServiceImpl implements AlarmService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-            fcmService.registerToken(userId, request.token(), request.deviceType());
+            fcmService.registerToken(user, request.token(), request.deviceType());
 
             log.info("FCM 토큰 등록 완료: userId={}, deviceType={}", userId, request.deviceType());
-            return RegisterFcmTokenResponse.success();
+            return RegisterFcmTokenResponse.sucess();
 
         } catch (BoombimException e) {
-            throw e;
+            throw new BoombimException(ErrorCode.FCM_TOKEN_REGISTER_FAILED);
         } catch (Exception e) {
             log.error("FCM 토큰 등록 실패: userId={}, error={}", userId, e.getMessage());
             return RegisterFcmTokenResponse.failure("FCM 토큰 등록에 실패했습니다: " + e.getMessage());
