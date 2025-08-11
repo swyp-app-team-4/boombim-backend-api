@@ -4,7 +4,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.service.PlaceService;
 import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
-import boombimapi.domain.place.presentation.dto.response.MapMarker;
+import boombimapi.domain.place.presentation.dto.response.MapMarkerResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,7 +32,7 @@ public class OfficialPlaceController {
         @ApiResponse(responseCode = "200", description = "공식 장소 마커 조회 성공")
     })
     @PostMapping
-    public ResponseEntity<BaseResponse<List<MapMarker>>> getMarkersInViewport(
+    public ResponseEntity<BaseResponse<List<MapMarkerResponse>>> getMarkersInViewport(
         @RequestBody ViewportRequest viewportRequest
     ) {
         return ResponseEntity.ok(

@@ -4,7 +4,7 @@ import boombimapi.domain.place.application.service.PlaceService;
 import boombimapi.domain.place.domain.entity.OfficialPlace;
 import boombimapi.domain.place.domain.repository.OfficialPlaceRepository;
 import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
-import boombimapi.domain.place.presentation.dto.response.MapMarker;
+import boombimapi.domain.place.presentation.dto.response.MapMarkerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class OfficialPlaceServiceImpl implements PlaceService {
     private final OfficialPlaceRepository officialPlaceRepository;
 
     @Override
-    public List<MapMarker> getMarkersInViewport(
+    public List<MapMarkerResponse> getMarkersInViewport(
         ViewportRequest viewportRequest
     ) {
 
@@ -40,7 +40,7 @@ public class OfficialPlaceServiceImpl implements PlaceService {
         );
 
         return officialPlaces.stream()
-            .map(MapMarker::fromEntity)
+            .map(MapMarkerResponse::fromEntity)
             .toList();
 
     }
