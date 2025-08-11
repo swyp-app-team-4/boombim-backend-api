@@ -1,4 +1,4 @@
-package boombimapi.domain.place.domain;
+package boombimapi.domain.place.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
