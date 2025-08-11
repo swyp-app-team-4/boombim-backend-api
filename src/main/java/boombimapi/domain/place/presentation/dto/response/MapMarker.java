@@ -1,4 +1,4 @@
-package boombimapi.domain.place.presentation.dto;
+package boombimapi.domain.place.presentation.dto.response;
 
 public record MapMarker(
     Long id,
