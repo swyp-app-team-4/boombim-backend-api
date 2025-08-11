@@ -1,4 +1,4 @@
-package boombimapi.domain.place.application.service.impl;
+package boombimapi.domain.place.application.service;
 
 import boombimapi.domain.place.domain.entity.OfficialPlace;
 import boombimapi.domain.place.domain.repository.OfficialPlaceRepository;

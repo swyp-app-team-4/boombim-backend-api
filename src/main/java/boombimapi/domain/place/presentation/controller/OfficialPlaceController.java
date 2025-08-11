@@ -2,7 +2,7 @@ package boombimapi.domain.place.presentation.controller;
 
 import static boombimapi.global.response.ResponseMessage.*;
 
-import boombimapi.domain.place.application.service.PlaceService;
+import boombimapi.domain.place.application.service.OfficialPlaceService;
 import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
 import boombimapi.domain.place.presentation.dto.response.MapMarkerResponse;
 import boombimapi.global.response.BaseResponse;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "OfficialPlace", description = "공식 장소 API")
 public class OfficialPlaceController {
 
-    private final PlaceService officialPlaceService;
+    private final OfficialPlaceService officialPlaceService;
 
     @Operation(summary = "뷰포트 내 공식 장소 마커 조회 API", description = "뷰포트 내에 위치한 공식 장소들의 좌표를 리스트로 반환합니다.")
     @ApiResponses(value = {
