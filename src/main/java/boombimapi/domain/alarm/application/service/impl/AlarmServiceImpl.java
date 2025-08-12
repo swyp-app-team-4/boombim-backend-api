@@ -6,6 +6,7 @@ import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
+import boombimapi.domain.alarm.domain.entity.alarm.type.DeliveryStatus;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
@@ -174,8 +175,9 @@ public class AlarmServiceImpl implements AlarmService {
         List<HistoryResponse> result = new ArrayList<>();
 
         for (AlarmRecipient alarmHistory : alarmHistores) {
-
-            result.add(new HistoryResponse(alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getMessage(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus()));
+            if (!alarmHistory.getDeliveryStatus().equals(DeliveryStatus.FAILED)) {
+                result.add(new HistoryResponse(alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getMessage(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus()));
+            }
         }
 
         return result;

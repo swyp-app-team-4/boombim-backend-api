@@ -136,6 +136,7 @@ public class FcmServiceImpl implements FcmService {
 
                 if (invalidSet.contains(ft.getToken())) {
                     // 영구 실패
+                    log.info("실패로 와라");
                     ar.markFailed("INVALID_OR_UNREGISTERED");
                 } else {
                     // 성공
@@ -151,7 +152,7 @@ public class FcmServiceImpl implements FcmService {
         deactivateInvalidTokens(invalidTokens);
 
         alarmRecipientRepository.saveAll(recipientsToSave);
-        
+
         // 실패 토큰 원인은 서버 문제, 잘못된 형식, 유저가 앱 삭제 등 등 여러가지 이유가 있음 이건 주기적으로 삭제할거임 스케줄러
         AlarmSendResult result = new AlarmSendResult(successCount, failureCount, invalidTokens);
         log.info("전체 알림 전송 완료: 성공={}, 실패={}", successCount, failureCount);
@@ -205,7 +206,7 @@ public class FcmServiceImpl implements FcmService {
                 failureCount++;
 
                 // 토큰 관련 오류인 경우 invalid 목록에 추가
-                if (e.getMessage().contains("UNREGISTERED") || e.getMessage().contains("INVALID_ARGUMENT")) {
+                if (e.getMessage() != null) {
                     invalidTokens.add(token);
                 }
             }
