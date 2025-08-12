@@ -62,8 +62,10 @@ public enum ErrorCode {
     ALARM_NOT_FOUND(-302, "알림을 찾을 수 없습니다.", 404),
     ALARM_ACCESS_DENIED(-303, "해당 알림에 대한 권한이 없습니다.", 403),
     FIREBASE_INITIALIZATION_FAILED(-304, "Firebase 초기화에 실패했습니다.", 500),
-    INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400);
+    INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400),
 
+    // official congestion
+    OFFICIAL_CONGESTION_NOT_FOUND(-400, "공식 혼잡도 데이터가 존재하지 않습니다.", 406);
     private final int code;
     private final String message;
     private final int httpCode;

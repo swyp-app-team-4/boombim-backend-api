@@ -1,5 +1,6 @@
-package boombimapi.domain.congestion.domain.entity;
+package boombimapi.domain.congestion.official.entity;
 
+import boombimapi.domain.congestion.common.entity.CongestionLevel;
 import boombimapi.domain.place.domain.entity.OfficialPlace;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +16,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 @Entity
 @Getter
+@Immutable
 @Table(name = "official_congestion_forecasts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OfficialCongestionForecast {

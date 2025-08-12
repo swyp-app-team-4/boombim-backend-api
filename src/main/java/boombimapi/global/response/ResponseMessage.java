@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ResponseMessage {
 
-    GET_OFFICIAL_PLACES_WITHIN_VIEWPORT_SUCCESS("뷰포트 내 공식 장소 마커 조회 성공");
+    // official
+    GET_OFFICIAL_PLACES_WITHIN_VIEWPORT_SUCCESS("뷰포트 내 공식 장소 마커 조회 성공"),
+    GET_LATEST_OFFICIAL_CONGESTION_SUCCESS("최신 공식 혼잡도 조회 성공");
 
     private final String message;
 
