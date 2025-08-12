@@ -16,8 +16,13 @@ public enum ErrorCode {
      */
 
     /**
-     * 401 : 미승인 403 : 권한의 문제가 있을때 406 : 객체가 조회되지 않을 때 409 : 현재 데이터와 값이 충돌날 때(ex. 아이디 중복) 412 : 파라미터 값이 뭔가 누락됐거나 잘못 왔을 때 422 : 파라미터 문법 오류 424 : 뭔가 단계가
-     * 꼬였을때, 1번안하고 2번하고 그런경우
+     * 401 : 미승인
+     * 403 : 권한의 문제가 있을때
+     * 406 : 객체가 조회되지 않을 때
+     * 409 : 현재 데이터와 값이 충돌날 때(ex. 아이디 중복)
+     * 412 : 파라미터 값이 뭔가 누락됐거나 잘못 왔을 때
+     * 422 : 파라미터 문법 오류
+     * 424 : 뭔가 단계가 꼬였을때, 1번안하고 2번하고 그런경우
      */
 
     // Common
@@ -51,10 +56,16 @@ public enum ErrorCode {
     USER_NOT_EXIST(-211, "존재하지 않는 유저입니다.", 404),
     DUPLICATE_EMAIL(-213, "이미 사용 중인 이메일입니다.", 409),
 
+    // Alarm & FCM
+    FCM_TOKEN_REGISTER_FAILED(-300, "FCM 토큰 등록에 실패했습니다.", 500),
+    FCM_SEND_FAILED(-301, "알림 전송에 실패했습니다.", 500),
+    ALARM_NOT_FOUND(-302, "알림을 찾을 수 없습니다.", 404),
+    ALARM_ACCESS_DENIED(-303, "해당 알림에 대한 권한이 없습니다.", 403),
+    FIREBASE_INITIALIZATION_FAILED(-304, "Firebase 초기화에 실패했습니다.", 500),
+    INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400),
+
     // official congestion
     OFFICIAL_CONGESTION_NOT_FOUND(-400, "공식 혼잡도 데이터가 존재하지 않습니다.", 406);
-
-
     private final int code;
     private final String message;
     private final int httpCode;

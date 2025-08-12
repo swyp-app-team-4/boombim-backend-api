@@ -29,6 +29,15 @@ spring:
     port: ${REDIS_PORT}
     password: ${REDIS_PASSWORD}
 
+  task:
+    scheduling:
+      enabled: true
+    execution:
+      pool:
+        core-size: 2
+        max-size: 10
+        queue-capacity: 100
+
 jwt:
   secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION}
@@ -66,3 +75,8 @@ oauth2:
     key-id: ${APPLE_KEY_ID}
     private-key: ${APPLE_PRIVATE_KEY}
     redirect-uri: ${APPLE_REDIRECT_URI}
+
+
+# Firebase FCM 설정
+firebase:
+  service-account-key: ${FIREBASE_SERVICE_ACCOUNT_KEY}

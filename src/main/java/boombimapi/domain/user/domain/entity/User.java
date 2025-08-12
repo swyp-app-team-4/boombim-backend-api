@@ -1,5 +1,8 @@
 package boombimapi.domain.user.domain.entity;
 
+import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
+import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
+import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -9,6 +12,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -19,6 +24,19 @@ public class User {
     @Id
     @Column(unique = true, nullable = false)
     private String id;
+
+
+    // 1) 내가 "보낸" 알림들 (Alarm.sender)
+    @OneToMany(mappedBy = "sender")
+    private List<Alarm> sentAlarms = new ArrayList<>();
+
+    // 2) 내가 "받는" 알림들 (조인 엔티티 AlarmRecipient.user)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AlarmRecipient> alarmRecipients = new ArrayList<>();
+
+    // 3) 내 디바이스 토큰들 (FcmToken.user)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FcmToken> fcmTokens = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;
