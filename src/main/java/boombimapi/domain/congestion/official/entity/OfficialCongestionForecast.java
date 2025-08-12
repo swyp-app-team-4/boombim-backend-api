@@ -15,9 +15,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 @Entity
 @Getter
+@Immutable
 @Table(name = "official_congestion_forecasts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OfficialCongestionForecast {
