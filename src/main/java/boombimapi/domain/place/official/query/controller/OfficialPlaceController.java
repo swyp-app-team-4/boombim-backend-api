@@ -1,10 +1,10 @@
-package boombimapi.domain.place.presentation.controller;
+package boombimapi.domain.place.official.query.controller;
 
 import static boombimapi.global.response.ResponseMessage.*;
 
-import boombimapi.domain.place.application.service.OfficialPlaceService;
-import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
-import boombimapi.domain.place.presentation.dto.response.MapMarkerResponse;
+import boombimapi.domain.place.official.query.service.OfficialPlaceService;
+import boombimapi.domain.place.official.query.dto.request.ViewportRequest;
+import boombimapi.domain.place.official.query.dto.response.MapMarkerResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

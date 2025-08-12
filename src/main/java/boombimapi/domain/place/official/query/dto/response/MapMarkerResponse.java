@@ -1,7 +1,7 @@
-package boombimapi.domain.place.presentation.dto.response;
+package boombimapi.domain.place.official.query.dto.response;
 
-import boombimapi.domain.place.domain.entity.OfficialPlace;
-import boombimapi.domain.place.presentation.dto.common.Coordinate;
+import boombimapi.domain.place.official.entity.OfficialPlace;
+import boombimapi.domain.place.official.query.dto.common.Coordinate;
 
 public record MapMarkerResponse(
     Long id,

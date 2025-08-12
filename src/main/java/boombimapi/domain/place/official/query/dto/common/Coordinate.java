@@ -1,4 +1,4 @@
-package boombimapi.domain.place.presentation.dto.common;
+package boombimapi.domain.place.official.query.dto.common;
 
 public record Coordinate(
     double latitude,

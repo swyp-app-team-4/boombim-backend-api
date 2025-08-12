@@ -1,9 +1,9 @@
-package boombimapi.domain.place.application.service;
+package boombimapi.domain.place.official.query.service;
 
-import boombimapi.domain.place.domain.entity.OfficialPlace;
-import boombimapi.domain.place.domain.repository.OfficialPlaceRepository;
-import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
-import boombimapi.domain.place.presentation.dto.response.MapMarkerResponse;
+import boombimapi.domain.place.official.entity.OfficialPlace;
+import boombimapi.domain.place.official.query.repository.OfficialPlaceRepository;
+import boombimapi.domain.place.official.query.dto.request.ViewportRequest;
+import boombimapi.domain.place.official.query.dto.response.MapMarkerResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

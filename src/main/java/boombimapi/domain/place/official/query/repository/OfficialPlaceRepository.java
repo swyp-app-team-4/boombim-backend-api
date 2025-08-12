@@ -1,6 +1,6 @@
-package boombimapi.domain.place.domain.repository;
+package boombimapi.domain.place.official.query.repository;
 
-import boombimapi.domain.place.domain.entity.OfficialPlace;
+import boombimapi.domain.place.official.entity.OfficialPlace;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
