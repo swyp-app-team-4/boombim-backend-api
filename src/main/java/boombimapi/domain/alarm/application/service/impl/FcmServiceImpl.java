@@ -101,9 +101,9 @@ public class FcmServiceImpl implements FcmService {
     /**
      * 모든 사용자에게 알림 전송 (배치)
      */
-    @Async
+
     @Override
-    public CompletableFuture<AlarmSendResult> sendNotificationToAll(String title, String body, Alarm alarm) {
+    public AlarmSendResult sendNotificationToAll(String title, String body, Alarm alarm) {
         List<FcmToken> allTokens = fcmTokenRepository.findAllActiveTokens();
         log.info("전체 알림 전송 시작: 총 {} 개의 토큰", allTokens.size());
 
@@ -156,7 +156,7 @@ public class FcmServiceImpl implements FcmService {
         AlarmSendResult result = new AlarmSendResult(successCount, failureCount, invalidTokens);
         log.info("전체 알림 전송 완료: 성공={}, 실패={}", successCount, failureCount);
 
-        return CompletableFuture.completedFuture(result);
+        return result;
     }
 
     /**
@@ -168,51 +168,51 @@ public class FcmServiceImpl implements FcmService {
                 .map(FcmToken::getToken)
                 .toList();
 
-        MulticastMessage message = MulticastMessage.builder()
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
-                        .build())
-                .setAndroidConfig(AndroidConfig.builder()
-                        .setNotification(AndroidNotification.builder()
-                                .setIcon("ic_notification")
-                                .setColor("#FF6B35")
+        log.info("=== FCM 개별 전송 시작 ===");
+        log.info("전송할 토큰 수: {}", tokenStrings.size());
+
+        int successCount = 0;
+        int failureCount = 0;
+        List<String> invalidTokens = new ArrayList<>();
+
+        for (String token : tokenStrings) {
+            try {
+                Message message = Message.builder()
+                        .setNotification(Notification.builder()
+                                .setTitle(title)
+                                .setBody(body)
                                 .build())
-                        .build())
-                .setApnsConfig(ApnsConfig.builder()
-                        .setAps(Aps.builder()
-                                .setSound("default")
+                        .setAndroidConfig(AndroidConfig.builder()
+                                .setNotification(AndroidNotification.builder()
+                                        .setIcon("ic_notification")
+                                        .setColor("#FF6B35")
+                                        .build())
                                 .build())
-                        .build())
-                .addAllTokens(tokenStrings)
-                .build();
+                        .setApnsConfig(ApnsConfig.builder()
+                                .setAps(Aps.builder()
+                                        .setSound("default")
+                                        .build())
+                                .build())
+                        .setToken(token)
+                        .build();
 
-        try {
-            BatchResponse response = firebaseMessaging.sendMulticast(message);
+                String response = firebaseMessaging.send(message);
+                log.info("개별 전송 성공: {}", response);
+                successCount++;
 
-            List<String> invalidTokens = new ArrayList<>();
-            List<SendResponse> responses = response.getResponses();
+            } catch (Exception e) {
+                log.error("개별 전송 실패 - 토큰: {}, 오류: {}", token.substring(0, 20) + "...", e.getMessage());
+                failureCount++;
 
-            for (int i = 0; i < responses.size(); i++) {
-                SendResponse sendResponse = responses.get(i);
-                if (!sendResponse.isSuccessful()) {
-                    String errorCode = String.valueOf(sendResponse.getException().getErrorCode());
-                    if ("UNREGISTERED".equals(errorCode) || "INVALID_ARGUMENT".equals(errorCode)) {
-                        invalidTokens.add(tokenStrings.get(i));
-                    }
+                // 토큰 관련 오류인 경우 invalid 목록에 추가
+                if (e.getMessage().contains("UNREGISTERED") || e.getMessage().contains("INVALID_ARGUMENT")) {
+                    invalidTokens.add(token);
                 }
             }
-
-            return new AlarmSendResult(
-                    response.getSuccessCount(),
-                    response.getFailureCount(),
-                    invalidTokens
-            );
-
-        } catch (Exception e) {
-            log.error("배치 알림 전송 실패: {}", e.getMessage());
-            return new AlarmSendResult(0, tokens.size(), tokenStrings);
         }
+
+        log.info("FCM 전송 완료 - 성공: {}, 실패: {}", successCount, failureCount);
+        return new AlarmSendResult(successCount, failureCount, invalidTokens);
     }
 
     /**

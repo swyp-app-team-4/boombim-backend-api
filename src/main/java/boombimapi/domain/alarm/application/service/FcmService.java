@@ -39,7 +39,7 @@ public interface FcmService {
      * @param body 알림 내용
      * @return 전송 결과 (성공/실패 건수 포함)
      */
-    CompletableFuture<AlarmSendResult> sendNotificationToAll(String title, String body, Alarm alarm);
+   AlarmSendResult sendNotificationToAll(String title, String body, Alarm alarm);
 
     /**
      * 오래된 비활성 토큰 정리

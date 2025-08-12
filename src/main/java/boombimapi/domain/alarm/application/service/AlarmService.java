@@ -23,7 +23,7 @@ public interface AlarmService {
      * @param request 알림 전송 요청 정보
      * @return 전송 결과
      */
-    CompletableFuture<SendAlarmResponse> sendAlarm(String senderUserId, SendAlarmRequest request);
+    SendAlarmResponse sendAlarm(String senderUserId, SendAlarmRequest request);
 
     /**
      * FCM 토큰 등록
@@ -50,13 +50,5 @@ public interface AlarmService {
      * @param alarmId 알림 ID
      * @return 알림 상세 정보
      */
-    AlarmHistoryResponse getAlarmDetail(String userId, Long alarmId);
 
-    /**
-     * 사용자의 FCM 토큰 개수 조회
-     *
-     * @param userId 사용자 ID
-     * @return 등록된 토큰 개수
-     */
-    int getUserTokenCount(String userId);
 }

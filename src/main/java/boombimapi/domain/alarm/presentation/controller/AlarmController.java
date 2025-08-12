@@ -9,6 +9,8 @@ import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -45,11 +47,10 @@ public class AlarmController {
 
         log.info("FCM 토큰 등록 요청: userId={}, deviceType={}", userId, request.deviceType());
 
-        RegisterFcmTokenResponse response = alarmService.registerFcmToken(userId, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(alarmService.registerFcmToken(userId, request));
     }
 
-    @Operation(summary = "알림 전송 (관리자 전용)", description = "관리자가 사용자들에게 알림을 전송합니다.")
+    @Operation(summary = "알림 전송 (이벤트/공지)", description = "관리자가 사용자들에게 알림을 전송합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알림 전송 시작"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -57,14 +58,14 @@ public class AlarmController {
             @ApiResponse(responseCode = "403", description = "관리자 권한 필요")
     })
     @PostMapping("/send")
-    public CompletableFuture<ResponseEntity<SendAlarmResponse>> sendAlarm(
+    public ResponseEntity<SendAlarmResponse> sendAlarm(
             @AuthenticationPrincipal String userId,
             @Valid @RequestBody SendAlarmRequest request) {
 
         log.info("알림 전송 요청: 관리자={}, 제목={}", userId, request.title());
 
-        return alarmService.sendAlarm(userId, request)
-                .thenApply(ResponseEntity::ok);
+        return ResponseEntity.ok(alarmService.sendAlarm(userId, request));
+
     }
 
     @Operation(summary = "알림 내역 조회 (관리자 전용)", description = "관리자가 발송한 알림 내역을 조회합니다.")
@@ -81,26 +82,5 @@ public class AlarmController {
         return ResponseEntity.ok(alarmService.getAlarmHistory(userId, req));
     }
 
-    @Operation(summary = "[Test]알림 상세 조회 (관리자 전용)", description = "특정 알림의 상세 정보를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "403", description = "권한 없음"),
-            @ApiResponse(responseCode = "404", description = "알림을 찾을 수 없음")
-    })
-    @GetMapping("/{alarmId}")
-    public ResponseEntity<AlarmHistoryResponse> getAlarmDetail(
-            @AuthenticationPrincipal String userId,
-            @PathVariable Long alarmId) {
 
-        AlarmHistoryResponse response = alarmService.getAlarmDetail(userId, alarmId);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "[Test]사용자 FCM 토큰 개수 조회", description = "현재 등록된 FCM 토큰 개수를 조회합니다.")
-    @GetMapping("/token-count")
-    public ResponseEntity<Integer> getUserTokenCount(@AuthenticationPrincipal String userId) {
-        int count = alarmService.getUserTokenCount(userId);
-        return ResponseEntity.ok(count);
-    }
 }

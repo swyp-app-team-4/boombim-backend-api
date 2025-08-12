@@ -48,9 +48,8 @@ public class AlarmServiceImpl implements AlarmService {
     /**
      * 관리자가 알림 전송
      */
-    @Async
     @Override
-    public CompletableFuture<SendAlarmResponse> sendAlarm(String senderUserId, SendAlarmRequest request) {
+    public SendAlarmResponse sendAlarm(String senderUserId, SendAlarmRequest request) {
         log.info("알림 전송 요청: 발신자={}, 타입={}",
                 senderUserId, request.type());
 
@@ -100,7 +99,7 @@ public class AlarmServiceImpl implements AlarmService {
                     request.title(),
                     request.message(),
                     alarm
-            ).get(); // 비동기 결과 대기
+            ); // 비동기 결과 대기
 
 
             // 전송 결과 업데이트
@@ -115,22 +114,20 @@ public class AlarmServiceImpl implements AlarmService {
             log.info("알림 전송 완료: alarmId={}, 성공={}, 실패={}",
                     savedAlarm.getId(), sendResult.successCount(), sendResult.failureCount());
 
-            return CompletableFuture.completedFuture(
+            return
                     SendAlarmResponse.of(
                             savedAlarm,
                             sendResult.successCount(),
                             sendResult.failureCount(),
                             sendResult.successCount() + sendResult.failureCount()
-                    )
-            );
+                    );
 
         } catch (Exception e) {
             log.error("알림 전송 중 오류 발생: alarmId={}, error={}", savedAlarm.getId(), e.getMessage());
             savedAlarm.updateFailureReason("전송 중 오류: " + e.getMessage());
-
-            return CompletableFuture.completedFuture(
-                    SendAlarmResponse.of(savedAlarm, 0, 1, 1)
-            );
+            //throw new BoombimException(ErrorCode.FCM_SEND_FAILED);
+            return
+                    SendAlarmResponse.of(savedAlarm, 0, 1, 1);
         }
     }
 
@@ -177,46 +174,17 @@ public class AlarmServiceImpl implements AlarmService {
         List<HistoryResponse> result = new ArrayList<>();
 
         for (AlarmRecipient alarmHistory : alarmHistores) {
+
             result.add(new HistoryResponse(alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getMessage(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus()));
         }
 
         return result;
     }
 
-    /**
-     * 특정 알림 상세 조회
-     */
-    @Override
-    public AlarmHistoryResponse getAlarmDetail(String userId, Long alarmId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        if (!isAdmin(user)) {
-            throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
-        }
-
-        Alarm alarm = alarmRepository.findById(alarmId)
-                .orElseThrow(() -> new BoombimException(ErrorCode.OBJECT_NOT_FOUND, "알림을 찾을 수 없습니다."));
-
-        // 본인이 발송한 알림인지 확인
-        if (!alarm.getSender().equals(user)) {
-            throw new BoombimException(ErrorCode.FORBIDDEN, "해당 알림에 대한 권한이 없습니다.");
-        }
-
-        return AlarmHistoryResponse.of(alarm);
-    }
-
-    /**
-     * 관리자 권한 확인
-     */
     private boolean isAdmin(User user) {
         return user.getRole().name().equals("ADMIN");
     }
 
-    /**
-     * 사용자의 FCM 토큰 개수 조회
-     */
-    public int getUserTokenCount(String userId) {
-        return fcmService.getUserTokenCount(userId);
-    }
+
 }
