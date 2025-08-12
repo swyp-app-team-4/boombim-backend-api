@@ -4,7 +4,7 @@ import static boombimapi.domain.congestion.official.entity.QOfficialCongestion.o
 import static boombimapi.domain.congestion.common.entity.QCongestionLevel.congestionLevel;
 import static boombimapi.domain.place.domain.entity.QOfficialPlace.officialPlace;
 
-import boombimapi.domain.congestion.official.query.dto.OfficialCongestionResponse;
+import boombimapi.domain.congestion.official.query.dto.response.OfficialCongestionResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Optional;
