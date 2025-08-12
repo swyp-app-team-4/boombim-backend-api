@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/official-place")
 @Tag(name = "OfficialPlace", description = "공식 장소 API")
-public class OfficialPlaceController {
+public class OfficialPlaceQueryController {
 
     private final OfficialPlaceService officialPlaceService;
 
