@@ -6,6 +6,7 @@ import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
+import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
 import boombimapi.domain.vote.domain.repository.VoteDuplicationRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
@@ -13,6 +14,8 @@ import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import boombimapi.domain.vote.presentation.dto.res.VoteListRes;
+import boombimapi.domain.vote.presentation.dto.res.list.MyVoteRes;
+import boombimapi.domain.vote.presentation.dto.res.list.VoteRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -20,7 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -115,26 +119,70 @@ public class VoteServiceImpl implements VoteService {
         if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
         // 다른사용자가 눌렀을떄 혹시 모르니깐!!
-        if(!Objects.equals(vote.getUser().getId(), user.getId())) throw new BoombimException(ErrorCode.NO_PERMISSION_TO_CLOSE_VOTE);
+        if (!Objects.equals(vote.getUser().getId(), user.getId()))
+            throw new BoombimException(ErrorCode.NO_PERMISSION_TO_CLOSE_VOTE);
 
         // 투표 종료 비활성화 false로 바꿈
         vote.updateIsVoteDeactivate();
+
+        //종료 알람 넣기 
+        //~~~~ 
     }
 
     @Override
-    public VoteListRes listVote(String userId) {
+    public VoteListRes listVote(String userId, double latitude, double longitude) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
-        // 사용자 위치에 맞게 떠야됨 근데 이거 나중에
+        // 투표 리스트(사용자 위치에 맞게 떠야됨)
+        List<VoteRes> voteRes = voteList(latitude, longitude);
+
+        // 내 질문 투표 리스트
+        List<MyVoteRes> myVoteRes = myVoteList(user);
 
 
-        //중복도 내투표에 뜨게해야된다.!
-
-
-        return null;
+        return VoteListRes.of(voteRes, myVoteRes);
     }
 
+    private List<VoteRes> voteList(double latitude, double longitude) {
+        List<VoteRes> voteResList = new ArrayList<>();
+
+        List<Vote> votes = calculate500(latitude, longitude);
+        for (Vote vote : votes) {
+            List<Long> voteAnswer = voteAnswerCnt(vote);
+            voteResList.add(VoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기"));
+        }
+
+        return voteResList;
+    }
+
+    private List<MyVoteRes> myVoteList(User user) {
+        List<MyVoteRes> myVoteRes = new ArrayList<>();
+        ///  내꺼 가져오기
+        List<Vote> myVoteList = voteRepository.findByUser(user);
+        for (Vote vote : myVoteList) {
+            //// 각 투표마다 투표자들 가져오기
+            List<Long> voteAnswer = voteAnswerCnt(vote);
+
+            myVoteRes.add(MyVoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus()));
+        }
+
+        /// 투표 중복꺼 가져오기 즉 중속
+        List<VoteDuplication> duplicationMyList = voteDuplicationRepository.findByUser(user);
+        for (VoteDuplication voteDuplication : duplicationMyList) {
+            Vote vote = voteRepository.findById(voteDuplication.getVote().getId()).orElse(null);
+            if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
+
+            List<Long> voteAnswer = voteAnswerCnt(vote);
+
+            myVoteRes.add(MyVoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus()));
+        }
+
+        return myVoteRes;
+    }
 
     // 허버사인 공식 500m 반경 파악
     public boolean isWithin500Meters(double posLatitude, double posLongitude,
@@ -158,4 +206,60 @@ public class VoteServiceImpl implements VoteService {
         return distance <= 500; // 500m 이내면 true
     }
 
+    // 투표마다 투표 4개 답변 숫 얻어오기
+    public List<Long> voteAnswerCnt(Vote vote) {
+        List<VoteAnswer> voteAnswer = voteAnswerRepository.findByVote(vote);
+        Map<VoteAnswerType, Long> counts = voteAnswer.stream()
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+
+        long relaxedCount = counts.getOrDefault(VoteAnswerType.RELAXED, 0L);
+        long commonlyCount = counts.getOrDefault(VoteAnswerType.COMMONLY, 0L);
+        long slightlyBusyCount = counts.getOrDefault(VoteAnswerType.SLIGHTLY_BUSY, 0L);
+        long crowdedCount = counts.getOrDefault(VoteAnswerType.CROWDED, 0L);
+
+        List<Long> result = new ArrayList<>();
+        result.add(relaxedCount);
+        result.add(commonlyCount);
+        result.add(slightlyBusyCount);
+        result.add(crowdedCount);
+        return result;
+    }
+
+
+    private List<Vote> calculate500(double latitude, double longitude) {
+        final double RADIUS_M = 500.0;
+
+        // 1) 바운딩 박스(사각형) 계산: 위도 1도 ≈ 111,320m, 경도 1도 ≈ 111,320 * cos(lat)
+        double latDelta = RADIUS_M / 111_320d;
+        double lonDelta = RADIUS_M / (111_320d * Math.cos(Math.toRadians(latitude)));
+
+        double latMin = latitude - latDelta;
+        double latMax = latitude + latDelta;
+        double lonMin = longitude - lonDelta;
+        double lonMax = longitude + lonDelta;
+
+        // 2) 후보 조회 (바운딩 박스 안만)
+        //   - 만약 아래 메서드가 없으면 findAll()로 받고 스트림에서 lat/lon 사각형 필터 먼저 해도 됨.
+        List<Vote> candidates = voteRepository.findAllInBoundingBox(latMin, latMax, lonMin, lonMax);
+
+        // 3) 하버사인으로 500m 이내만 남기고, 거리 기준 정렬
+        List<Vote> within500m = candidates.stream()
+                .filter(v -> distanceMeters(latitude, longitude, v.getLatitude(), v.getLongitude()) <= RADIUS_M)
+                .sorted(Comparator.comparingDouble(v -> distanceMeters(latitude, longitude, v.getLatitude(), v.getLongitude())))
+                .toList();
+
+        return within500m;
+    }
+
+
+    private static double distanceMeters(double lat1, double lon1, double lat2, double lon2) {
+        final double R = 6_371_000d; // 지구 반지름(m)
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
 }

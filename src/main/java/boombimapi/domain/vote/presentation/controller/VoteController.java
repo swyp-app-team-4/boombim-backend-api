@@ -50,8 +50,12 @@ public class VoteController {
 
     @Operation(description = "투표 리스트(투표목록/내질문) api")
     @GetMapping
-    public ResponseEntity<VoteListRes> listVote(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(voteService.listVote(userId));
+    public ResponseEntity<VoteListRes> listVote(
+            @AuthenticationPrincipal String userId,
+            @RequestParam double latitude,
+            @RequestParam double longitude) {
+
+        return ResponseEntity.ok(voteService.listVote(userId, latitude, longitude));
     }
 
 

@@ -4,6 +4,7 @@ import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import boombimapi.domain.vote.presentation.dto.res.VoteListRes;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface VoteService {
 
@@ -13,7 +14,8 @@ public interface VoteService {
 
     void deleteVote(String userId, VoteDeleteReq req);
 
-    VoteListRes listVote(String userId);
+    VoteListRes listVote(String userId, double latitude,
+                         double longitude);
 
 
 }

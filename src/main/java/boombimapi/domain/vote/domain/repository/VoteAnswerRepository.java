@@ -5,8 +5,11 @@ import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VoteAnswerRepository extends JpaRepository<VoteAnswer, Long> {
     Optional<VoteAnswer> findByUserAndVote(User user, Vote vote);
+
+    List<VoteAnswer> findByVote(Vote vote);
 }
