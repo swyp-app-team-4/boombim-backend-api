@@ -275,7 +275,8 @@ public class VoteServiceImpl implements VoteService {
         return R * c;
     }
 
-    private List<User> getUsers(Vote vote) {
+    @Override
+    public List<User> getUsers(Vote vote) {
         // 종료 알람 넣기
         Set<User> userSet = new HashSet<>();
 

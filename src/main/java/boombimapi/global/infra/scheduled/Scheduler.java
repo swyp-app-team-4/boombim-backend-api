@@ -1,6 +1,10 @@
 package boombimapi.global.infra.scheduled;
 
+import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
+import boombimapi.domain.user.domain.entity.User;
+import boombimapi.domain.vote.application.service.VoteService;
+import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
 import jakarta.transaction.Transactional;
@@ -10,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +22,8 @@ import java.time.Instant;
 public class Scheduler {
     private final FcmService fcmService;
     private final VoteRepository voteRepository;
+    private final VoteService voteService;
+    private final AlarmService alarmService;
 
     /**
      * 매일 새벽 3시에 오래된 FCM 토큰 정리
@@ -35,8 +42,20 @@ public class Scheduler {
     @Scheduled(fixedDelay = 60_000L, initialDelay = 30_000L) // 1분마다, 앱 시작 30초 후 시작
     @Transactional
     public void sweepExpiredVotes() {
+
+        List<Vote> expiredVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(VoteStatus.PROGRESS, Instant.now());
+
         int n = voteRepository.bulkCloseExpired(VoteStatus.PROGRESS, VoteStatus.END, Instant.now());
         // log.debug("Closed {} expired votes", n);
+
+        // 자동 종료도 알림 있어야됨
+        for (Vote expiredVote : expiredVotes) {
+            List<User> userList = voteService.getUsers(expiredVote);
+
+            alarmService.sendEndVoteAlarm(expiredVote, userList);
+
+        }
+
     }
 
 }

@@ -31,4 +31,5 @@ public interface AlarmService {
     // 투표 종료 알림
     SendAlarmResponse sendEndVoteAlarm(Vote vote, List<User> userList);
 
+
 }

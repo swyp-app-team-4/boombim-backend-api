@@ -38,4 +38,8 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     @Query("select v.user from Vote v where v = :vote")
     List<User> findUsersByVote(@Param("vote") Vote vote);
+
+    List<Vote> findByVoteStatusAndEndTimeLessThanEqual(VoteStatus status, Instant now);
+
+
 }
