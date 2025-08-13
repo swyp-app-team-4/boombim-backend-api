@@ -2,13 +2,16 @@ package boombimapi.domain.vote.domain.entity;
 
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.user.domain.entity.User;
+import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +57,13 @@ public class Vote {
     @Column(nullable = false)
     private boolean isVoteActivate;
 
+    @CreationTimestamp
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    // 투표 상태
+    @Column(nullable = false)
+    private VoteStatus voteStatus;
     // 투표 타이머 앤 고민좀 !!
     @Column(nullable = false)
     private Instant endTime; // 생성 시 now() + 30m
@@ -68,6 +78,7 @@ public class Vote {
         this.posName = posName;
         this.isVoteActivate = true;
         this.endTime = Instant.now().plus(30, ChronoUnit.MINUTES); // 생성 시 30분 뒤
+        this.voteStatus = VoteStatus.PROGRESS;
     }
 
 

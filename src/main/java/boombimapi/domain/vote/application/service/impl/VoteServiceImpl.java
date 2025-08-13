@@ -12,6 +12,7 @@ import boombimapi.domain.vote.domain.repository.VoteRepository;
 import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
+import boombimapi.domain.vote.presentation.dto.res.VoteListRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -99,6 +100,10 @@ public class VoteServiceImpl implements VoteService {
                 .vote(vote)
                 .answerType(req.voteAnswerType()).build());
 
+        // =======
+        // 여기서 혼잡도 정보한테도 넘겨야됨 이건 추후!!
+        // =======
+
     }
 
     @Override
@@ -114,6 +119,20 @@ public class VoteServiceImpl implements VoteService {
 
         // 투표 종료 비활성화 false로 바꿈
         vote.updateIsVoteDeactivate();
+    }
+
+    @Override
+    public VoteListRes listVote(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        // 사용자 위치에 맞게 떠야됨 근데 이거 나중에
+
+
+        //중복도 내투표에 뜨게해야된다.!
+
+
+        return null;
     }
 
 
