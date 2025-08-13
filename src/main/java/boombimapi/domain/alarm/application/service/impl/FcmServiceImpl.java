@@ -9,6 +9,8 @@ import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.FcmTokenRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
+import boombimapi.domain.alarm.presentation.dto.req.AlarmSendDto;
+import boombimapi.domain.alarm.presentation.dto.req.AlarmSendResDto;
 import boombimapi.domain.user.domain.entity.User;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
@@ -67,36 +69,6 @@ public class FcmServiceImpl implements FcmService {
         }
     }
 
-    /**
-     * 단일 사용자에게 알림 전송 보류
-     */
-    @Override
-    public boolean sendNotificationToUser(String userId, String title, String body) {
-        List<FcmToken> tokens = fcmTokenRepository.findByUserIdAndIsActiveTrue(userId);
-
-        if (tokens.isEmpty()) {
-            log.warn("사용자의 활성 FCM 토큰이 없음: userId={}", userId);
-            return false;
-        }
-
-        boolean hasSuccess = false;
-        for (FcmToken token : tokens) {
-            try {
-                sendSingleNotification(token.getToken(), title, body);
-                token.updateLastUsedAt();
-                hasSuccess = true;
-            } catch (Exception e) {
-                log.error("FCM 전송 실패: userId={}, token={}, error={}",
-                        userId, token.getToken().substring(0, 10) + "...", e.getMessage());
-                // 토큰이 무효화된 경우 비활성화
-                if (isTokenInvalid(e)) {
-                    token.deactivate();
-                }
-            }
-        }
-
-        return hasSuccess;
-    }
 
     /**
      * 모든 사용자에게 알림 전송 (배치)
@@ -107,19 +79,59 @@ public class FcmServiceImpl implements FcmService {
         List<FcmToken> allTokens = fcmTokenRepository.findAllActiveTokens();
         log.info("전체 알림 전송 시작: 총 {} 개의 토큰", allTokens.size());
 
+
+        AlarmSendDto dto = AlarmSendDto.builder()
+                .allTokens(allTokens)
+                .title(title)
+                .body(body)
+                .alarm(alarm)
+                .build();
+
+        AlarmSendResDto res = sendProxyBatch(dto);
+
+        // 실패 토큰 원인은 서버 문제, 잘못된 형식, 유저가 앱 삭제 등 등 여러가지 이유가 있음 이건 주기적으로 삭제할거임 스케줄러
+        AlarmSendResult result = new AlarmSendResult(res.successCount(), res.failureCount(), res.invalidTokens());
+        log.info("전체 알림 전송 완료: 성공={}, 실패={}", res.successCount(), res.failureCount());
+
+        return result;
+    }
+
+
+    @Override
+    public AlarmSendResult sendNotificationToVote(String title, String body, Alarm alarm, List<User> userList) {
+        List<FcmToken> allTokens = fcmTokenRepository.findByUserInAndIsActiveTrueOrderByUser_IdAscLastUsedAtDesc(userList);
+        log.info("투표한 유저들 알림 전송 시작: 총 {} 개의 토큰", allTokens.size());
+
+
+        AlarmSendDto dto = AlarmSendDto.builder()
+                .allTokens(allTokens)
+                .title(title)
+                .body(body)
+                .alarm(alarm)
+                .build();
+
+        AlarmSendResDto res = sendProxyBatch(dto);
+
+        // 실패 토큰 원인은 서버 문제, 잘못된 형식, 유저가 앱 삭제 등 등 여러가지 이유가 있음 이건 주기적으로 삭제할거임 스케줄러
+        AlarmSendResult result = new AlarmSendResult(res.successCount(), res.failureCount(), res.invalidTokens());
+        log.info("전체 알림 전송 완료: 성공={}, 실패={}", res.successCount(), res.failureCount());
+        return result;
+    }
+
+
+    private AlarmSendResDto sendProxyBatch(AlarmSendDto dto) {
+
+        // 저장할 수신 기록
+        List<AlarmRecipient> recipientsToSave = new ArrayList<>();
         int successCount = 0;
         int failureCount = 0;
         List<String> invalidTokens = new ArrayList<>();
 
-
-        // 저장할 수신 기록
-        List<AlarmRecipient> recipientsToSave = new ArrayList<>();
-
         // 배치로 전송 (최대 500개씩)
         int batchSize = 500;
-        for (int i = 0; i < allTokens.size(); i += batchSize) {
-            List<FcmToken> batch = allTokens.subList(i, Math.min(i + batchSize, allTokens.size()));
-            AlarmSendResult batchResult = sendBatchNotification(batch, title, body);
+        for (int i = 0; i < dto.allTokens().size(); i += batchSize) {
+            List<FcmToken> batch = dto.allTokens().subList(i, Math.min(i + batchSize, dto.allTokens().size()));
+            AlarmSendResult batchResult = sendBatchNotification(batch, dto.title(), dto.body());
 
             successCount += batchResult.successCount();
             failureCount += batchResult.failureCount();
@@ -129,7 +141,7 @@ public class FcmServiceImpl implements FcmService {
 
             for (FcmToken ft : batch) {
                 AlarmRecipient ar = AlarmRecipient.builder()
-                        .alarm(alarm)
+                        .alarm(dto.alarm())
                         .user(ft.getUser())              // User 연관
                         .deviceType(ft.getDeviceType())  // IOS/ANDROID/WEB
                         .build();
@@ -145,7 +157,7 @@ public class FcmServiceImpl implements FcmService {
                 recipientsToSave.add(ar);
             }
             log.info("배치 전송 완료: {}/{} (성공: {}, 실패: {})",
-                    i + batch.size(), allTokens.size(), batchResult.successCount(), batchResult.failureCount());
+                    i + batch.size(), dto.allTokens().size(), batchResult.successCount(), batchResult.failureCount());
         }
 
         // 무효한 토큰들 비활성화
@@ -153,12 +165,9 @@ public class FcmServiceImpl implements FcmService {
 
         alarmRecipientRepository.saveAll(recipientsToSave);
 
-        // 실패 토큰 원인은 서버 문제, 잘못된 형식, 유저가 앱 삭제 등 등 여러가지 이유가 있음 이건 주기적으로 삭제할거임 스케줄러
-        AlarmSendResult result = new AlarmSendResult(successCount, failureCount, invalidTokens);
-        log.info("전체 알림 전송 완료: 성공={}, 실패={}", successCount, failureCount);
-
-        return result;
+        return AlarmSendResDto.of(successCount, failureCount, invalidTokens);
     }
+
 
     /**
      * 배치 알림 전송
@@ -216,31 +225,6 @@ public class FcmServiceImpl implements FcmService {
         return new AlarmSendResult(successCount, failureCount, invalidTokens);
     }
 
-    /**
-     * 단일 알림 전송
-     */
-    private void sendSingleNotification(String token, String title, String body) throws FirebaseMessagingException {
-        Message message = Message.builder()
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
-                        .build())
-                .setAndroidConfig(AndroidConfig.builder()
-                        .setNotification(AndroidNotification.builder()
-                                .setIcon("ic_notification")
-                                .setColor("#FF6B35")
-                                .build())
-                        .build())
-                .setApnsConfig(ApnsConfig.builder()
-                        .setAps(Aps.builder()
-                                .setSound("default")
-                                .build())
-                        .build())
-                .setToken(token)
-                .build();
-
-        firebaseMessaging.send(message);
-    }
 
     /**
      * 무효한 토큰들 비활성화
@@ -274,12 +258,5 @@ public class FcmServiceImpl implements FcmService {
         log.info("30일 이상 된 비활성 토큰 정리 완료");
     }
 
-    /**
-     * 사용자 토큰 개수 조회
-     */
-    @Override
-    public int getUserTokenCount(String userId) {
-        return fcmTokenRepository.findByUserIdAndIsActiveTrue(userId).size();
-    }
 }
 

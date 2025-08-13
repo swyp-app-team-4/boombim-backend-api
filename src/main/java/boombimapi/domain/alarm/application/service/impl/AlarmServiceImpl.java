@@ -6,12 +6,12 @@ import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
+import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
 import boombimapi.domain.alarm.domain.entity.alarm.type.DeliveryStatus;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
-import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
@@ -20,6 +20,7 @@ import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
 import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.user.domain.repository.UserRepository;
+import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -50,19 +51,9 @@ public class AlarmServiceImpl implements AlarmService {
      * 관리자가 알림 전송
      */
     @Override
-    public SendAlarmResponse sendAlarm(String senderUserId, SendAlarmRequest request) {
-        log.info("알림 전송 요청: 발신자={}, 타입={}",
-                senderUserId, request.type());
-
-        // 발신자가 관리자인지 확인
+    public SendAlarmResponse sendAllAlarm(String senderUserId, SendAlarmRequest request) {
         User sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
-
-        /**
-         * 빠른 개발을 위해 일단 뺴겠음
-         if (!isAdmin(sender)) {
-         throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
-         }*/
 
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
@@ -80,27 +71,12 @@ public class AlarmServiceImpl implements AlarmService {
         try {
             savedAlarm.updateStatus(AlarmStatus.SENDING);
 
-            /*** 단일 사용자인데 나중에 쓸 곳 있을거 같아서 빼겠음
-             *             if (request.targetUserId() != null) {
-             *                 // 특정 사용자에게 전송
-             *                 boolean success = fcmService.sendNotificationToUser(
-             *                         request.targetUserId(),
-             *                         request.title(),
-             *                         request.message()
-             *                 );
-             *                 sendResult = success ?
-             *                         new AlarmSendResult(1, 0, java.util.List.of()) :
-             *                         new AlarmSendResult(0, 1, java.util.List.of());
-             *             }
-             */
-
-
             // 전체 사용자에게 전송
             sendResult = fcmService.sendNotificationToAll(
                     request.title(),
                     request.message(),
                     alarm
-            ); // 비동기 결과 대기
+            );
 
 
             // 전송 결과 업데이트
@@ -115,20 +91,18 @@ public class AlarmServiceImpl implements AlarmService {
             log.info("알림 전송 완료: alarmId={}, 성공={}, 실패={}",
                     savedAlarm.getId(), sendResult.successCount(), sendResult.failureCount());
 
-            return
-                    SendAlarmResponse.of(
-                            savedAlarm,
-                            sendResult.successCount(),
-                            sendResult.failureCount(),
-                            sendResult.successCount() + sendResult.failureCount()
-                    );
+            return SendAlarmResponse.of(
+                    savedAlarm,
+                    sendResult.successCount(),
+                    sendResult.failureCount(),
+                    sendResult.successCount() + sendResult.failureCount()
+            );
 
         } catch (Exception e) {
             log.error("알림 전송 중 오류 발생: alarmId={}, error={}", savedAlarm.getId(), e.getMessage());
             savedAlarm.updateFailureReason("전송 중 오류: " + e.getMessage());
             //throw new BoombimException(ErrorCode.FCM_SEND_FAILED);
-            return
-                    SendAlarmResponse.of(savedAlarm, 0, 1, 1);
+            return SendAlarmResponse.of(savedAlarm, 0, 1, 1);
         }
     }
 
@@ -159,7 +133,7 @@ public class AlarmServiceImpl implements AlarmService {
      * 알림 내역 조회
      */
     @Override
-    public List<HistoryResponse> getAlarmHistory(String userId, GetAlarmHistoryRequest req) {
+    public List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
@@ -170,7 +144,7 @@ public class AlarmServiceImpl implements AlarmService {
          */
 
 
-        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByUserAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(req.deviceType()));
+        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByUserAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(deviceType.name()));
 
         List<HistoryResponse> result = new ArrayList<>();
 
@@ -181,6 +155,66 @@ public class AlarmServiceImpl implements AlarmService {
         }
 
         return result;
+    }
+
+    @Override
+    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<User> userList) {
+        // 관리자 일단 최승호로 하겠음~! 나중에 수정 할꺼임
+        User sender = userRepository.findById("4386048193")
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        String title = vote.getPosName() + "투표 종료 알림";
+        String message = vote.getPosName() + "투표가 종료됐어요! 투표 정보 확인해보세요";
+        // 알림 엔티티 생성
+        Alarm alarm = Alarm.builder()
+                .title(title)
+                .message(message)
+                .type(AlarmType.VOTE)
+                .sender(sender)
+                .build();
+
+        Alarm savedAlarm = alarmRepository.save(alarm);
+
+        // 알림 전송 처리
+        AlarmSendResult sendResult;
+
+        try {
+            savedAlarm.updateStatus(AlarmStatus.SENDING);
+
+            // 투표한 사람들에게 전송
+            sendResult = fcmService.sendNotificationToVote(
+                    title,
+                    message,
+                    alarm,
+                    userList
+            );
+
+
+            // 전송 결과 업데이트
+            if (sendResult.failureCount() == 0) {
+                savedAlarm.updateStatus(AlarmStatus.SENT);
+            } else if (sendResult.successCount() > 0) {
+                savedAlarm.updateStatus(AlarmStatus.SENT);
+            } else {
+                savedAlarm.updateFailureReason("모든 대상자에게 전송 실패");
+            }
+
+            log.info("알림 전송 완료: alarmId={}, 성공={}, 실패={}",
+                    savedAlarm.getId(), sendResult.successCount(), sendResult.failureCount());
+
+            return SendAlarmResponse.of(
+                    savedAlarm,
+                    sendResult.successCount(),
+                    sendResult.failureCount(),
+                    sendResult.successCount() + sendResult.failureCount()
+            );
+
+        } catch (Exception e) {
+            log.error("알림 전송 중 오류 발생: alarmId={}, error={}", savedAlarm.getId(), e.getMessage());
+            savedAlarm.updateFailureReason("전송 중 오류: " + e.getMessage());
+            //throw new BoombimException(ErrorCode.FCM_SEND_FAILED);
+            return SendAlarmResponse.of(savedAlarm, 0, 1, 1);
+        }
     }
 
 

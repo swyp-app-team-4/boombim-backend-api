@@ -4,6 +4,9 @@ import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
+import boombimapi.domain.vote.domain.entity.Vote;
+import boombimapi.domain.vote.domain.entity.VoteAnswer;
+import boombimapi.domain.vote.domain.entity.VoteDuplication;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +40,18 @@ public class User {
     // 3) 내 디바이스 토큰들 (FcmToken.user)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FcmToken> fcmTokens = new ArrayList<>();
+
+    // 4) 내 투표 목록들  주인
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votess = new ArrayList<>();
+
+    // 5) 내 투표 목록들  부하
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VoteDuplication> voteDuplications = new ArrayList<>();
+
+    // 6) 내 투표 답변들
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VoteAnswer> voteAnswers = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;
