@@ -65,7 +65,12 @@ public enum ErrorCode {
     INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400),
 
     // official congestion
-    OFFICIAL_CONGESTION_NOT_FOUND(-400, "공식 혼잡도 데이터가 존재하지 않습니다.", 406);
+    OFFICIAL_CONGESTION_NOT_FOUND(-400, "공식 혼잡도 데이터가 존재하지 않습니다.", 406),
+
+    // vote
+    DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다.", 409),
+    OUT_OF_500M_RADIUS(-501, "현재 위치가 반경 500m를 초과했습니다.", 403);
+
     private final int code;
     private final String message;
     private final int httpCode;

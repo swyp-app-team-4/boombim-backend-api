@@ -60,13 +60,13 @@ public class Vote {
 
 
     @Builder
-    public Vote(User user, String posId, double latitude, double longitude, String posName, boolean isVoteActivate) {
+    public Vote(User user, String posId, double latitude, double longitude, String posName) {
         this.user = user;
         this.posId = posId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.posName = posName;
-        this.isVoteActivate = isVoteActivate;
+        this.isVoteActivate = true;
         this.endTime = Instant.now().plus(30, ChronoUnit.MINUTES); // 생성 시 30분 뒤
     }
 
