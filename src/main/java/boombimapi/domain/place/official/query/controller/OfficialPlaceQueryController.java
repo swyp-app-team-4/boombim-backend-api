@@ -1,10 +1,10 @@
-package boombimapi.domain.place.presentation.controller;
+package boombimapi.domain.place.official.query.controller;
 
 import static boombimapi.global.response.ResponseMessage.*;
 
-import boombimapi.domain.place.application.service.OfficialPlaceService;
-import boombimapi.domain.place.presentation.dto.request.ViewportRequest;
-import boombimapi.domain.place.presentation.dto.response.MapMarkerResponse;
+import boombimapi.domain.place.official.query.service.OfficialPlaceQueryService;
+import boombimapi.domain.place.official.query.dto.request.ViewportRequest;
+import boombimapi.domain.place.official.query.dto.response.MapMarkerResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/official-place")
 @Tag(name = "OfficialPlace", description = "공식 장소 API")
-public class OfficialPlaceController {
+public class OfficialPlaceQueryController {
 
-    private final OfficialPlaceService officialPlaceService;
+    private final OfficialPlaceQueryService officialPlaceQueryService;
 
     @Operation(summary = "뷰포트 내 공식 장소 마커 조회 API", description = "뷰포트 내에 위치한 공식 장소들의 좌표를 리스트로 반환합니다.")
     @ApiResponses(value = {
@@ -39,7 +39,7 @@ public class OfficialPlaceController {
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_OFFICIAL_PLACES_WITHIN_VIEWPORT_SUCCESS,
-                officialPlaceService.getMarkersInViewport(viewportRequest)
+                officialPlaceQueryService.getMarkersInViewport(viewportRequest)
             )
         );
     }
