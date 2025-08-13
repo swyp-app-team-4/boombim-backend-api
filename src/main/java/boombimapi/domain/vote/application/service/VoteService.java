@@ -18,10 +18,9 @@ public interface VoteService {
 
     void answerVote(String userId, VoteAnswerReq req);
 
-    SendAlarmResponse endVote(String userId, VoteDeleteReq req);
+    void endVote(String userId, VoteDeleteReq req);
 
     VoteListRes listVote(String userId, double latitude,
                          double longitude);
 
-    List<User> getUsers(Vote vote);
 }

@@ -119,7 +119,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
-    public SendAlarmResponse endVote(String userId, VoteDeleteReq req) {
+    public void endVote(String userId, VoteDeleteReq req) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
@@ -134,10 +134,8 @@ public class VoteServiceImpl implements VoteService {
         vote.updateIsVoteDeactivate();
         vote.updateStatusDeactivate();
 
-        List<User> userList = getUsers(vote);
-
-        // 알람 전송
-        return alarmService.sendEndVoteAlarm(vote, userList);
+        // 투표 알림 가게 true로 변환
+        vote.updatePassivityAlarmActivate();
 
     }
 
@@ -275,22 +273,4 @@ public class VoteServiceImpl implements VoteService {
         return R * c;
     }
 
-    @Override
-    public List<User> getUsers(Vote vote) {
-        // 종료 알람 넣기
-        Set<User> userSet = new HashSet<>();
-
-        // 1) 투표 생성자
-        userSet.addAll(voteRepository.findUsersByVote(vote));
-
-        // 2) 중복투표한 유저
-        userSet.addAll(voteDuplicationRepository.findUsersByVote(vote));
-
-        // 3) 답변한 유저
-        userSet.addAll(voteAnswerRepository.findUsersByVote(vote));
-
-        // 최종 리스트
-        List<User> userList = new ArrayList<>(userSet);
-        return userList;
-    }
 }

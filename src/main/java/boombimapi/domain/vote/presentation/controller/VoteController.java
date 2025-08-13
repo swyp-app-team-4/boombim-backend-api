@@ -44,8 +44,8 @@ public class VoteController {
 
     @Operation(description = "투표 종료하기 api")
     @PatchMapping
-    public ResponseEntity<SendAlarmResponse> endVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
-        return ResponseEntity.ok(voteService.endVote(userId, req));
+    public void endVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
+        voteService.endVote(userId, req);
     }
 
 

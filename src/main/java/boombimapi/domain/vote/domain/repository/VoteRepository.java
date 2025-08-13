@@ -41,5 +41,7 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     List<Vote> findByVoteStatusAndEndTimeLessThanEqual(VoteStatus status, Instant now);
 
+    List<Vote> findByPassivityAlarmFlagTrue();
+
 
 }
