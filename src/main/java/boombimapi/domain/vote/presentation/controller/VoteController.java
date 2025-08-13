@@ -1,7 +1,8 @@
 package boombimapi.domain.vote.presentation.controller;
 
 import boombimapi.domain.vote.application.service.VoteService;
-import boombimapi.domain.vote.presentation.dto.req.RegisterReq;
+import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
+import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,15 @@ public class VoteController {
 //5. 투표 종료 api
 //6. 알림 2개는 나중에
     @Operation(description = "투표 생성 api")
-    @PostMapping
-    public void registerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody RegisterReq req) {
+    @PostMapping("register")
+    public void registerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteRegisterReq req) {
         voteService.registerVote(userId, req);
+    }
+
+
+    @Operation(description = "투표하기 api")
+    @PostMapping("answer")
+    public void checkVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteAnswerReq req) {
+        voteService.answerVote(userId, req);
     }
 }

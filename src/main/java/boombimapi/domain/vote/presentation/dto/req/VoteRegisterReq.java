@@ -1,6 +1,6 @@
 package boombimapi.domain.vote.presentation.dto.req;
 
-public record RegisterReq(
+public record VoteRegisterReq(
         String posId,
 
         double posLatitude,

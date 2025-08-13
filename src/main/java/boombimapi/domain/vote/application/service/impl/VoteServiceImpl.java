@@ -4,11 +4,13 @@ import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.user.domain.repository.UserRepository;
 import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.domain.entity.Vote;
+import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
 import boombimapi.domain.vote.domain.repository.VoteDuplicationRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
-import boombimapi.domain.vote.presentation.dto.req.RegisterReq;
+import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
+import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -31,7 +33,7 @@ public class VoteServiceImpl implements VoteService {
     private final UserRepository userRepository;
 
     @Override
-    public void registerVote(String userId, RegisterReq req) {
+    public void registerVote(String userId, VoteRegisterReq req) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
@@ -72,6 +74,27 @@ public class VoteServiceImpl implements VoteService {
         // 중복 검사인지 확인해야됨
         // 타이머는 30분 이때 다른 사용자가 똑같은거하면 덮어쓰기 이해되지??
         // 또한 위도 경도 맞게
+
+    }
+
+    @Override
+    public void answerVote(String userId, VoteAnswerReq req) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        Vote vote = voteRepository.findById(req.voteId()).orElse(null);
+        if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
+
+
+        // 같은 투표 중복자 막기
+        VoteAnswer voteAnswer = voteAnswerRepository.findByUserAndVote(user, vote).orElse(null);
+        if (voteAnswer != null) throw new BoombimException(ErrorCode.DUPLICATE_VOTE_USER);
+
+        // 투표 완료
+        voteAnswerRepository.save(VoteAnswer.builder()
+                .user(user)
+                .vote(vote)
+                .answerType(req.voteAnswerType()).build());
 
     }
 
