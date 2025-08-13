@@ -7,6 +7,9 @@ import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import boombimapi.domain.vote.presentation.dto.res.VoteListRes;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,38 +21,51 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/vote")
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Vote", description = "투표 관련 API")
 public class VoteController {
 
     private final VoteService voteService;
 
-    //1. 지역 누르면 투표 생성 api  - 중복 검사인지 확인해야됨 타이머는 30분 이때 다른 사용자가 똑같은거하면 덮어쓰기 이해되지?? 또한 위도 경도 맞게
-//2. 투표하기 api - 4가지 중 중복 안되게
-//3. 투표리스트(중복 질문자수 api 몇명이 궁금), 내 질문 api 합쳐서 드리기
-//4. 그리고 애초에 투표리스트는 사용자가 거리 500m 지역만 활성화 이것도 3번이랑 연관
-//5. 투표 종료 api
-//6. 알림 2개는 나중에(여기서 스케줄러 걔도 짜야됨 그  종료 알림 수동종료 알림은 짬 )
-//7. 투표 종료하면 시간도 초기화 그리고 시간로직 따로 개발해야될듯..!
-    @Operation(description = "투표 생성 api")
+    @Operation(summary = "투표 생성", description = "새로운 투표를 생성합니다. 현재 위치가 반경 500m 이내여야 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "투표 생성 성공"),
+            @ApiResponse(responseCode = "403", description = "500m 반경 초과"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저"),
+            @ApiResponse(responseCode = "409", description = "중복된 장소")
+    })
     @PostMapping
     public void registerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteRegisterReq req) {
         voteService.registerVote(userId, req);
     }
 
-
-    @Operation(description = "투표하기 api")
+    @Operation(summary = "투표하기", description = "기존 투표에 투표합니다. 종료된 투표이거나 이미 투표한 경우 오류가 발생합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "투표 성공"),
+            @ApiResponse(responseCode = "400", description = "종료된 투표"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저 또는 투표"),
+            @ApiResponse(responseCode = "409", description = "이미 투표함")
+    })
     @PostMapping("/answer")
     public void answerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteAnswerReq req) {
         voteService.answerVote(userId, req);
     }
 
-    @Operation(description = "투표 종료하기 api")
+    @Operation(summary = "투표 종료", description = "본인이 생성한 투표를 종료합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "투표 종료 성공"),
+            @ApiResponse(responseCode = "403", description = "투표 종료 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저 또는 투표")
+    })
     @PatchMapping
     public void endVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
         voteService.endVote(userId, req);
     }
 
-
-    @Operation(description = "투표 리스트(투표목록/내질문) api")
+    @Operation(summary = "투표 목록 조회", description = "현재 위치 기준 반경 500m 이내 투표 목록과 내 질문 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저")
+    })
     @GetMapping
     public ResponseEntity<VoteListRes> listVote(
             @AuthenticationPrincipal String userId,
@@ -58,6 +74,7 @@ public class VoteController {
 
         return ResponseEntity.ok(voteService.listVote(userId, latitude, longitude));
     }
+
 
 
 }
