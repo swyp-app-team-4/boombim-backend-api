@@ -10,6 +10,7 @@ import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
 import boombimapi.domain.vote.domain.repository.VoteDuplicationRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
 import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
+import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
@@ -17,6 +18,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -96,6 +99,21 @@ public class VoteServiceImpl implements VoteService {
                 .vote(vote)
                 .answerType(req.voteAnswerType()).build());
 
+    }
+
+    @Override
+    public void deleteVote(String userId, VoteDeleteReq req) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        Vote vote = voteRepository.findById(req.voteId()).orElse(null);
+        if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
+
+        // 다른사용자가 눌렀을떄 혹시 모르니깐!!
+        if(!Objects.equals(vote.getUser().getId(), user.getId())) throw new BoombimException(ErrorCode.NO_PERMISSION_TO_CLOSE_VOTE);
+
+        // 투표 종료 비활성화 false로 바꿈
+        vote.updateIsVoteDeactivate();
     }
 
 

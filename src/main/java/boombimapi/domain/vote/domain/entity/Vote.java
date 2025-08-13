@@ -71,7 +71,7 @@ public class Vote {
     }
 
 
-    public void updateIsVoteActivate(boolean isVoteActivate) {
+    public void updateIsVoteDeactivate() {
         this.isVoteActivate = false;
     }
 

@@ -2,16 +2,14 @@ package boombimapi.domain.vote.presentation.controller;
 
 import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
+import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/vote")
@@ -28,15 +26,23 @@ public class VoteController {
 //5. 투표 종료 api
 //6. 알림 2개는 나중에
     @Operation(description = "투표 생성 api")
-    @PostMapping("register")
+    @PostMapping
     public void registerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteRegisterReq req) {
         voteService.registerVote(userId, req);
     }
 
 
     @Operation(description = "투표하기 api")
-    @PostMapping("answer")
-    public void checkVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteAnswerReq req) {
+    @PostMapping("/answer")
+    public void answerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteAnswerReq req) {
         voteService.answerVote(userId, req);
     }
+
+    @Operation(description = "투표 종료하기 api")
+    @DeleteMapping
+    public void deleteVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
+        voteService.deleteVote(userId, req);
+    }
+
+
 }
