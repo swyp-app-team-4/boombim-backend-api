@@ -93,6 +93,9 @@ public class VoteServiceImpl implements VoteService {
         Vote vote = voteRepository.findById(req.voteId()).orElse(null);
         if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
+        // 투표 종료됐는데 투표할려고 할때
+        if(!vote.isVoteActivate()) throw new BoombimException(ErrorCode.VOTE_ALREADY_CLOSED);
+
 
         // 같은 투표 중복자 막기
         VoteAnswer voteAnswer = voteAnswerRepository.findByUserAndVote(user, vote).orElse(null);
