@@ -47,6 +47,13 @@ public class SchedulerService {
     @Transactional
     public void sweepExpiredVotes() {
         // 자동
+        auto();
+
+        // 수동
+        passivity();
+    }
+
+    private void auto(){
         List<Vote> autoVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(VoteStatus.PROGRESS, Instant.now());
 
         // 투포 시간 된거 종료로 바꾸기
@@ -59,8 +66,8 @@ public class SchedulerService {
             alarmService.sendEndVoteAlarm(autoVote, userList);
 
         }
-
-        // 수동
+    }
+    private void passivity(){
         List<Vote> passivityVotes = voteRepository.findByPassivityAlarmFlagTrue();
 
         // 수동 종료 알림
