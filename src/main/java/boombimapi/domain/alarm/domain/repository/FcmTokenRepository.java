@@ -1,5 +1,5 @@
 package boombimapi.domain.alarm.domain.repository;
-import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
+import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,6 +20,9 @@ public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
     // 모든 활성화된 토큰 조회 (전체 알림용)
     @Query("SELECT f FROM FcmToken f WHERE f.isActive = true")
     List<FcmToken> findAllActiveTokens();
+
+    // 투표 유저 알림용
+    List<FcmToken> findByUserInAndIsActiveTrueOrderByUser_IdAscLastUsedAtDesc(List<User> users);
 
     // 토큰으로 조회
     Optional<FcmToken> findByToken(String token);

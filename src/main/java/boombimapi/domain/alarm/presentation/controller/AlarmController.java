@@ -61,7 +61,7 @@ public class AlarmController {
 
         log.info("알림 전송 요청: 관리자={}, 제목={}", userId, request.title());
 
-        return ResponseEntity.ok(alarmService.sendAlarm(userId, request));
+        return ResponseEntity.ok(alarmService.sendAllAlarm(userId, request));
 
     }
 

@@ -1,5 +1,6 @@
 package boombimapi.domain.vote.presentation.controller;
 
+import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
 import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
@@ -26,7 +27,7 @@ public class VoteController {
 //3. 투표리스트(중복 질문자수 api 몇명이 궁금), 내 질문 api 합쳐서 드리기
 //4. 그리고 애초에 투표리스트는 사용자가 거리 500m 지역만 활성화 이것도 3번이랑 연관
 //5. 투표 종료 api
-//6. 알림 2개는 나중에
+//6. 알림 2개는 나중에(여기서 스케줄러 걔도 짜야됨 그  종료 알림 수동종료 알림은 짬 )
 //7. 투표 종료하면 시간도 초기화 그리고 시간로직 따로 개발해야될듯..!
     @Operation(description = "투표 생성 api")
     @PostMapping
@@ -42,9 +43,9 @@ public class VoteController {
     }
 
     @Operation(description = "투표 종료하기 api")
-    @DeleteMapping
-    public void deleteVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
-        voteService.deleteVote(userId, req);
+    @PatchMapping
+    public ResponseEntity<SendAlarmResponse> endVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
+        return ResponseEntity.ok(voteService.endVote(userId, req));
     }
 
 

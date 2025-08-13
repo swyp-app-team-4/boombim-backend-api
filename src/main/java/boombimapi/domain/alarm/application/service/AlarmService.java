@@ -8,6 +8,8 @@ import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
+import boombimapi.domain.user.domain.entity.User;
+import boombimapi.domain.vote.domain.entity.Vote;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,39 +19,16 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface AlarmService {
 
-    /**
-     * 관리자가 알림 전송 (비동기)
-     *
-     * @param senderUserId 발송자(관리자) ID
-     * @param request 알림 전송 요청 정보
-     * @return 전송 결과
-     */
-    SendAlarmResponse sendAlarm(String senderUserId, SendAlarmRequest request);
+    // 공지 사항 및 이벤트 알림 전송
+    SendAlarmResponse sendAllAlarm(String senderUserId, SendAlarmRequest request);
 
-    /**
-     * FCM 토큰 등록
-     *
-     * @param userId 사용자 ID
-     * @param request FCM 토큰 등록 요청
-     * @return 등록 결과
-     */
+    // FCM 토큰 등록
     RegisterFcmTokenResponse registerFcmToken(String userId, RegisterFcmTokenRequest request);
 
-    /**
-     * 알림 내역 조회 (관리자용)
-     *
-     * @param userId 조회자(관리자) ID
-     * @param request 조회 조건
-     * @return 페이징된 알림 내역
-     */
+    // 알림 내역 조회
     List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType);
 
-    /**
-     * 특정 알림 상세 조회
-     *
-     * @param userId 조회자 ID
-     * @param alarmId 알림 ID
-     * @return 알림 상세 정보
-     */
+    // 투표 종료 알림
+    SendAlarmResponse sendEndVoteAlarm(Vote vote, List<User> userList);
 
 }

@@ -29,9 +29,13 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
         update Vote v
            set v.voteStatus = :end, v.isVoteActivate = false
          where v.voteStatus = :progress
+         and v.isVoteActivate = true
            and v.endTime <= :now
     """)
     int bulkCloseExpired(@Param("progress") VoteStatus progress,
                          @Param("end") VoteStatus end,
                          @Param("now") Instant now);
+
+    @Query("select v.user from Vote v where v = :vote")
+    List<User> findUsersByVote(@Param("vote") Vote vote);
 }

@@ -1,5 +1,8 @@
 package boombimapi.domain.vote.application.service.impl;
 
+import boombimapi.domain.alarm.application.service.AlarmService;
+import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
+import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
 import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.user.domain.repository.UserRepository;
 import boombimapi.domain.vote.application.service.VoteService;
@@ -39,6 +42,8 @@ public class VoteServiceImpl implements VoteService {
     private final VoteDuplicationRepository voteDuplicationRepository;
 
     private final UserRepository userRepository;
+
+    private final AlarmService alarmService;
 
     @Override
     public void registerVote(String userId, VoteRegisterReq req) {
@@ -94,7 +99,7 @@ public class VoteServiceImpl implements VoteService {
         if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
         // 투표 종료됐는데 투표할려고 할때
-        if(!vote.isVoteActivate()) throw new BoombimException(ErrorCode.VOTE_ALREADY_CLOSED);
+        if (!vote.isVoteActivate()) throw new BoombimException(ErrorCode.VOTE_ALREADY_CLOSED);
 
 
         // 같은 투표 중복자 막기
@@ -114,7 +119,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
-    public void deleteVote(String userId, VoteDeleteReq req) {
+    public SendAlarmResponse endVote(String userId, VoteDeleteReq req) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
@@ -127,9 +132,13 @@ public class VoteServiceImpl implements VoteService {
 
         // 투표 종료 비활성화 false로 바꿈
         vote.updateIsVoteDeactivate();
+        vote.updateStatusDeactivate();
 
-        //종료 알람 넣기 
-        //~~~~ 
+        List<User> userList = getUsers(vote);
+
+        // 알람 전송
+        return alarmService.sendEndVoteAlarm(vote, userList);
+
     }
 
     @Override
@@ -264,5 +273,23 @@ public class VoteServiceImpl implements VoteService {
                 * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    private List<User> getUsers(Vote vote) {
+        // 종료 알람 넣기
+        Set<User> userSet = new HashSet<>();
+
+        // 1) 투표 생성자
+        userSet.addAll(voteRepository.findUsersByVote(vote));
+
+        // 2) 중복투표한 유저
+        userSet.addAll(voteDuplicationRepository.findUsersByVote(vote));
+
+        // 3) 답변한 유저
+        userSet.addAll(voteAnswerRepository.findUsersByVote(vote));
+
+        // 최종 리스트
+        List<User> userList = new ArrayList<>(userSet);
+        return userList;
     }
 }
