@@ -11,7 +11,6 @@ import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
-import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
@@ -159,7 +158,7 @@ public class AlarmServiceImpl implements AlarmService {
      * 알림 내역 조회
      */
     @Override
-    public List<HistoryResponse> getAlarmHistory(String userId, GetAlarmHistoryRequest req) {
+    public List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
@@ -170,7 +169,7 @@ public class AlarmServiceImpl implements AlarmService {
          */
 
 
-        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByUserAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(req.deviceType()));
+        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByUserAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(deviceType.name()));
 
         List<HistoryResponse> result = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package boombimapi.domain.alarm.application.service;
 
-import boombimapi.domain.alarm.presentation.dto.req.GetAlarmHistoryRequest;
+import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
+
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
@@ -41,7 +42,7 @@ public interface AlarmService {
      * @param request 조회 조건
      * @return 페이징된 알림 내역
      */
-    List<HistoryResponse> getAlarmHistory(String userId, GetAlarmHistoryRequest request);
+    List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType);
 
     /**
      * 특정 알림 상세 조회
