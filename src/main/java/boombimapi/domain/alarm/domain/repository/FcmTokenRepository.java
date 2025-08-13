@@ -17,12 +17,18 @@ public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
     // 사용자별 활성화된 토큰 조회
     List<FcmToken> findByUserIdAndIsActiveTrue(String userId);
 
-    // 모든 활성화된 토큰 조회 (전체 알림용)
-    @Query("SELECT f FROM FcmToken f WHERE f.isActive = true")
+    // 모든 활성화된 토큰 조회 (전체 알림용) - alarmFlag가 false인 유저만
+    @Query("SELECT f FROM FcmToken f WHERE f.isActive = true AND f.user.alarmFlag = false")
     List<FcmToken> findAllActiveTokens();
 
-    // 투표 유저 알림용
-    List<FcmToken> findByUserInAndIsActiveTrueOrderByUser_IdAscLastUsedAtDesc(List<User> users);
+    // 투표 종료 유저 알림용 - alarmFlag가 false인 유저만
+    @Query("SELECT f FROM FcmToken f " +
+            "WHERE f.user IN :users " +
+            "AND f.isActive = true " +
+            "AND f.user.alarmFlag = false " +
+            "ORDER BY f.user.id ASC, f.lastUsedAt DESC")
+    List<FcmToken> findActiveTokensForUsers(@Param("users") List<User> users);
+
 
     // 토큰으로 조회
     Optional<FcmToken> findByToken(String token);

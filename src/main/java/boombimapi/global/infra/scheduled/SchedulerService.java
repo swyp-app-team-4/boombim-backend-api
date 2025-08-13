@@ -2,6 +2,8 @@ package boombimapi.global.infra.scheduled;
 
 import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
+import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
+import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
 import boombimapi.domain.user.domain.entity.User;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
@@ -53,7 +55,22 @@ public class SchedulerService {
         passivity();
     }
 
-    private void auto(){
+
+    // 매일 오후 4시에 소통방 알림
+    @Scheduled(cron = "0 0 16 * * *") // 매일 오후 4시
+    public void sendDailyNotification() {
+        log.info("오후 4시 알림 작업 시작");
+        try {
+            // 관리자 아이디 나중에 바꾸게씅.!
+            alarmService.sendAllAlarm("4380323224", SendAlarmRequest.builder().title("소통방 참여해주세요").message("하라고").type(AlarmType.COMMUNICATION).build());
+            log.info("오후 4시 알림 작업 완료");
+        } catch (Exception e) {
+            log.error("오후 4시 알림 작업 중 오류 발생", e);
+        }
+    }
+
+
+    private void auto() {
         List<Vote> autoVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(VoteStatus.PROGRESS, Instant.now());
 
         // 투포 시간 된거 종료로 바꾸기
@@ -67,7 +84,8 @@ public class SchedulerService {
 
         }
     }
-    private void passivity(){
+
+    private void passivity() {
         List<Vote> passivityVotes = voteRepository.findByPassivityAlarmFlagTrue();
 
         // 수동 종료 알림

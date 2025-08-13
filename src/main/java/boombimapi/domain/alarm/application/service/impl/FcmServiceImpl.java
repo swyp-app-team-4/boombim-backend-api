@@ -99,7 +99,7 @@ public class FcmServiceImpl implements FcmService {
 
     @Override
     public AlarmSendResult sendNotificationToVote(String title, String body, Alarm alarm, List<User> userList) {
-        List<FcmToken> allTokens = fcmTokenRepository.findByUserInAndIsActiveTrueOrderByUser_IdAscLastUsedAtDesc(userList);
+        List<FcmToken> allTokens = fcmTokenRepository.findActiveTokensForUsers(userList);
         log.info("투표한 유저들 알림 전송 시작: 총 {} 개의 토큰", allTokens.size());
 
 

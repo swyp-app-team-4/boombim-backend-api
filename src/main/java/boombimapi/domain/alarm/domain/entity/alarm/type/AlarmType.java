@@ -3,7 +3,7 @@ package boombimapi.domain.alarm.domain.entity.alarm.type;
 
 public enum AlarmType {
     ANNOUNCEMENT("공지사항"),
-    PROMOTION("프로모션"),
+    COMMUNICATION("소통방"),
     VOTE("투표 종료 알림"),
     EVENT("이벤트");
 

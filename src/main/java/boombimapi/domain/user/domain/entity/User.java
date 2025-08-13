@@ -74,6 +74,10 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    // false면 알림감 true면 알림 안감
+    @Column(name = "alarm_flag", nullable = false)
+    private boolean alarmFlag;
+
     @Builder
     public User(String id, String email, String name, String profile,
                 SocialProvider socialProvider, Role role) {
@@ -83,6 +87,7 @@ public class User {
         this.profile = profile;
         this.socialProvider = socialProvider;
         this.role = role;
+        this.alarmFlag = false;
     }
 
     public void updateEmailAndProfile(String email, String profile) {
