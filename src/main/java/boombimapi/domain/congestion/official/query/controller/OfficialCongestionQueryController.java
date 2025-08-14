@@ -2,7 +2,7 @@ package boombimapi.domain.congestion.official.query.controller;
 
 import static boombimapi.global.response.ResponseMessage.*;
 
-import boombimapi.domain.congestion.official.query.dto.OfficialCongestionResponse;
+import boombimapi.domain.congestion.official.query.dto.response.OfficialCongestionResponse;
 import boombimapi.domain.congestion.official.query.service.OfficialCongestionQueryService;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;

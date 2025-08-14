@@ -2,7 +2,7 @@ package boombimapi.domain.congestion.official.query.service;
 
 import static boombimapi.global.infra.exception.error.ErrorCode.*;
 
-import boombimapi.domain.congestion.official.query.dto.OfficialCongestionResponse;
+import boombimapi.domain.congestion.official.query.dto.response.OfficialCongestionResponse;
 import boombimapi.domain.congestion.official.query.repository.OfficialCongestionQueryRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import lombok.RequiredArgsConstructor;
