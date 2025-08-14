@@ -114,6 +114,7 @@ public class VoteServiceImpl implements VoteService {
         VoteAnswer voteAnswer = voteAnswerRepository.findByUserAndVote(user, vote).orElse(null);
         if (voteAnswer != null) throw new BoombimException(ErrorCode.DUPLICATE_VOTE_USER);
 
+        log.info(String.valueOf(req.voteAnswerType()));
         // 투표 완료
         voteAnswerRepository.save(VoteAnswer.builder()
                 .user(user)
@@ -232,7 +233,7 @@ public class VoteServiceImpl implements VoteService {
 
         long relaxedCount = counts.getOrDefault(VoteAnswerType.RELAXED, 0L);
         long commonlyCount = counts.getOrDefault(VoteAnswerType.COMMONLY, 0L);
-        long slightlyBusyCount = counts.getOrDefault(VoteAnswerType.SLIGHTLY_BUSY, 0L);
+        long slightlyBusyCount = counts.getOrDefault(VoteAnswerType.BUSY, 0L);
         long crowdedCount = counts.getOrDefault(VoteAnswerType.CROWDED, 0L);
 
         List<Long> result = new ArrayList<>();

@@ -30,6 +30,7 @@ public class VoteAnswer {
     private Vote vote;
 
     // 투표 타입
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private VoteAnswerType answerType;
 
