@@ -136,9 +136,9 @@ public class VoteServiceImpl implements VoteService {
         if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
         // 다른사용자가 눌렀을떄 혹시 모르니깐!!
-        if (!Objects.equals(vote.getUser().getId(), user.getId()))
+        if (!Objects.equals(vote.getUser().getId(), user.getId())) {
             throw new BoombimException(ErrorCode.NO_PERMISSION_TO_CLOSE_VOTE);
-
+        }
         // 투표 종료 비활성화 false로 바꿈
         vote.updateIsVoteDeactivate();
         vote.updateStatusDeactivate();

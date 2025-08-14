@@ -63,6 +63,7 @@ public class Vote {
 
     // 투표 상태 위에 위에 꺼랑 중복되긴 하는데 앱단에서 보기 편하게 하라구 넣음
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private VoteStatus voteStatus;
     // 투표 타이머 앤 고민좀 !!
     @Column(nullable = false)
@@ -90,15 +91,16 @@ public class Vote {
     public void updateIsVoteDeactivate() {
         this.isVoteActivate = false;
     }
+
     public void updateStatusDeactivate() {
         this.voteStatus = VoteStatus.END;
     }
 
-    public void updatePassivityAlarmActivate(){
+    public void updatePassivityAlarmActivate() {
         this.passivityAlarmFlag = true;
     }
 
-    public void updatePassivityAlarmDeactivate(){
+    public void updatePassivityAlarmDeactivate() {
         this.passivityAlarmFlag = false;
     }
 
