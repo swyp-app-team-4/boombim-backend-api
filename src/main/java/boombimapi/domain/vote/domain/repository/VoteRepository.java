@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, Long> {
-    Optional<Vote> findByPosId(String posId);
+    Optional<Vote> findByPosIdAndIsVoteActivateTrue(String posId);
 
     List<Vote> findByUser(User user);
 

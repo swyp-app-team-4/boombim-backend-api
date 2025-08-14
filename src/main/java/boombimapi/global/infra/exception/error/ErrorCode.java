@@ -68,7 +68,8 @@ public enum ErrorCode {
     OFFICIAL_CONGESTION_NOT_FOUND(-400, "공식 혼잡도 데이터가 존재하지 않습니다.", 406),
 
     // vote
-    DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다.", 409),
+    DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다. 추가 저장하겠습니다.", 409),
+    DUPLICATE_USER(-500, "장소는 또 저장할 수 없습니다.", 409),
     OUT_OF_500M_RADIUS(-501, "현재 위치가 반경 500m를 초과했습니다.", 403),
     VOTE_NOT_EXIST(-502, "존재하지 않는 투표입니다.", 404),
     DUPLICATE_VOTE_USER(-503, "이미 투표했습니다.", 409),

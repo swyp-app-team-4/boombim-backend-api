@@ -21,7 +21,7 @@ import boombimapi.domain.vote.presentation.dto.res.list.MyVoteRes;
 import boombimapi.domain.vote.presentation.dto.res.list.VoteRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,6 +46,7 @@ public class VoteServiceImpl implements VoteService {
     private final AlarmService alarmService;
 
     @Override
+    @Transactional(noRollbackFor = BoombimException.class)
     public void registerVote(String userId, VoteRegisterReq req) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
@@ -59,21 +60,28 @@ public class VoteServiceImpl implements VoteService {
 
 
         // 중복 검사인지 확인
-        Vote vote = voteRepository.findByPosId(req.posId()).orElse(null);
+        Vote vote = voteRepository.findByPosIdAndIsVoteActivateTrue(req.posId()).orElse(null);
+
 
         // 중복이면 덮어 씌어야됨
         if (vote != null) {
-            // 1. 같은 유저가 본인꺼 또 등록하려고 할떄 덮어씌우면 안되고 그냥 에러
+            // 1. 활성화 된거면 안됨
+            // 2. 같은 유저가 본인꺼 또 등록하려고 할떄 덮어씌우면 안되고 그냥 에러
             if (user.getId().equals(vote.getUser().getId())) {
-                throw new BoombimException(ErrorCode.DUPLICATE_POS_ID);
+                throw new BoombimException(ErrorCode.DUPLICATE_USER);
             }
 
-            // 2. 다른 사용자면 종속으로 저장!
+            // 3. 다른 사용자고 종속 저장 했는데 또 하면 저장 안되게
+            List<User> usersByVote = voteDuplicationRepository.findUsersByVote(vote);
+            for (User userD : usersByVote) {
+                if (user.getId().equals(userD.getId())) throw new BoombimException(ErrorCode.DUPLICATE_USER);
+            }
+
+            // 4. 다른 사용자고 처음이면 종속으로 저장!
             VoteDuplication vd = VoteDuplication.builder().vote(vote).user(user).build();
             voteDuplicationRepository.save(vd);
             throw new BoombimException(ErrorCode.DUPLICATE_POS_ID);
         }
-
         Vote vb = Vote.builder()
                 .user(user)
                 .posId(req.posId())
