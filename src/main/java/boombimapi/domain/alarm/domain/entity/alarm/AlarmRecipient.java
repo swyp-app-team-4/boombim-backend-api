@@ -57,4 +57,9 @@ public class AlarmRecipient {
     public void markSent() { this.deliveryStatus = DeliveryStatus.SENT; this.sentAt = LocalDateTime.now(); }
     public void markFailed(String reason) { this.deliveryStatus = DeliveryStatus.FAILED; this.failureReason = reason; }
 
+    // 읽음 처리
+    public void updateDeliveryStatus(){
+        this.deliveryStatus=DeliveryStatus.READ;
+    }
+
 }

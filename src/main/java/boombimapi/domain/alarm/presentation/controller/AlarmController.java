@@ -5,6 +5,7 @@ import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
+import boombimapi.domain.alarm.presentation.dto.req.UpdateAlarmStatusReq;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
@@ -74,8 +75,21 @@ public class AlarmController {
     public ResponseEntity<List<HistoryResponse>> getAlarmHistory(
             @AuthenticationPrincipal String userId,
             @RequestParam DeviceType deviceType
-            ) {
+    ) {
         return ResponseEntity.ok(alarmService.getAlarmHistory(userId, deviceType));
+    }
+
+    @Operation(summary = "알림 읽은 바꿈", description = "알림을 읽었다고 바꿉니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "알림 및 유저 존재하지 않음"),
+    })
+    @PatchMapping
+    public void updateAlarmStatus(
+            @AuthenticationPrincipal String userId,
+            @RequestBody UpdateAlarmStatusReq req
+    ) {
+        alarmService.updateAlarmStatus(userId, req);
     }
 
 

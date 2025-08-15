@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Schema(description = "알림 조회")
 public record HistoryResponse(
 
-        @Schema(description = "알림 id", example = "3")
-        Long alarmId,
+        @Schema(description = "사용자별 알림 id", example = "3")
+        Long alarmReId,
 
         @Schema(description = "알림 제목", example = "붐빔 알림) 새로운 업데이트가 있습니다!")
         String title,

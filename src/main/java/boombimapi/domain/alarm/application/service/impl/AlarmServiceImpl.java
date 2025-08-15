@@ -14,6 +14,7 @@ import boombimapi.domain.alarm.domain.repository.AlarmRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
+import boombimapi.domain.alarm.presentation.dto.req.UpdateAlarmStatusReq;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -145,7 +147,7 @@ public class AlarmServiceImpl implements AlarmService {
 
         for (AlarmRecipient alarmHistory : alarmHistores) {
             if (!alarmHistory.getDeliveryStatus().equals(DeliveryStatus.FAILED)) {
-                result.add(new HistoryResponse(alarmHistory.getAlarm().getId(), alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus(), alarmHistory.getAlarm().getCreatedAt()));
+                result.add(new HistoryResponse(alarmHistory.getId(), alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus(), alarmHistory.getAlarm().getCreatedAt()));
             }
         }
 
@@ -210,6 +212,20 @@ public class AlarmServiceImpl implements AlarmService {
             //throw new BoombimException(ErrorCode.FCM_SEND_FAILED);
             return SendAlarmResponse.of(savedAlarm, 0, 1, 1);
         }
+    }
+
+    @Override
+    public void updateAlarmStatus(String userId, UpdateAlarmStatusReq req) {
+        Member member = userRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        AlarmRecipient ar = alarmRecipientRepository.findById(req.alarmReId()).orElse(null);
+        if (ar == null) throw new BoombimException(ErrorCode.ALARM_NOT_FOUND);
+
+        if (!Objects.equals(ar.getMember().getId(), member.getId()))
+            throw new BoombimException(ErrorCode.ALARM_ACCESS_DENIED);
+
+        ar.updateDeliveryStatus();
     }
 
 

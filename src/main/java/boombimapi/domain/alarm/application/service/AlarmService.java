@@ -4,6 +4,7 @@ import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
+import boombimapi.domain.alarm.presentation.dto.req.UpdateAlarmStatusReq;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
@@ -29,6 +30,9 @@ public interface AlarmService {
 
     // 투표 종료 알림
     SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList);
+
+    // 알림 상태 업데이트 읽었는지 안읽었는지
+    void updateAlarmStatus(String userId, UpdateAlarmStatusReq req);
 
 
 }
