@@ -24,7 +24,7 @@ public class OfficialPlace {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "poi_code", length = 20, nullable = false)
+    @Column(name = "poi_code", length = 20, nullable = false, unique = true)
     private String poiCode;
 
     @Column(name = "centroid_latitude", nullable = false)
