@@ -160,7 +160,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<User> userList) {
         // 관리자 일단 최승호로 하겠음~! 나중에 수정 할꺼임
-        User sender = userRepository.findById("4386048193")
+        User sender = userRepository.findById("_oC6_IgQLn8Z6jdAzahFz36OUaaCLvXZyhOhpMpElS0")
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
         String title = vote.getPosName() + "투표 종료 알림";
