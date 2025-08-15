@@ -1,5 +1,11 @@
 package boombimapi.domain.place.dto.request;
 
-public record ViewportRequest() {
+import boombimapi.global.dto.Coordinate;
+
+public record ViewportRequest(
+    Coordinate topLeft,
+    Coordinate bottomRight,
+    Coordinate memberCoordinate
+) {
 
 }
