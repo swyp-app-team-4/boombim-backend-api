@@ -16,13 +16,8 @@ public enum ErrorCode {
      */
 
     /**
-     * 401 : 미승인
-     * 403 : 권한의 문제가 있을때
-     * 406 : 객체가 조회되지 않을 때
-     * 409 : 현재 데이터와 값이 충돌날 때(ex. 아이디 중복)
-     * 412 : 파라미터 값이 뭔가 누락됐거나 잘못 왔을 때
-     * 422 : 파라미터 문법 오류
-     * 424 : 뭔가 단계가 꼬였을때, 1번안하고 2번하고 그런경우
+     * 401 : 미승인 403 : 권한의 문제가 있을때 406 : 객체가 조회되지 않을 때 409 : 현재 데이터와 값이 충돌날 때(ex. 아이디 중복) 412 : 파라미터 값이 뭔가 누락됐거나 잘못 왔을 때 422 : 파라미터 문법 오류 424 : 뭔가 단계가
+     * 꼬였을때, 1번안하고 2번하고 그런경우
      */
 
     // Common
@@ -64,8 +59,10 @@ public enum ErrorCode {
     FIREBASE_INITIALIZATION_FAILED(-304, "Firebase 초기화에 실패했습니다.", 500),
     INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400),
 
-    // official congestion
-    OFFICIAL_CONGESTION_NOT_FOUND(-400, "공식 혼잡도 데이터가 존재하지 않습니다.", 406),
+    // official
+    OFFICIAL_PLACE_NOT_FOUND(-400, "공식 장소가 존재하지 않습니다.", 406),
+    OFFICIAL_CONGESTION_NOT_FOUND(-401, "공식 혼잡도 데이터가 존재하지 않습니다.", 406),
+
 
     // vote
     DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다. 추가 저장하겠습니다.", 409),
