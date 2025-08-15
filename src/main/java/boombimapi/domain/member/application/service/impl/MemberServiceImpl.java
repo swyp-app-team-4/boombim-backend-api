@@ -30,5 +30,13 @@ public class MemberServiceImpl implements MemberService {
         return GetMemberRes.of(user);
     }
 
+    @Override
+    public void updateNickname(String userId, String name) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        member.updateName(name);
+    }
+
 
 }

@@ -94,4 +94,8 @@ public class Member {
         this.email = email;
         this.profile = profile;
     }
+
+    public void updateName(String name) {
+        this.name=name;
+    }
 }

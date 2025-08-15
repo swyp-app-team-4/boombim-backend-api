@@ -7,4 +7,6 @@ public interface MemberService {
 
     GetMemberRes getMember(String userId);
 
+    void updateNickname(String userId, String name);
+
 }
