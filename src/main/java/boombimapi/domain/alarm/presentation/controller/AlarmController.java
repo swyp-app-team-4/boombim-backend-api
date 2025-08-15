@@ -53,7 +53,7 @@ public class AlarmController {
             @ApiResponse(responseCode = "200", description = "알림 전송 시작"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요 // 일단 안넣음")
+            @ApiResponse(responseCode = "403", description = "관리자 권한 필요")
     })
     @PostMapping("/send")
     public ResponseEntity<SendAlarmResponse> sendAlarm(
