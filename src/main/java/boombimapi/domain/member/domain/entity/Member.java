@@ -1,4 +1,4 @@
-package boombimapi.domain.user.domain.entity;
+package boombimapi.domain.member.domain.entity;
 
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @Table(name = "member")
-public class User {
+public class Member {
     @Id
     @Column(unique = true, nullable = false)
     private String id;
@@ -34,23 +34,23 @@ public class User {
     private List<Alarm> sentAlarms = new ArrayList<>();
 
     // 2) 내가 "받는" 알림들 (조인 엔티티 AlarmRecipient.user)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AlarmRecipient> alarmRecipients = new ArrayList<>();
 
     // 3) 내 디바이스 토큰들 (FcmToken.user)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FcmToken> fcmTokens = new ArrayList<>();
 
     // 4) 내 투표 목록들  주인
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votess = new ArrayList<>();
 
     // 5) 내 투표 목록들  부하
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteDuplication> voteDuplications = new ArrayList<>();
 
     // 6) 내 투표 답변들
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteAnswer> voteAnswers = new ArrayList<>();
 
     @Column(nullable = false)
@@ -79,7 +79,7 @@ public class User {
     private boolean alarmFlag;
 
     @Builder
-    public User(String id, String email, String name, String profile,
+    public Member(String id, String email, String name, String profile,
                 SocialProvider socialProvider, Role role) {
         this.id = id;
         this.email = email;
@@ -93,5 +93,9 @@ public class User {
     public void updateEmailAndProfile(String email, String profile) {
         this.email = email;
         this.profile = profile;
+    }
+
+    public void updateName(String name) {
+        this.name=name;
     }
 }

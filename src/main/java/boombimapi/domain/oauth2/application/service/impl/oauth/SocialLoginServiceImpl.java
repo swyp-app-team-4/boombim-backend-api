@@ -1,5 +1,6 @@
 package boombimapi.domain.oauth2.application.service.impl.oauth;
 
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.oauth2.application.service.CreateAccessTokenAndRefreshTokenService;
 import boombimapi.domain.oauth2.application.service.OAuth2Service;
 import boombimapi.domain.oauth2.application.service.SocialLoginService;
@@ -8,9 +9,9 @@ import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
-import boombimapi.domain.user.domain.entity.Role;
-import boombimapi.domain.user.domain.entity.User;
-import boombimapi.domain.user.domain.repository.UserRepository;
+import boombimapi.domain.member.domain.entity.Role;
+
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.SocialToken;
@@ -32,12 +33,12 @@ public class SocialLoginServiceImpl implements SocialLoginService {
 
     private final java.util.Map<SocialProvider, OAuth2Service> oauth2Services;
     private final CreateAccessTokenAndRefreshTokenService tokenService;
-    private final UserRepository userRepository;
+    private final MemberRepository userRepository;
     private final SocialTokenRepository socialTokenRepository;
 
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
                                   CreateAccessTokenAndRefreshTokenService tokenService,
-                                  UserRepository userRepository,
+                                  MemberRepository userRepository,
                                   SocialTokenRepository socialTokenRepository) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
@@ -91,7 +92,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         KakaoTokenResponse tokenResponse = oauth2Service.convertToTokenResponse(tokenRequest);
 
         // 4. 사용자 생성 또는 업데이트
-        User user = createSocialUser(provider, tokenResponse, userResponse);
+        Member user = createSocialUser(provider, tokenResponse, userResponse);
 
         // 5. JWT 토큰 생성 및 반환
         return tokenService.createAccessTokenAndRefreshToken(
@@ -120,7 +121,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         KakaoUserResponse userResponse = oauth2Service.getUserInfo(tokenResponse.accessToken());
         log.info("사용자 정보 획득 완료: userId={}, provider={}", userResponse.id(), provider);
 
-        User user = createSocialUser(provider, tokenResponse, userResponse);
+        Member user = createSocialUser(provider, tokenResponse, userResponse);
 
         return tokenService.createAccessTokenAndRefreshToken(
                 user.getId(),
@@ -153,7 +154,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         return service;
     }
 
-    private User createSocialUser(SocialProvider provider,
+    private Member createSocialUser(SocialProvider provider,
                                   KakaoTokenResponse tokenResponse,
                                   KakaoUserResponse userResponse) {
         log.info("소셜 사용자 생성 시작: provider={}, userId={}", provider, userResponse.id());
@@ -163,18 +164,18 @@ public class SocialLoginServiceImpl implements SocialLoginService {
             throw new IllegalArgumentException("사용자 ID가 유효하지 않습니다");
         }
 
-        User user = userRepository.findById(userResponse.id()).orElse(null);
+        Member user = userRepository.findById(userResponse.id()).orElse(null);
 
 
         if (user == null) {
-            Optional<User> existingUserByEmail = userRepository.findByEmail(userResponse.getEmail());
+            Optional<Member> existingUserByEmail = userRepository.findByEmail(userResponse.getEmail());
             if (existingUserByEmail.isPresent()) {
                 log.error("이미 사용 중인 이메일입니다: {}", userResponse.getEmail());
                 throw new BoombimException(ErrorCode.DUPLICATE_EMAIL);
             }
 
             log.info("신규 {} 사용자 생성: {}", provider, userResponse.getName());
-            user = User.builder()
+            user = Member.builder()
                     .id(userResponse.id())
                     .email(userResponse.getEmail())
                     .name(userResponse.getName())
@@ -185,7 +186,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
             userRepository.save(user);
         } else {
             if (!user.getEmail().equals(userResponse.getEmail())) {
-                Optional<User> existingUserByEmail = userRepository.findByEmail(userResponse.getEmail());
+                Optional<Member> existingUserByEmail = userRepository.findByEmail(userResponse.getEmail());
                 if (existingUserByEmail.isPresent() && !existingUserByEmail.get().getId().equals(user.getId())) {
                     log.error("변경하려는 이메일이 이미 사용 중입니다: {}", userResponse.getEmail());
                     throw new BoombimException(ErrorCode.DUPLICATE_EMAIL);

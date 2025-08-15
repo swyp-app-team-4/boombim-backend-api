@@ -1,10 +1,9 @@
 package boombimapi.domain.vote.application.service.impl;
 
 import boombimapi.domain.alarm.application.service.AlarmService;
-import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
-import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
-import boombimapi.domain.user.domain.entity.User;
-import boombimapi.domain.user.domain.repository.UserRepository;
+
+import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -41,14 +40,14 @@ public class VoteServiceImpl implements VoteService {
 
     private final VoteDuplicationRepository voteDuplicationRepository;
 
-    private final UserRepository userRepository;
+    private final MemberRepository userRepository;
 
     private final AlarmService alarmService;
 
     @Override
     @Transactional(noRollbackFor = BoombimException.class)
     public void registerVote(String userId, VoteRegisterReq req) {
-        User user = userRepository.findById(userId).orElse(null);
+        Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         //위도 경도 500m 맞는지 true면 있음 false면 없음
@@ -67,23 +66,23 @@ public class VoteServiceImpl implements VoteService {
         if (vote != null) {
             // 1. 활성화 된거면 안됨
             // 2. 같은 유저가 본인꺼 또 등록하려고 할떄 덮어씌우면 안되고 그냥 에러
-            if (user.getId().equals(vote.getUser().getId())) {
+            if (user.getId().equals(vote.getMember().getId())) {
                 throw new BoombimException(ErrorCode.DUPLICATE_USER);
             }
 
             // 3. 다른 사용자고 종속 저장 했는데 또 하면 저장 안되게
-            List<User> usersByVote = voteDuplicationRepository.findUsersByVote(vote);
-            for (User userD : usersByVote) {
+            List<Member> usersByVote = voteDuplicationRepository.findMembersByVote(vote);
+            for (Member userD : usersByVote) {
                 if (user.getId().equals(userD.getId())) throw new BoombimException(ErrorCode.DUPLICATE_USER);
             }
 
             // 4. 다른 사용자고 처음이면 종속으로 저장!
-            VoteDuplication vd = VoteDuplication.builder().vote(vote).user(user).build();
+            VoteDuplication vd = VoteDuplication.builder().vote(vote).member(user).build();
             voteDuplicationRepository.save(vd);
             throw new BoombimException(ErrorCode.DUPLICATE_POS_ID);
         }
         Vote vb = Vote.builder()
-                .user(user)
+                .member(user)
                 .posId(req.posId())
                 .posName(req.posName())
                 .latitude(req.posLatitude())
@@ -100,7 +99,7 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public void answerVote(String userId, VoteAnswerReq req) {
-        User user = userRepository.findById(userId).orElse(null);
+        Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         Vote vote = voteRepository.findById(req.voteId()).orElse(null);
@@ -111,13 +110,13 @@ public class VoteServiceImpl implements VoteService {
 
 
         // 같은 투표 중복자 막기
-        VoteAnswer voteAnswer = voteAnswerRepository.findByUserAndVote(user, vote).orElse(null);
+        VoteAnswer voteAnswer = voteAnswerRepository.findByMemberAndVote(user, vote).orElse(null);
         if (voteAnswer != null) throw new BoombimException(ErrorCode.DUPLICATE_VOTE_USER);
 
         log.info(String.valueOf(req.voteAnswerType()));
         // 투표 완료
         voteAnswerRepository.save(VoteAnswer.builder()
-                .user(user)
+                .member(user)
                 .vote(vote)
                 .answerType(req.voteAnswerType()).build());
 
@@ -129,14 +128,14 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public void endVote(String userId, VoteDeleteReq req) {
-        User user = userRepository.findById(userId).orElse(null);
+         Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         Vote vote = voteRepository.findById(req.voteId()).orElse(null);
         if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
         // 다른사용자가 눌렀을떄 혹시 모르니깐!!
-        if (!Objects.equals(vote.getUser().getId(), user.getId())) {
+        if (!Objects.equals(vote.getMember().getId(), user.getId())) {
             throw new BoombimException(ErrorCode.NO_PERMISSION_TO_CLOSE_VOTE);
         }
         // 투표 종료 비활성화 false로 바꿈
@@ -150,7 +149,7 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public VoteListRes listVote(String userId, double latitude, double longitude) {
-        User user = userRepository.findById(userId).orElse(null);
+        Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         // 투표 리스트(사용자 위치에 맞게 떠야됨)
@@ -176,10 +175,10 @@ public class VoteServiceImpl implements VoteService {
         return voteResList;
     }
 
-    private List<MyVoteRes> myVoteList(User user) {
+    private List<MyVoteRes> myVoteList(Member user) {
         List<MyVoteRes> myVoteRes = new ArrayList<>();
         ///  내꺼 가져오기
-        List<Vote> myVoteList = voteRepository.findByUser(user);
+        List<Vote> myVoteList = voteRepository.findByMember(user);
         for (Vote vote : myVoteList) {
             //// 각 투표마다 투표자들 가져오기
             List<Long> voteAnswer = voteAnswerCnt(vote);
@@ -189,7 +188,7 @@ public class VoteServiceImpl implements VoteService {
         }
 
         /// 투표 중복꺼 가져오기 즉 중속
-        List<VoteDuplication> duplicationMyList = voteDuplicationRepository.findByUser(user);
+        List<VoteDuplication> duplicationMyList = voteDuplicationRepository.findByMember(user);
         for (VoteDuplication voteDuplication : duplicationMyList) {
             Vote vote = voteRepository.findById(voteDuplication.getVote().getId()).orElse(null);
             if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);

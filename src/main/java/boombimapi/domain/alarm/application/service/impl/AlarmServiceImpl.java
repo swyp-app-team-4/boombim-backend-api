@@ -14,27 +14,24 @@ import boombimapi.domain.alarm.domain.repository.AlarmRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
-import boombimapi.domain.alarm.presentation.dto.res.AlarmHistoryResponse;
+import boombimapi.domain.alarm.presentation.dto.req.UpdateAlarmStatusReq;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
-import boombimapi.domain.user.domain.entity.User;
-import boombimapi.domain.user.domain.repository.UserRepository;
+
+import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ import java.util.concurrent.CompletableFuture;
 public class AlarmServiceImpl implements AlarmService {
 
     private final AlarmRepository alarmRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository userRepository;
     private final FcmService fcmService;
     private final AlarmRecipientRepository alarmRecipientRepository;
 
@@ -52,7 +49,7 @@ public class AlarmServiceImpl implements AlarmService {
      */
     @Override
     public SendAlarmResponse sendAllAlarm(String senderUserId, SendAlarmRequest request) {
-        User sender = userRepository.findById(senderUserId)
+        Member sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
         // 알림 엔티티 생성
@@ -113,7 +110,7 @@ public class AlarmServiceImpl implements AlarmService {
     public RegisterFcmTokenResponse registerFcmToken(String userId, RegisterFcmTokenRequest request) {
         try {
             // 사용자 존재 확인
-            User user = userRepository.findById(userId)
+            Member user = userRepository.findById(userId)
                     .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
             fcmService.registerToken(user, request.token(), request.deviceType());
@@ -134,7 +131,7 @@ public class AlarmServiceImpl implements AlarmService {
      */
     @Override
     public List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType) {
-        User user = userRepository.findById(userId)
+        Member user = userRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
         /*** // 나중에 관리자 권함 추가
@@ -144,13 +141,13 @@ public class AlarmServiceImpl implements AlarmService {
          */
 
 
-        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByUserAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(deviceType.name()));
+        List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByMemberAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(deviceType.name()));
 
         List<HistoryResponse> result = new ArrayList<>();
 
         for (AlarmRecipient alarmHistory : alarmHistores) {
             if (!alarmHistory.getDeliveryStatus().equals(DeliveryStatus.FAILED)) {
-                result.add(new HistoryResponse(alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getMessage(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus()));
+                result.add(new HistoryResponse(alarmHistory.getId(), alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus(), alarmHistory.getAlarm().getCreatedAt()));
             }
         }
 
@@ -158,9 +155,9 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<User> userList) {
+    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList) {
         // 관리자 일단 최승호로 하겠음~! 나중에 수정 할꺼임
-        User sender = userRepository.findById("_oC6_IgQLn8Z6jdAzahFz36OUaaCLvXZyhOhpMpElS0")
+        Member sender = userRepository.findById("_oC6_IgQLn8Z6jdAzahFz36OUaaCLvXZyhOhpMpElS0")
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
         String title = vote.getPosName() + "투표 종료 알림";
@@ -217,8 +214,22 @@ public class AlarmServiceImpl implements AlarmService {
         }
     }
 
+    @Override
+    public void updateAlarmStatus(String userId, UpdateAlarmStatusReq req) {
+        Member member = userRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-    private boolean isAdmin(User user) {
+        AlarmRecipient ar = alarmRecipientRepository.findById(req.alarmReId()).orElse(null);
+        if (ar == null) throw new BoombimException(ErrorCode.ALARM_NOT_FOUND);
+
+        if (!Objects.equals(ar.getMember().getId(), member.getId()))
+            throw new BoombimException(ErrorCode.ALARM_ACCESS_DENIED);
+
+        ar.updateDeliveryStatus();
+    }
+
+
+    private boolean isAdmin(Member user) {
         return user.getRole().name().equals("ADMIN");
     }
 

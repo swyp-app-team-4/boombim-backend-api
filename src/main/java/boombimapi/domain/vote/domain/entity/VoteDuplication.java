@@ -1,6 +1,7 @@
 package boombimapi.domain.vote.domain.entity;
 
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,14 +23,14 @@ public class VoteDuplication {
     private Vote vote;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
 
     @Builder
-    public VoteDuplication(Vote vote, User user){
+    public VoteDuplication(Vote vote, Member member){
         this.vote=vote;
-        this.user = user;
+        this.member = member;
     }
 
 }

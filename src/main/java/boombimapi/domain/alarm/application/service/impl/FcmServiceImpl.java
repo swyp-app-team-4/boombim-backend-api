@@ -11,19 +11,18 @@ import boombimapi.domain.alarm.domain.repository.FcmTokenRepository;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.AlarmSendDto;
 import boombimapi.domain.alarm.presentation.dto.req.AlarmSendResDto;
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import com.google.firebase.messaging.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +38,10 @@ public class FcmServiceImpl implements FcmService {
      * FCM 토큰 등록
      */
     @Override
-    public void registerToken(User user, String token, DeviceType deviceType) {
+    public void registerToken(Member user, String token, DeviceType deviceType) {
         try {
             // 기존 토큰이 있는지 확인
-            Optional<FcmToken> existingToken = fcmTokenRepository.findByUserIdAndToken(user.getId(), token);
+            Optional<FcmToken> existingToken = fcmTokenRepository.findByMemberIdAndToken(user.getId(), token);
 
             if (existingToken.isPresent()) {
                 // 기존 토큰이 있으면 활성화 및 마지막 사용 시간 업데이트
@@ -52,7 +51,7 @@ public class FcmServiceImpl implements FcmService {
             } else {
                 // 새로운 토큰 생성
                 FcmToken fcmToken = FcmToken.builder()
-                        .user(user)
+                        .member(user)
                         .token(token)
                         .deviceType(deviceType)
                         .build();
@@ -98,7 +97,7 @@ public class FcmServiceImpl implements FcmService {
 
 
     @Override
-    public AlarmSendResult sendNotificationToVote(String title, String body, Alarm alarm, List<User> userList) {
+    public AlarmSendResult sendNotificationToVote(String title, String body, Alarm alarm, List<Member> userList) {
         List<FcmToken> allTokens = fcmTokenRepository.findActiveTokensForUsers(userList);
         log.info("투표한 유저들 알림 전송 시작: 총 {} 개의 토큰", allTokens.size());
 
@@ -142,7 +141,7 @@ public class FcmServiceImpl implements FcmService {
             for (FcmToken ft : batch) {
                 AlarmRecipient ar = AlarmRecipient.builder()
                         .alarm(dto.alarm())
-                        .user(ft.getUser())              // User 연관
+                        .member(ft.getMember())              // User 연관
                         .deviceType(ft.getDeviceType())  // IOS/ANDROID/WEB
                         .build();
 

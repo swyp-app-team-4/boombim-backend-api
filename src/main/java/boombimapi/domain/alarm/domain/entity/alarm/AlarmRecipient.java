@@ -1,9 +1,9 @@
 package boombimapi.domain.alarm.domain.entity.alarm;
 
-import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
 import boombimapi.domain.alarm.domain.entity.alarm.type.DeliveryStatus;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,8 +26,8 @@ public class AlarmRecipient {
     private Alarm alarm;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -48,13 +48,18 @@ public class AlarmRecipient {
     private LocalDateTime createdAt;
 
     @Builder
-    public AlarmRecipient(Alarm alarm, User user, DeviceType deviceType) {
+    public AlarmRecipient(Alarm alarm, Member member, DeviceType deviceType) {
         this.alarm = alarm;
-        this.user = user;
+        this.member = member;
         this.deviceType=deviceType;
     }
 
     public void markSent() { this.deliveryStatus = DeliveryStatus.SENT; this.sentAt = LocalDateTime.now(); }
     public void markFailed(String reason) { this.deliveryStatus = DeliveryStatus.FAILED; this.failureReason = reason; }
+
+    // 읽음 처리
+    public void updateDeliveryStatus(){
+        this.deliveryStatus=DeliveryStatus.READ;
+    }
 
 }

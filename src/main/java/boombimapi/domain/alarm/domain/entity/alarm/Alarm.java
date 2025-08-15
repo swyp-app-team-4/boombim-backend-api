@@ -4,7 +4,8 @@ package boombimapi.domain.alarm.domain.entity.alarm;
 
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,8 +27,8 @@ public class Alarm {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "sender_user_id", nullable = false)
-    private User sender;
+    @JoinColumn(name = "sender_member_id", nullable = false)
+    private Member sender;
 
     @OneToMany(mappedBy = "alarm", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AlarmRecipient> recipients = new ArrayList<>();
@@ -58,7 +59,7 @@ public class Alarm {
     private String failureReason; // 전송 실패 시 원인
 
     @Builder
-    public Alarm(String title, String message, AlarmType type, User sender) {
+    public Alarm(String title, String message, AlarmType type, Member sender) {
         this.title = title;
         this.message = message;
         this.type = type;
