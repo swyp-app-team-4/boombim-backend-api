@@ -150,7 +150,7 @@ public class AlarmServiceImpl implements AlarmService {
 
         for (AlarmRecipient alarmHistory : alarmHistores) {
             if (!alarmHistory.getDeliveryStatus().equals(DeliveryStatus.FAILED)) {
-                result.add(new HistoryResponse(alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getMessage(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus()));
+                result.add(new HistoryResponse(alarmHistory.getAlarm().getId(), alarmHistory.getAlarm().getTitle(), alarmHistory.getAlarm().getType(), alarmHistory.getDeliveryStatus(), alarmHistory.getAlarm().getCreatedAt()));
             }
         }
 
