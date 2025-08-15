@@ -1,13 +1,21 @@
 package boombimapi.domain.place.application;
 
+import static boombimapi.global.infra.exception.error.ErrorCode.*;
+
 import boombimapi.domain.congestion.entity.CongestionLevel;
 import boombimapi.domain.congestion.entity.OfficialCongestion;
+import boombimapi.domain.congestion.repository.OfficialCongestionDemographicsRepository;
+import boombimapi.domain.congestion.repository.OfficialCongestionForecastRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.OfficialPlaceDemographics;
+import boombimapi.domain.place.dto.response.OfficialPlaceForecast;
+import boombimapi.domain.place.dto.response.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
 import boombimapi.global.dto.Coordinate;
+import boombimapi.global.infra.exception.error.BoombimException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class OfficialPlaceService {
 
     private final OfficialPlaceRepository officialPlaceRepository;
+    private final OfficialCongestionForecastRepository forecastRepository;
     private final OfficialCongestionRepository officialCongestionRepository;
+    private final OfficialCongestionDemographicsRepository demographicsRepository;
 
     public List<ViewportResponse> getOfficialPlacesInViewport(
         ViewportRequest request
@@ -88,6 +98,45 @@ public class OfficialPlaceService {
         result.sort(Comparator.comparingDouble(ViewportResponse::distance));
 
         return result;
+    }
+
+    public OfficialPlaceOverviewResponse getOverview(
+        Long officialPlaceId
+    ) {
+
+        OfficialPlace officialPlace = officialPlaceRepository
+            .findById(officialPlaceId)
+            .orElseThrow(() -> new BoombimException(OFFICIAL_PLACE_NOT_FOUND));
+
+        OfficialCongestion latestOfficialCongestion = officialCongestionRepository
+            .findTopByOfficialPlaceIdOrderByObservedAtDesc(officialPlace.getId())
+            .orElseThrow(() -> new BoombimException(OFFICIAL_CONGESTION_NOT_FOUND));
+
+        List<OfficialPlaceDemographics> demographics = demographicsRepository
+            .findByOfficialCongestion(latestOfficialCongestion)
+            .stream()
+            .map(OfficialPlaceDemographics::from)
+            .toList();
+
+        List<OfficialPlaceForecast> forecasts = forecastRepository
+            .findByOfficialPlaceAndObservedAtOrderByForecastTimeAsc(
+                officialPlace,
+                latestOfficialCongestion.getObservedAt()
+            )
+            .stream()
+            .map(OfficialPlaceForecast::from)
+            .toList();
+
+        return new OfficialPlaceOverviewResponse(
+            officialPlace.getId(),
+            officialPlace.getName(),
+            officialPlace.getPoiCode(),
+            officialPlace.getCentroidLatitude(),
+            officialPlace.getCentroidLongitude(),
+            officialPlace.getPolygonCoordinates(),
+            demographics,
+            forecasts
+        );
     }
 
     private List<OfficialPlace> findOfficialPlacesInViewport(
