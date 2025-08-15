@@ -38,7 +38,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping
+    @PatchMapping
     public ResponseEntity<GetMemberRes> getMember(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService.getMember(userId));
     }
