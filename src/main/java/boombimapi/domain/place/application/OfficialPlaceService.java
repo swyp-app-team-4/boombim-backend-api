@@ -9,6 +9,7 @@ import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
 import boombimapi.global.dto.Coordinate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -83,6 +84,8 @@ public class OfficialPlaceService {
                 congestionLevel.getName(),
                 congestionLevel.getMessage()));
         }
+
+        result.sort(Comparator.comparingDouble(ViewportResponse::distance));
 
         return result;
     }
