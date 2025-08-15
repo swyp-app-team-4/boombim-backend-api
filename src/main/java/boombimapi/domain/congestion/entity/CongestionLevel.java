@@ -1,4 +1,4 @@
-package boombimapi.domain.congestion.common.entity;
+package boombimapi.domain.congestion.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

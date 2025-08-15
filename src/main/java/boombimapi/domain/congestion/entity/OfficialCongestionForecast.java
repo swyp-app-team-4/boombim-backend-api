@@ -1,7 +1,6 @@
-package boombimapi.domain.congestion.official.entity;
+package boombimapi.domain.congestion.entity;
 
-import boombimapi.domain.congestion.common.entity.CongestionLevel;
-import boombimapi.domain.place.official.entity.OfficialPlace;
+import boombimapi.domain.place.entity.OfficialPlace;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
