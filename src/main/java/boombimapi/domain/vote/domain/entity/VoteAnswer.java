@@ -1,15 +1,13 @@
 package boombimapi.domain.vote.domain.entity;
 
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -22,8 +20,8 @@ public class VoteAnswer {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vote_id", nullable = false)
@@ -36,8 +34,8 @@ public class VoteAnswer {
 
 
     @Builder
-    public VoteAnswer(User user, Vote vote, VoteAnswerType answerType){
-        this.user=user;
+    public VoteAnswer(Member member, Vote vote, VoteAnswerType answerType){
+        this.member=member;
         this.vote=vote;
         this.answerType=answerType;
     }

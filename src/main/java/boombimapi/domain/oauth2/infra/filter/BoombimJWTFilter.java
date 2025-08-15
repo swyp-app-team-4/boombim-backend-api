@@ -1,6 +1,6 @@
 package boombimapi.domain.oauth2.infra.filter;
 
-import boombimapi.domain.user.domain.entity.Role;
+import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.util.JWTUtil;

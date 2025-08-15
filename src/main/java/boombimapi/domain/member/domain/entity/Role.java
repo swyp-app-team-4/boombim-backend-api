@@ -1,4 +1,4 @@
-package boombimapi.domain.user.domain.entity;
+package boombimapi.domain.member.domain.entity;
 
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;

@@ -2,7 +2,7 @@ package boombimapi.domain.oauth2.application.service.impl.auth;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
-import boombimapi.domain.user.domain.entity.Role;
+import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.JsonWebToken;

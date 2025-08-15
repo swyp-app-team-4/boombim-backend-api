@@ -1,7 +1,8 @@
 package boombimapi.domain.alarm.domain.entity.fcm;
 
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "fcm_token",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "token"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "token"})
 ) // 같은 토큰 중복 될까봐 넣었음
 @Getter
 @NoArgsConstructor
@@ -22,10 +23,10 @@ public class FcmToken {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 연관관계 매핑: FK 컬럼 user_id
+    // 연관관계 매핑: FK 컬럼 member_id
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(nullable = false, length = 1024) // TEXT보다 VARCHAR 권장(인덱스 용이)
     private String token;
@@ -45,8 +46,8 @@ public class FcmToken {
     private boolean isActive = true;
 
     @Builder
-    public FcmToken(User user, String token, DeviceType deviceType) {
-        this.user = user;
+    public FcmToken(Member member, String token, DeviceType deviceType) {
+        this.member = member;
         this.token = token;
         this.deviceType = deviceType;
         this.lastUsedAt = LocalDateTime.now();
