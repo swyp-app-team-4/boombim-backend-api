@@ -1,6 +1,7 @@
 package boombimapi.domain.vote.domain.repository;
 
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import feign.Param;
@@ -15,7 +16,7 @@ import java.util.Optional;
 public interface VoteRepository extends JpaRepository<Vote, Long> {
     Optional<Vote> findByPosIdAndIsVoteActivateTrue(String posId);
 
-    List<Vote> findByUser(User user);
+    List<Vote> findByMember(Member user);
 
     // 위도/경도 바운딩 박스 안에 들어오는 후보만 가져오기
     @Query("SELECT v FROM Vote v " +
@@ -36,8 +37,8 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
                          @Param("end") VoteStatus end,
                          @Param("now") Instant now);
 
-    @Query("select v.user from Vote v where v = :vote")
-    List<User> findUsersByVote(@Param("vote") Vote vote);
+    @Query("select v.member from Vote v where v = :vote")
+    List<Member> findMembersByVote(@Param("vote") Vote vote);
 
     List<Vote> findByVoteStatusAndEndTimeLessThanEqual(VoteStatus status, Instant now);
 

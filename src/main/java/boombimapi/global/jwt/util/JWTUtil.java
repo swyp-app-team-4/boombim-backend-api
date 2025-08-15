@@ -1,6 +1,6 @@
 package boombimapi.global.jwt.util;
 
-import boombimapi.domain.user.domain.entity.Role;
+import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;

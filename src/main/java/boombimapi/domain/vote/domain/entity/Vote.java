@@ -1,7 +1,7 @@
 package boombimapi.domain.vote.domain.entity;
 
-import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -27,8 +27,8 @@ public class Vote {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteDuplication> voteDuplications = new ArrayList<>();
@@ -75,8 +75,8 @@ public class Vote {
 
 
     @Builder
-    public Vote(User user, String posId, double latitude, double longitude, String posName) {
-        this.user = user;
+    public Vote(Member member, String posId, double latitude, double longitude, String posName) {
+        this.member = member;
         this.posId = posId;
         this.latitude = latitude;
         this.longitude = longitude;

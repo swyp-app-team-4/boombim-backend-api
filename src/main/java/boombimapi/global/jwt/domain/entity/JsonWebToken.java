@@ -1,6 +1,6 @@
 package boombimapi.global.jwt.domain.entity;
 
-import boombimapi.domain.user.domain.entity.Role;
+import boombimapi.domain.member.domain.entity.Role;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;

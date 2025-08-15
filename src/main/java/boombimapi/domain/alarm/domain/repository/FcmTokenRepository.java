@@ -1,6 +1,7 @@
 package boombimapi.domain.alarm.domain.repository;
-import boombimapi.domain.user.domain.entity.User;
+
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
+import boombimapi.domain.member.domain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,26 +16,26 @@ import java.util.Optional;
 public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
 
     // 사용자별 활성화된 토큰 조회
-    List<FcmToken> findByUserIdAndIsActiveTrue(String userId);
+    List<FcmToken> findByMemberIdAndIsActiveTrue(String userId);
 
     // 모든 활성화된 토큰 조회 (전체 알림용) - alarmFlag가 false인 유저만
-    @Query("SELECT f FROM FcmToken f WHERE f.isActive = true AND f.user.alarmFlag = false")
+    @Query("SELECT f FROM FcmToken f WHERE f.isActive = true AND f.member.alarmFlag = false")
     List<FcmToken> findAllActiveTokens();
 
     // 투표 종료 유저 알림용 - alarmFlag가 false인 유저만
     @Query("SELECT f FROM FcmToken f " +
-            "WHERE f.user IN :users " +
+            "WHERE f.member IN :users " +
             "AND f.isActive = true " +
-            "AND f.user.alarmFlag = false " +
-            "ORDER BY f.user.id ASC, f.lastUsedAt DESC")
-    List<FcmToken> findActiveTokensForUsers(@Param("users") List<User> users);
+            "AND f.member.alarmFlag = false " +
+            "ORDER BY f.member.id ASC, f.lastUsedAt DESC")
+    List<FcmToken> findActiveTokensForUsers(@Param("users") List<Member> users);
 
 
     // 토큰으로 조회
     Optional<FcmToken> findByToken(String token);
 
     // 사용자와 토큰으로 조회
-    Optional<FcmToken> findByUserIdAndToken(String userId, String token);
+    Optional<FcmToken> findByMemberIdAndToken(String userId, String token);
 
     // 비활성화된 토큰 삭제
     @Modifying
@@ -43,6 +44,6 @@ public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
 
     // 사용자의 기존 토큰들 비활성화
     @Modifying
-    @Query("UPDATE FcmToken f SET f.isActive = false WHERE f.user.id = :userId AND f.token != :currentToken")
+    @Query("UPDATE FcmToken f SET f.isActive = false WHERE f.member.id = :userId AND f.token != :currentToken")
     void deactivateOtherTokens(@Param("userId") String userId, @Param("currentToken") String currentToken);
 }

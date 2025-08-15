@@ -4,7 +4,8 @@ import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
-import boombimapi.domain.user.domain.entity.User;
+
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
@@ -79,8 +80,8 @@ public class SchedulerService {
 
         // 자동 종료 알림
         for (Vote autoVote : autoVotes) {
-            List<User> userList = getUsers(autoVote);
-            alarmService.sendEndVoteAlarm(autoVote, userList);
+            List<Member> memberList = getMembers(autoVote);
+            alarmService.sendEndVoteAlarm(autoVote, memberList);
 
         }
     }
@@ -93,28 +94,28 @@ public class SchedulerService {
             // false로 전환
             passivityVote.updatePassivityAlarmDeactivate();
 
-            List<User> userList = getUsers(passivityVote);
+            List<Member> userList = getMembers(passivityVote);
             alarmService.sendEndVoteAlarm(passivityVote, userList);
         }
     }
 
 
-    private List<User> getUsers(Vote vote) {
+    private List<Member> getMembers(Vote vote) {
         // 종료 알람 넣기
-        Set<User> userSet = new HashSet<>();
+        Set<Member> memberSet = new HashSet<>();
 
         // 1) 투표 생성자
-        userSet.addAll(voteRepository.findUsersByVote(vote));
+        memberSet.addAll(voteRepository.findMembersByVote(vote));
 
         // 2) 중복투표한 유저
-        userSet.addAll(voteDuplicationRepository.findUsersByVote(vote));
+        memberSet.addAll(voteDuplicationRepository.findMembersByVote(vote));
 
         // 3) 답변한 유저
-        userSet.addAll(voteAnswerRepository.findUsersByVote(vote));
+        memberSet.addAll(voteAnswerRepository.findMembersByVote(vote));
 
         // 최종 리스트
-        List<User> userList = new ArrayList<>(userSet);
-        return userList;
+        List<Member> memberList = new ArrayList<>(memberSet);
+        return memberList;
     }
 
 }
