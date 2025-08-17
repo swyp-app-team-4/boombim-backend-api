@@ -28,6 +28,7 @@ import boombimapi.global.infra.scheduled.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     private final MessageService messageService;
 
+    @Value("${admin.id}")
+    private String adminId;
     /**
      * 관리자가 알림 전송
      */
@@ -159,8 +162,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList) {
-        // 관리자 일단 최승호로 하겠음~! 나중에 수정 할꺼임
-        Member sender = userRepository.findById("_oC6_IgQLn8Z6jdAzahFz36OUaaCLvXZyhOhpMpElS0")
+
+        Member sender = userRepository.findById(adminId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
         String title = messageService.endAlarmTitle(vote);

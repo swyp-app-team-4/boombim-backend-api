@@ -48,4 +48,18 @@ public class MessageService {
 
     }
 
+
+    public String dailyCommunityTitle() {
+        return "💬 오늘의 소통방에 참여해보세요!";
+    }
+
+    public String dailyCommunityMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("🙌 서로의 의견을 나누고 소통해요!\n");
+        sb.append("📅 매일 오후 4시에 소통방이 열립니다.\n\n");
+        sb.append("👉 지금 바로 참여해서 여러분의 생각을 공유해보세요!");
+        return sb.toString();
+    }
+
+
 }

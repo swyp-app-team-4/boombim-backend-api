@@ -14,6 +14,7 @@ import boombimapi.domain.vote.domain.repository.VoteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,11 @@ public class SchedulerService {
     private final VoteDuplicationRepository voteDuplicationRepository;
     private final VoteAnswerRepository voteAnswerRepository;
     private final AlarmService alarmService;
+    private final MessageService messageService;
+
+    @Value("${admin.id}")
+    private String adminId;
+
 
     // 매일 새벽 3시에 오래된 FCM 토큰 정리
     @Scheduled(cron = "0 0 3 * * *") // 매일 오전 3시
@@ -63,7 +69,11 @@ public class SchedulerService {
         log.info("오후 4시 알림 작업 시작");
         try {
             // 관리자 아이디 나중에 바꾸게씅.!
-            alarmService.sendAllAlarm("4380323224", SendAlarmRequest.builder().title("소통방 참여해주세요").message("하라고").type(AlarmType.COMMUNICATION).build());
+            alarmService.sendAllAlarm(adminId, SendAlarmRequest
+                    .builder()
+                    .title(messageService.dailyCommunityTitle())
+                    .message(messageService.dailyCommunityMessage())
+                    .type(AlarmType.COMMUNICATION).build());
             log.info("오후 4시 알림 작업 완료");
         } catch (Exception e) {
             log.error("오후 4시 알림 작업 중 오류 발생", e);
