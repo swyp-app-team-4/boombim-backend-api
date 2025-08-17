@@ -36,11 +36,15 @@ public record MyVoteRes(
         String allType,
 
         @Schema(description = "투표 상태 (진행중 / 종료)", example = "PROGRESS or END")
-        VoteStatus voteStatus
+        VoteStatus voteStatus,
+
+        @Schema(description = "투표했으면 true, 안했으면 false", example = "true")
+        boolean voteFlag
 
 ) {
     public static MyVoteRes of(Long voteId, Long voteDuplicationCnt, LocalDateTime createdAt, String posName, Long relaxedCnt,
-                               Long commonly, Long slightlyBusyCnt, Long crowedCnt, String allType, VoteStatus voteStatus) {
-        return new MyVoteRes(voteId, voteDuplicationCnt, createdAt, posName, relaxedCnt, commonly, slightlyBusyCnt, crowedCnt, allType, voteStatus);
+                               Long commonly, Long slightlyBusyCnt, Long crowedCnt, String allType, VoteStatus voteStatus, boolean voteFlag) {
+        return new MyVoteRes(voteId, voteDuplicationCnt, createdAt, posName, relaxedCnt,
+                commonly, slightlyBusyCnt, crowedCnt, allType, voteStatus, voteFlag);
     }
 }

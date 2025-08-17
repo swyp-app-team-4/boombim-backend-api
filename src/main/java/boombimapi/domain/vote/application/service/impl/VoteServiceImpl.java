@@ -128,7 +128,7 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public void endVote(String userId, VoteDeleteReq req) {
-         Member user = userRepository.findById(userId).orElse(null);
+        Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         Vote vote = voteRepository.findById(req.voteId()).orElse(null);
@@ -153,7 +153,7 @@ public class VoteServiceImpl implements VoteService {
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         // 투표 리스트(사용자 위치에 맞게 떠야됨)
-        List<VoteRes> voteRes = voteList(latitude, longitude);
+        List<VoteRes> voteRes = voteList(user, latitude, longitude);
 
         // 내 질문 투표 리스트
         List<MyVoteRes> myVoteRes = myVoteList(user);
@@ -162,14 +162,17 @@ public class VoteServiceImpl implements VoteService {
         return VoteListRes.of(voteRes, myVoteRes);
     }
 
-    private List<VoteRes> voteList(double latitude, double longitude) {
+    private List<VoteRes> voteList(Member user, double latitude, double longitude) {
+
+
         List<VoteRes> voteResList = new ArrayList<>();
 
         List<Vote> votes = calculate500(latitude, longitude);
         for (Vote vote : votes) {
             List<Long> voteAnswer = voteAnswerCnt(vote);
+            boolean voteFlag = voteUsercheck(vote, user);
             voteResList.add(VoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
-                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기"));
+                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기", voteFlag));
         }
 
         return voteResList;
@@ -182,9 +185,10 @@ public class VoteServiceImpl implements VoteService {
         for (Vote vote : myVoteList) {
             //// 각 투표마다 투표자들 가져오기
             List<Long> voteAnswer = voteAnswerCnt(vote);
-
+            boolean voteFlag = voteUsercheck(vote, user);
             myVoteRes.add(MyVoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
-                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus()));
+                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3),
+                    "내 질문", vote.getVoteStatus(), voteFlag));
         }
 
         /// 투표 중복꺼 가져오기 즉 중속
@@ -194,9 +198,9 @@ public class VoteServiceImpl implements VoteService {
             if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
             List<Long> voteAnswer = voteAnswerCnt(vote);
-
+            boolean voteFlag = voteUsercheck(vote, user);
             myVoteRes.add(MyVoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
-                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus()));
+                    voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus(), voteFlag));
         }
 
         return myVoteRes;
@@ -279,6 +283,18 @@ public class VoteServiceImpl implements VoteService {
                 * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    private boolean voteUsercheck(Vote vote, Member user) {
+        boolean voteFlag = false;
+        List<VoteAnswer> voteAnswers = vote.getVoteAnswers();
+        for (VoteAnswer voteAnswer : voteAnswers) {
+            if (Objects.equals(voteAnswer.getMember().getId(), user.getId())) {
+                return true;
+            }
+        }
+
+        return voteFlag;
     }
 
 }

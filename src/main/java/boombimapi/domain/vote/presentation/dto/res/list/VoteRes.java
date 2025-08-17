@@ -31,11 +31,16 @@ public record VoteRes(
         @Schema(description = "붐빔 투표 수", example = "2")
         Long crowedCnt,
 
-        @Schema(description = "전체 타입 (예: '투표하기')", example = "투표하기")
-        String allType
+        @Schema(description = "전체 타입 (예: '투표하기, 내 질문')", example = "투표하기")
+        String allType,
 
+        @Schema(description = "투표했으면 true, 안했으면 false", example = "true")
+        boolean voteFlag
 ) {
-    public static VoteRes of(Long voteId, Long voteDuplicationCnt, LocalDateTime createdAt, String posName, Long relaxedCnt, Long commonly, Long slightlyBusyCnt, Long crowedCnt, String allType) {
-        return new VoteRes(voteId, voteDuplicationCnt, createdAt, posName, relaxedCnt, commonly, slightlyBusyCnt, crowedCnt, allType);
+    public static VoteRes of(Long voteId, Long voteDuplicationCnt, LocalDateTime createdAt,
+                             String posName, Long relaxedCnt, Long commonly, Long slightlyBusyCnt,
+                             Long crowedCnt, String allType, boolean voteFlag) {
+        return new VoteRes(voteId, voteDuplicationCnt, createdAt, posName, relaxedCnt,
+                commonly, slightlyBusyCnt, crowedCnt, allType, voteFlag);
     }
 }
