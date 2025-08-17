@@ -1,10 +1,10 @@
 package boombimapi.domain.member.application.service;
 
 
-import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
-import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
+import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
+import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
 
-import boombimapi.domain.member.presentation.dto.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
 
 import java.util.List;
 

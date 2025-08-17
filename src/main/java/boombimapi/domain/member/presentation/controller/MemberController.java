@@ -1,10 +1,10 @@
 package boombimapi.domain.member.presentation.controller;
 
 import boombimapi.domain.member.application.service.MemberService;
-import boombimapi.domain.member.presentation.dto.req.NicknameReq;
-import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
-import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
-import boombimapi.domain.member.presentation.dto.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
+import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
+import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
+import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

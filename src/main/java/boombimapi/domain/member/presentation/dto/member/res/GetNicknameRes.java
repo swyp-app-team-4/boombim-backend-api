@@ -1,7 +1,5 @@
-package boombimapi.domain.member.presentation.dto.res;
+package boombimapi.domain.member.presentation.dto.member.res;
 
-import boombimapi.domain.member.domain.entity.Member;
-import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "닉네임 호출 첫 화면")

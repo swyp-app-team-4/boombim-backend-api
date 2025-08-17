@@ -40,7 +40,7 @@ public class SecurityConfig {
             "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
             "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
             "/api/oauth2/logout",
-            "/api/healthcheck"
+            "/api/healthcheck", "/api/admin/login"
     );
 
     @Bean
@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOriginPatterns(List.of("http://10.245.22.230:3000", "http://localhost:3000",
-                            "https://api.boombim.p-e.kr","https://appleid.apple.com"));
+                            "https://api.boombim.p-e.kr", "https://appleid.apple.com"));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
@@ -69,7 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/healthcheck").permitAll()
                         .requestMatchers("/api/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
                         .requestMatchers("/api/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
-                        .requestMatchers("/api/oauth2/logout").permitAll()
+                        .requestMatchers("/api/oauth2/logout", "/api/admin/login").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/api/reissue").permitAll()

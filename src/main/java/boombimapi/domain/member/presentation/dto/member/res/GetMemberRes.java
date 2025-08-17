@@ -1,4 +1,4 @@
-package boombimapi.domain.member.presentation.dto.res;
+package boombimapi.domain.member.presentation.dto.member.res;
 
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.member.domain.entity.Member;

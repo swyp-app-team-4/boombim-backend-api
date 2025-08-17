@@ -1,6 +1,6 @@
-package boombimapi.domain.member.presentation.dto.res;
+package boombimapi.domain.member.presentation.dto.member.res;
 
-import boombimapi.domain.member.presentation.dto.res.mypage.MPVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.MPVoteRes;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;

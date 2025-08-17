@@ -5,10 +5,10 @@ import boombimapi.domain.member.application.service.MemberService;
 
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
-import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
-import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
-import boombimapi.domain.member.presentation.dto.res.MyPageVoteRes;
-import boombimapi.domain.member.presentation.dto.res.mypage.MPVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
+import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
+import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.MPVoteRes;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;

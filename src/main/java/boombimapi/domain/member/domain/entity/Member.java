@@ -74,6 +74,9 @@ public class Member {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    // 관리자 비번 null이어도됨
+    private String password;
+
     // false면 알림감 true면 알림 안감
     @Column(name = "alarm_flag", nullable = false)
     private boolean alarmFlag;

@@ -1,4 +1,4 @@
-package boombimapi.domain.member.presentation.dto.res.mypage;
+package boombimapi.domain.member.presentation.dto.member.res.mypage;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
