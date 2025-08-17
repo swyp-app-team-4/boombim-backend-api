@@ -7,9 +7,7 @@ import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
-import boombimapi.domain.member.presentation.dto.res.MyPageVoteAnswerRes;
 import boombimapi.domain.member.presentation.dto.res.MyPageVoteRes;
-import boombimapi.domain.member.presentation.dto.res.mypage.MPVoteAnswerRes;
 import boombimapi.domain.member.presentation.dto.res.mypage.MPVoteRes;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -85,25 +83,7 @@ public class MemberServiceImpl implements MemberService {
             return List.of();
         }
 
-
-        // 2) 날짜(일 단위)로 그룹핑
-        Map<LocalDate, List<MPVoteRes>> grouped = bottomResult.stream()
-                .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
-
-        // 3) 날짜 내림차순(최근일자 먼저),
-        //    같은 날짜 내에서는 시간 내림차순으로 정렬해서 MyPageVoteRes 구성
-        List<MyPageVoteRes> result = grouped.entrySet().stream()
-                .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
-                .map(e -> {
-                    List<MPVoteRes> items = e.getValue().stream()
-                            .sorted(Comparator.comparing(MPVoteRes::day).reversed())
-                            .toList();
-                    LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
-                    return MyPageVoteRes.of(headerDay, items);
-                })
-                .toList();
-
-        return result;
+        return dayMapping(bottomResult);
     }
 
 
@@ -112,15 +92,48 @@ public class MemberServiceImpl implements MemberService {
     public List<MyPageVoteRes> getMyVote(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-        List<VoteAnswer> voteAnswers = voteAnswerRepository.findByMember(member);
-        for (VoteAnswer voteAnswer : voteAnswers) {
 
+        // 1. 하위 데이터 수집
+        List<MPVoteRes> bottomResult = new ArrayList<>();
+        List<Vote> votes = voteRepository.findByMember(member);
+        List<VoteDuplication> voteDus = voteDuplicationRepository.findByMember(member);
+
+        // 본인이 올린거
+        for (Vote vote : votes) {
+            // 장소 이름
+            String posName = vote.getPosName();
+
+            // 인기 투표 타입과 투표수
+            Map.Entry<String, Long> answerTypeAndCnt = popularCnt(vote);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, answerTypeAndCnt.getKey(),
+                    answerTypeAndCnt.getValue()));
+        }
+
+        // 투표 중복 올린거
+        for (VoteDuplication voteDp : voteDus) {
+            Vote vote = voteDp.getVote();
+
+            // 장소 이름
+            String posName = vote.getPosName();
+
+            // 인기 투표 타입과 투표수
+            Map.Entry<String, Long> answerTypeAndCnt = popularCnt(vote);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, answerTypeAndCnt.getKey(),
+                    answerTypeAndCnt.getValue()));
         }
 
 
-        return null;
+        if (bottomResult.isEmpty()) {
+            return List.of();
+        }
+
+        return dayMapping(bottomResult);
+
 
     }
+
 
     @Override
     public void updateNickname(String userId, String name) {
@@ -155,5 +168,26 @@ public class MemberServiceImpl implements MemberService {
                 .orElse(Map.entry("없음", 0L));
     }
 
+
+    // 날짜 매핑
+    private List<MyPageVoteRes> dayMapping(List<MPVoteRes> bottomResult) {
+        // 2) 날짜(일 단위)로 그룹핑
+        Map<LocalDate, List<MPVoteRes>> grouped = bottomResult.stream()
+                .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
+
+        // 3) 날짜 내림차순(최근일자 먼저),
+        //    같은 날짜 내에서는 시간 내림차순으로 정렬해서 MyPageVoteRes 구성
+        List<MyPageVoteRes> result = grouped.entrySet().stream()
+                .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
+                .map(e -> {
+                    List<MPVoteRes> items = e.getValue().stream()
+                            .sorted(Comparator.comparing(MPVoteRes::day).reversed())
+                            .toList();
+                    LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
+                    return MyPageVoteRes.of(headerDay, items);
+                })
+                .toList();
+        return result;
+    }
 
 }
