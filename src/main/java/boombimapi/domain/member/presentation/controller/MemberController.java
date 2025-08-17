@@ -3,6 +3,7 @@ package boombimapi.domain.member.presentation.controller;
 import boombimapi.domain.member.application.service.MemberService;
 import boombimapi.domain.member.presentation.dto.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
+import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,7 +28,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping
+    @PatchMapping
     public void updateNickname(@AuthenticationPrincipal String userId, @RequestBody NicknameReq req) {
         memberService.updateNickname(userId, req.name());
     }
@@ -38,9 +39,20 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PatchMapping
+    @GetMapping
     public ResponseEntity<GetMemberRes> getMember(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService.getMember(userId));
+    }
+
+
+    @Operation(summary = "첫 닉네임 수정 API", description = "처음 로그인 할 시 닉네임 수정 화면 뜨는지 안뜨는지 확인하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @GetMapping
+    public ResponseEntity<GetNicknameRes> getNameFlag(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(memberService.getNameFlag(userId));
     }
 
 

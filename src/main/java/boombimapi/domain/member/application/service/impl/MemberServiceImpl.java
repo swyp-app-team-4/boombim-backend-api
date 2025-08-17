@@ -6,6 +6,7 @@ import boombimapi.domain.member.application.service.MemberService;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
+import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -36,6 +37,14 @@ public class MemberServiceImpl implements MemberService {
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         member.updateName(name);
+    }
+
+    @Override
+    public GetNicknameRes getNameFlag(String userId) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        return GetNicknameRes.of(member.isNameFlag());
     }
 
 
