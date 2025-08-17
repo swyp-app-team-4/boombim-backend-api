@@ -24,6 +24,7 @@ import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
+import boombimapi.global.infra.scheduled.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,8 @@ public class AlarmServiceImpl implements AlarmService {
     private final MemberRepository userRepository;
     private final FcmService fcmService;
     private final AlarmRecipientRepository alarmRecipientRepository;
+
+    private final MessageService messageService;
 
     /**
      * 관리자가 알림 전송
@@ -160,8 +163,8 @@ public class AlarmServiceImpl implements AlarmService {
         Member sender = userRepository.findById("_oC6_IgQLn8Z6jdAzahFz36OUaaCLvXZyhOhpMpElS0")
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        String title = vote.getPosName() + "투표 종료 알림";
-        String message = vote.getPosName() + "투표가 종료됐어요! 투표 정보 확인해보세요";
+        String title = messageService.endAlarmTitle(vote);
+        String message = messageService.endAlarmMessage(vote);
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
                 .title(title)
