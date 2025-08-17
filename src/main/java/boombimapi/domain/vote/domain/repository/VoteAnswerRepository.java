@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface VoteAnswerRepository extends JpaRepository<VoteAnswer, Long> {
     Optional<VoteAnswer> findByMemberAndVote(Member user, Vote vote);
 
+    List<VoteAnswer> findByMember(Member member);
+
     List<VoteAnswer> findByVote(Vote vote);
 
     @Query("select va.member from VoteAnswer va where va.vote = :vote")

@@ -34,17 +34,6 @@ public class MemberController {
     }
 
 
-    @Operation(summary = "마이페이지 사용자 정보 조회 API", description = "사용자 정보를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
-    })
-    @GetMapping
-    public ResponseEntity<GetMemberRes> getMember(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getMember(userId));
-    }
-
-
     @Operation(summary = "첫 닉네임 수정 API", description = "처음 로그인 할 시 닉네임 수정 화면 뜨는지 안뜨는지 확인하는 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
@@ -53,6 +42,16 @@ public class MemberController {
     @GetMapping("/name")
     public ResponseEntity<GetNicknameRes> getNameFlag(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService.getNameFlag(userId));
+    }
+
+    @Operation(summary = "마이페이지(1번 구간) 사용자 정보 조회 API", description = "사용자 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @GetMapping
+    public ResponseEntity<GetMemberRes> getMember(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(memberService.getMember(userId));
     }
 
 
