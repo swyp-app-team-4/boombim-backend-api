@@ -7,9 +7,14 @@ import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.member.presentation.dto.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.res.GetNicknameRes;
+import boombimapi.domain.member.presentation.dto.res.MyPageVoteAnswerRes;
+import boombimapi.domain.member.presentation.dto.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.res.mypage.MPVoteAnswerRes;
+import boombimapi.domain.member.presentation.dto.res.mypage.MPVoteRes;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
+import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
 import boombimapi.domain.vote.domain.repository.VoteDuplicationRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
@@ -20,7 +25,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -49,6 +57,71 @@ public class MemberServiceImpl implements MemberService {
         return GetMemberRes.of(user, (long) (voteDus.size() + votes.size()), (long) voteAnswers.size());
     }
 
+    // 3번 api 투표
+    @Override
+    public List<MyPageVoteRes> getMyVoteAnswer(String userId) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        // 1. 하위 데이터 먼저 수집
+        List<MPVoteRes> bottomResult = new ArrayList<>();
+
+        List<VoteAnswer> voteAnswers = voteAnswerRepository.findByMember(member);
+
+        for (VoteAnswer voteAnswer : voteAnswers) {
+            Vote vote = voteAnswer.getVote();
+
+            // 장소 이름
+            String posName = vote.getPosName();
+
+            // 인기 투표 타입과 투표수
+            Map.Entry<String, Long> answerTypeAndCnt = popularCnt(vote);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, answerTypeAndCnt.getKey(),
+                    answerTypeAndCnt.getValue()));
+        }
+
+        if (bottomResult.isEmpty()) {
+            return List.of();
+        }
+
+
+        // 2) 날짜(일 단위)로 그룹핑
+        Map<LocalDate, List<MPVoteRes>> grouped = bottomResult.stream()
+                .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
+
+        // 3) 날짜 내림차순(최근일자 먼저),
+        //    같은 날짜 내에서는 시간 내림차순으로 정렬해서 MyPageVoteRes 구성
+        List<MyPageVoteRes> result = grouped.entrySet().stream()
+                .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
+                .map(e -> {
+                    List<MPVoteRes> items = e.getValue().stream()
+                            .sorted(Comparator.comparing(MPVoteRes::day).reversed())
+                            .toList();
+                    LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
+                    return MyPageVoteRes.of(headerDay, items);
+                })
+                .toList();
+
+        return result;
+    }
+
+
+    // 4번 api 질문
+    @Override
+    public List<MyPageVoteRes> getMyVote(String userId) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        List<VoteAnswer> voteAnswers = voteAnswerRepository.findByMember(member);
+        for (VoteAnswer voteAnswer : voteAnswers) {
+
+        }
+
+
+        return null;
+
+    }
+
     @Override
     public void updateNickname(String userId, String name) {
         Member member = userRepository.findById(userId).orElse(null);
@@ -63,6 +136,23 @@ public class MemberServiceImpl implements MemberService {
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         return GetNicknameRes.of(member.isNameFlag());
+    }
+
+    // 인기 투표 즉 값 많은거 찾기
+    public Map.Entry<String, Long> popularCnt(Vote vote) {
+        List<VoteAnswer> voteAnswers = vote.getVoteAnswers();
+
+        if (voteAnswers == null || voteAnswers.isEmpty()) {
+            return Map.entry("없음", 0L);
+        }
+
+        Map<VoteAnswerType, Long> countMap = voteAnswers.stream()
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+
+        return countMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(e -> Map.entry(e.getKey().name(), e.getValue()))
+                .orElse(Map.entry("없음", 0L));
     }
 
 
