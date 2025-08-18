@@ -49,7 +49,8 @@ public enum ErrorCode {
     // user
     INVALID_ROLE(-210, "해당 역할이 존재하지 않습니다.", 400),
     USER_NOT_EXIST(-211, "존재하지 않는 유저입니다.", 404),
-    DUPLICATE_EMAIL(-213, "이미 사용 중인 이메일입니다.", 409),
+    DUPLICATE_EMAIL(-212, "이미 사용 중인 이메일입니다.", 409),
+    ADMIN_PERMISSION_REQUIRED(-213, "관리자 권한이 필요합니다.", 403),
 
     // Alarm & FCM
     FCM_TOKEN_REGISTER_FAILED(-300, "FCM 토큰 등록에 실패했습니다.", 500),
@@ -66,12 +67,12 @@ public enum ErrorCode {
 
     // vote
     DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다. 추가 저장하겠습니다.", 409),
-    DUPLICATE_USER(-500, "장소는 또 저장할 수 없습니다.", 409),
-    OUT_OF_500M_RADIUS(-501, "현재 위치가 반경 500m를 초과했습니다.", 403),
-    VOTE_NOT_EXIST(-502, "존재하지 않는 투표입니다.", 404),
-    DUPLICATE_VOTE_USER(-503, "이미 투표했습니다.", 409),
-    NO_PERMISSION_TO_CLOSE_VOTE(-504, "투표 종료 권한이 없습니다.", 403),
-    VOTE_ALREADY_CLOSED(-505, "종료된 투표입니다.", 400);
+    DUPLICATE_USER(-501, "장소는 또 저장할 수 없습니다.", 409),
+    OUT_OF_500M_RADIUS(-502, "현재 위치가 반경 500m를 초과했습니다.", 403),
+    VOTE_NOT_EXIST(-503, "존재하지 않는 투표입니다.", 404),
+    DUPLICATE_VOTE_USER(-504, "이미 투표했습니다.", 409),
+    NO_PERMISSION_TO_CLOSE_VOTE(-505, "투표 종료 권한이 없습니다.", 403),
+    VOTE_ALREADY_CLOSED(-506, "종료된 투표입니다.", 400);
 
 
     private final int code;

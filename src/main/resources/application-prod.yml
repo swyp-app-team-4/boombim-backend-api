@@ -80,3 +80,6 @@ oauth2:
 # Firebase FCM 설정
 firebase:
   service-account-key: ${FIREBASE_SERVICE_ACCOUNT_KEY}
+
+admin:
+  id: ${ADMIN_ID}

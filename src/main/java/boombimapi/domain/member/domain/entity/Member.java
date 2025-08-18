@@ -74,9 +74,16 @@ public class Member {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    // 관리자 비번 null이어도됨
+    private String password;
+
     // false면 알림감 true면 알림 안감
     @Column(name = "alarm_flag", nullable = false)
     private boolean alarmFlag;
+
+    // 첫 로그인일시에는 false 이후에는 계속 true
+    @Column(name= "name_flag", nullable = false)
+    private boolean nameFlag;
 
     @Builder
     public Member(String id, String email, String name, String profile,
@@ -88,6 +95,7 @@ public class Member {
         this.socialProvider = socialProvider;
         this.role = role;
         this.alarmFlag = false;
+        this.nameFlag = false;
     }
 
     public void updateEmailAndProfile(String email, String profile) {
@@ -97,5 +105,6 @@ public class Member {
 
     public void updateName(String name) {
         this.name=name;
+        this.nameFlag=true;
     }
 }

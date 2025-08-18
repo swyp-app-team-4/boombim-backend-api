@@ -24,9 +24,11 @@ import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
+import boombimapi.global.infra.scheduled.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,6 +46,11 @@ public class AlarmServiceImpl implements AlarmService {
     private final FcmService fcmService;
     private final AlarmRecipientRepository alarmRecipientRepository;
 
+    private final MessageService messageService;
+
+    @Value("${admin.id}")
+    private String adminId;
+
     /**
      * 관리자가 알림 전송
      */
@@ -51,6 +58,9 @@ public class AlarmServiceImpl implements AlarmService {
     public SendAlarmResponse sendAllAlarm(String senderUserId, SendAlarmRequest request) {
         Member sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        boolean admin = isAdmin(sender);
+        if (!admin) throw new BoombimException(ErrorCode.ADMIN_PERMISSION_REQUIRED);
 
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
@@ -155,13 +165,23 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList) {
-        // 관리자 일단 최승호로 하겠음~! 나중에 수정 할꺼임
-        Member sender = userRepository.findById("_oC6_IgQLn8Z6jdAzahFz36OUaaCLvXZyhOhpMpElS0")
-                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList, boolean flag) {
 
-        String title = vote.getPosName() + "투표 종료 알림";
-        String message = vote.getPosName() + "투표가 종료됐어요! 투표 정보 확인해보세요";
+        Member sender = userRepository.findById(adminId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+        String title = messageService.endAlarmTitle(vote);
+        String message;
+        // 질문자들
+        if(flag){
+            message = messageService.endVoteQuestionAlarmMessage(vote);
+        }
+        // 투표자들
+        else{
+            message = messageService.endVoteAnswerAlarmMessage(vote);
+        }
+
+
+
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
                 .title(title)

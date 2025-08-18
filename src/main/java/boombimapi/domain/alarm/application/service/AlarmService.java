@@ -29,7 +29,7 @@ public interface AlarmService {
     List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType);
 
     // 투표 종료 알림
-    SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList);
+    SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList, boolean flag);
 
     // 알림 상태 업데이트 읽었는지 안읽었는지
     void updateAlarmStatus(String userId, UpdateAlarmStatusReq req);
