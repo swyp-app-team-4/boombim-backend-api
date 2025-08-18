@@ -19,14 +19,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class SchedulerService {
     private final FcmService fcmService;
     private final VoteRepository voteRepository;
@@ -53,7 +52,6 @@ public class SchedulerService {
 
     // 투표 종류 후 알림
     @Scheduled(fixedDelay = 60_000L, initialDelay = 30_000L) // 1분마다, 앱 시작 30초 후 시작
-    @Transactional
     public void sweepExpiredVotes() {
         // 자동
         auto();
@@ -90,8 +88,11 @@ public class SchedulerService {
 
         // 자동 종료 알림
         for (Vote autoVote : autoVotes) {
-            List<Member> memberList = getMembers(autoVote);
-            alarmService.sendEndVoteAlarm(autoVote, memberList);
+            List<Member> baseMemberList = getBaseMembers(autoVote);
+            alarmService.sendEndVoteAlarm(autoVote, baseMemberList, true);
+
+            List<Member> answerMemberList = getAnswerersOnly(autoVote);
+            alarmService.sendEndVoteAlarm(autoVote, answerMemberList, false);
 
         }
     }
@@ -104,9 +105,43 @@ public class SchedulerService {
             // false로 전환
             passivityVote.updatePassivityAlarmDeactivate();
 
-            List<Member> userList = getMembers(passivityVote);
-            alarmService.sendEndVoteAlarm(passivityVote, userList);
+            List<Member> baseMemberList = getBaseMembers(passivityVote);
+            alarmService.sendEndVoteAlarm(passivityVote, baseMemberList, true);
+
+            List<Member> answerMemberList = getAnswerersOnly(passivityVote);
+            alarmService.sendEndVoteAlarm(passivityVote, answerMemberList, false);
         }
+    }
+
+
+    private List<Member> getBaseMembers(Vote vote) {
+        // 1) 투표 생성자
+        List<Member> creators = voteRepository.findMembersByVote(vote);
+
+        // 2) 중복투표한 유저
+        List<Member> duplicators = voteDuplicationRepository.findMembersByVote(vote);
+
+        // 1+2 합치고 중복 제거 (id 기준)
+        Map<String, Member> byId = new LinkedHashMap<>();
+        for (Member m : creators) byId.put(m.getId(), m);
+        for (Member m : duplicators) byId.put(m.getId(), m);
+
+        return new ArrayList<>(byId.values());
+    }
+
+    private List<Member> getAnswerersOnly(Vote vote) {
+        // 1+2 베이스 멤버의 id 세트
+        List<Member> baseMembers = getBaseMembers(vote);
+        Set<String> baseIds = baseMembers.stream()
+                .map(Member::getId)
+                .collect(Collectors.toSet());
+
+        // 3) 답변자 불러와서, 1+2에 없는 사람만 필터
+        List<Member> answerers = voteAnswerRepository.findMembersByVote(vote);
+        return answerers.stream()
+                .filter(m -> !baseIds.contains(m.getId()))
+                .distinct() // 혹시 쿼리 중복 대비
+                .collect(Collectors.toList());
     }
 
 

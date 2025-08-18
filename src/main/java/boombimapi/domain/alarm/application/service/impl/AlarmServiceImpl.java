@@ -165,13 +165,23 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList) {
+    public SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList, boolean flag) {
 
         Member sender = userRepository.findById(adminId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
-
         String title = messageService.endAlarmTitle(vote);
-        String message = messageService.endAlarmMessage(vote);
+        String message;
+        // 질문자들
+        if(flag){
+            message = messageService.endVoteQuestionAlarmMessage(vote);
+        }
+        // 투표자들
+        else{
+            message = messageService.endVoteAnswerAlarmMessage(vote);
+        }
+
+
+
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
                 .title(title)
