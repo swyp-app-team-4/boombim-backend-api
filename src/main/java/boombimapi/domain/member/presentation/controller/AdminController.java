@@ -22,7 +22,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @Operation(summary = "관리자 일반 로그인", description = "이메일과 비밀번호로 관리자 로그인을 처리합니다.")
+    @Operation(summary = "[관리자 전용] 일반 로그인", description = "이메일과 비밀번호로 관리자 로그인을 처리합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패 (이메일 또는 비밀번호 불일치)"),

@@ -48,7 +48,7 @@ public class AlarmController {
         return ResponseEntity.ok(alarmService.registerFcmToken(userId, request));
     }
 
-    @Operation(summary = "알림 전송 (이벤트/공지)", description = "관리자가 사용자들에게 알림을 전송합니다.")
+    @Operation(summary = "[관리자 전용] 이벤트/공지 알림 전송", description = "관리자가 사용자들에게 알림을 전송합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알림 전송 시작"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
