@@ -89,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
 
     // 4번 api 질문
     @Override
-    public List<MyPageVoteRes> getMyVote(String userId) {
+    public List<MyPageVoteRes> getMyVoteQuestion(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
