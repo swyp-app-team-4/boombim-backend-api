@@ -111,10 +111,10 @@ public class SchedulerService {
             passivityVote.updateStatusDeactivate();
 
             List<Member> baseMemberList = getBaseMembers(passivityVote);
-            alarmService.sendEndVoteAlarm(passivityVote, baseMemberList, true);
+            if (!baseMemberList.isEmpty()) alarmService.sendEndVoteAlarm(passivityVote, baseMemberList, true);
 
             List<Member> answerMemberList = getAnswerersOnly(passivityVote);
-            alarmService.sendEndVoteAlarm(passivityVote, answerMemberList, false);
+            if (!answerMemberList.isEmpty()) alarmService.sendEndVoteAlarm(passivityVote, answerMemberList, false);
         }
     }
 
