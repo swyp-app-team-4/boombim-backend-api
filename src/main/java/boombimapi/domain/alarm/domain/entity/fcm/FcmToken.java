@@ -20,7 +20,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FcmToken {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 연관관계 매핑: FK 컬럼 member_id
@@ -35,8 +36,7 @@ public class FcmToken {
     @Column(nullable = false)
     private DeviceType deviceType;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
@@ -53,8 +53,25 @@ public class FcmToken {
         this.lastUsedAt = LocalDateTime.now();
     }
 
-    public void updateLastUsedAt() { this.lastUsedAt = LocalDateTime.now(); }
-    public void deactivate() { this.isActive = false; }
-    public void activate() { this.isActive = true; updateLastUsedAt(); }
+    public void updateLastUsedAt() {
+        this.lastUsedAt = LocalDateTime.now();
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    public void activate() {
+        this.isActive = true;
+        updateLastUsedAt();
+    }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(); // 한국시간
+        }
+
+    }
 }
 

@@ -43,7 +43,7 @@ public class AlarmRecipient {
     @Column(columnDefinition = "TEXT")
     private String failureReason;
 
-    @CreationTimestamp
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -51,15 +51,30 @@ public class AlarmRecipient {
     public AlarmRecipient(Alarm alarm, Member member, DeviceType deviceType) {
         this.alarm = alarm;
         this.member = member;
-        this.deviceType=deviceType;
+        this.deviceType = deviceType;
     }
 
-    public void markSent() { this.deliveryStatus = DeliveryStatus.SENT; this.sentAt = LocalDateTime.now(); }
-    public void markFailed(String reason) { this.deliveryStatus = DeliveryStatus.FAILED; this.failureReason = reason; }
+    public void markSent() {
+        this.deliveryStatus = DeliveryStatus.SENT;
+        this.sentAt = LocalDateTime.now();
+    }
+
+    public void markFailed(String reason) {
+        this.deliveryStatus = DeliveryStatus.FAILED;
+        this.failureReason = reason;
+    }
 
     // 읽음 처리
-    public void updateDeliveryStatus(){
-        this.deliveryStatus=DeliveryStatus.READ;
+    public void updateDeliveryStatus() {
+        this.deliveryStatus = DeliveryStatus.READ;
+    }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(); // 한국시간
+        }
+
     }
 
 }

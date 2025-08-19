@@ -66,7 +66,6 @@ public class Member {
     @Column(name = "social_provider", nullable = false)
     private SocialProvider socialProvider;
 
-    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -106,5 +105,13 @@ public class Member {
     public void updateName(String name) {
         this.name=name;
         this.nameFlag=true;
+    }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(); // 한국시간
+        }
+
     }
 }
