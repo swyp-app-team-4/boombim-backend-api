@@ -18,6 +18,7 @@ import boombimapi.global.jwt.domain.entity.SocialToken;
 import boombimapi.global.jwt.domain.repository.SocialTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,9 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     private final CreateAccessTokenAndRefreshTokenService tokenService;
     private final MemberRepository userRepository;
     private final SocialTokenRepository socialTokenRepository;
+
+    @Value("${apple.profile}")
+    private String appleProfile;
 
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
                                   CreateAccessTokenAndRefreshTokenService tokenService,
@@ -155,8 +159,8 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     }
 
     private Member createSocialUser(SocialProvider provider,
-                                  KakaoTokenResponse tokenResponse,
-                                  KakaoUserResponse userResponse) {
+                                    KakaoTokenResponse tokenResponse,
+                                    KakaoUserResponse userResponse) {
         log.info("소셜 사용자 생성 시작: provider={}, userId={}", provider, userResponse.id());
 
         if (userResponse.id() == null || userResponse.id().isEmpty()) {
@@ -175,14 +179,26 @@ public class SocialLoginServiceImpl implements SocialLoginService {
             }
 
             log.info("신규 {} 사용자 생성: {}", provider, userResponse.getName());
-            user = Member.builder()
-                    .id(userResponse.id())
-                    .email(userResponse.getEmail())
-                    .name(userResponse.getName())
-                    .profile(userResponse.getProfile())
-                    .socialProvider(provider)
-                    .role(Role.USER)
-                    .build();
+            if (provider == SocialProvider.APPLE) {
+                user = Member.builder()
+                        .id(userResponse.id())
+                        .email(userResponse.getEmail())
+                        .name(userResponse.getName())
+                        .profile(appleProfile)
+                        .socialProvider(provider)
+                        .role(Role.USER)
+                        .build();
+            } else {
+                user = Member.builder()
+                        .id(userResponse.id())
+                        .email(userResponse.getEmail())
+                        .name(userResponse.getName())
+                        .profile(userResponse.getProfile())
+                        .socialProvider(provider)
+                        .role(Role.USER)
+                        .build();
+            }
+
             userRepository.save(user);
         } else {
             if (!user.getEmail().equals(userResponse.getEmail())) {
