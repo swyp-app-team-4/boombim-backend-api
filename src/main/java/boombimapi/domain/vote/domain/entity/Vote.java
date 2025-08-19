@@ -57,7 +57,7 @@ public class Vote {
     @Column(nullable = false)
     private boolean isVoteActivate;
 
-    @CreationTimestamp
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -66,7 +66,7 @@ public class Vote {
     @Enumerated(EnumType.STRING)
     private VoteStatus voteStatus;
     // 투표 타이머 앤 고민좀 !!
-    @CreationTimestamp
+
     @Column(nullable = false)
     private LocalDateTime endTime; // 생성 시 now() + 30m
 
@@ -105,6 +105,16 @@ public class Vote {
 
     public void updatePassivityAlarmDeactivate() {
         this.passivityAlarmFlag = false;
+    }
+
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(); // 한국시간
+        }
+        if (endTime == null) {
+            endTime = createdAt.plusMinutes(30);
+        }
     }
 
 }
