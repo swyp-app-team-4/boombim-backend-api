@@ -75,6 +75,7 @@ oauth2:
     key-id: ${APPLE_KEY_ID}
     private-key: ${APPLE_PRIVATE_KEY}
     redirect-uri: ${APPLE_REDIRECT_URI}
+    profile: ${APPLE_PROFILE}
 
 
 # Firebase FCM 설정

@@ -37,7 +37,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     private final MemberRepository userRepository;
     private final SocialTokenRepository socialTokenRepository;
 
-    @Value("${apple.profile}")
+    @Value("${oauth2.apple.profile}")
     private String appleProfile;
 
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
