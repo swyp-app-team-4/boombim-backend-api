@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,12 +36,12 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     """)
     int bulkCloseExpired(@Param("progress") VoteStatus progress,
                          @Param("end") VoteStatus end,
-                         @Param("now") Instant now);
+                         @Param("now") LocalDateTime now);
 
     @Query("select v.member from Vote v where v = :vote")
     List<Member> findMembersByVote(@Param("vote") Vote vote);
 
-    List<Vote> findByVoteStatusAndEndTimeLessThanEqual(VoteStatus status, Instant now);
+    List<Vote> findByVoteStatusAndEndTimeLessThanEqual(VoteStatus status, LocalDateTime now);
 
     List<Vote> findByPassivityAlarmFlagTrue();
 
