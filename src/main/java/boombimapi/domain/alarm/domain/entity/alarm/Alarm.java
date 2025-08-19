@@ -49,7 +49,6 @@ public class Alarm {
     @Column(nullable = false)
     private AlarmStatus status;
 
-    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -75,5 +74,12 @@ public class Alarm {
     public void updateFailureReason(String failureReason) {
         this.status = AlarmStatus.FAILED;
         this.failureReason = failureReason;
+    }
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(); // 한국시간
+        }
+
     }
 }
