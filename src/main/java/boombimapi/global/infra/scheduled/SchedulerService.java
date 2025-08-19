@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,10 +81,10 @@ public class SchedulerService {
 
 
     private void auto() {
-        List<Vote> autoVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(VoteStatus.PROGRESS, Instant.now());
+        List<Vote> autoVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(VoteStatus.PROGRESS, LocalDateTime.now());
 
         // 투포 시간 된거 종료로 바꾸기
-        voteRepository.bulkCloseExpired(VoteStatus.PROGRESS, VoteStatus.END, Instant.now());
+        voteRepository.bulkCloseExpired(VoteStatus.PROGRESS, VoteStatus.END, LocalDateTime.now());
         // log.debug("Closed {} expired votes", n);
 
         // 자동 종료 알림
@@ -104,6 +105,10 @@ public class SchedulerService {
         for (Vote passivityVote : passivityVotes) {
             // false로 전환
             passivityVote.updatePassivityAlarmDeactivate();
+
+            // 한번더 안전상으로 투표 종료 비활성화 false로 바꿈
+            passivityVote.updateIsVoteDeactivate();
+            passivityVote.updateStatusDeactivate();
 
             List<Member> baseMemberList = getBaseMembers(passivityVote);
             alarmService.sendEndVoteAlarm(passivityVote, baseMemberList, true);

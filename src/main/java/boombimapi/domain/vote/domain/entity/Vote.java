@@ -66,8 +66,9 @@ public class Vote {
     @Enumerated(EnumType.STRING)
     private VoteStatus voteStatus;
     // 투표 타이머 앤 고민좀 !!
+    @CreationTimestamp
     @Column(nullable = false)
-    private Instant endTime; // 생성 시 now() + 30m
+    private LocalDateTime endTime; // 생성 시 now() + 30m
 
     // 초기에는 무조건 false 그다음 사용자가 투표 종류하기 버튼 누르면 true로 바뀌고 스케줄러 거치면서 false로 바뀜
     @Column(nullable = false)
@@ -82,11 +83,13 @@ public class Vote {
         this.longitude = longitude;
         this.posName = posName;
         this.isVoteActivate = true;
-        this.endTime = Instant.now().plus(30, ChronoUnit.MINUTES); // 생성 시 30분 뒤
         this.voteStatus = VoteStatus.PROGRESS;
         this.passivityAlarmFlag = false;
     }
 
+    public void updateEndTime(int minutes) {
+        this.endTime = LocalDateTime.now().plusMinutes(minutes);
+    }
 
     public void updateIsVoteDeactivate() {
         this.isVoteActivate = false;
