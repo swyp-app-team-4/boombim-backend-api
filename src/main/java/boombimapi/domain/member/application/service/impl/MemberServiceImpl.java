@@ -52,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
         List<VoteDuplication> voteDus = voteDuplicationRepository.findByMember(user);
         List<Vote> votes = voteRepository.findByMember(user);
 
-        return GetMemberRes.of(user, (long) (voteDus.size() + votes.size()), (long) voteAnswers.size());
+        return GetMemberRes.of(user, (long) voteAnswers.size(), (long) (voteDus.size() + votes.size()));
     }
 
     // 3번 api 투표
