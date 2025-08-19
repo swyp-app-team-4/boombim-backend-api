@@ -52,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
         List<VoteDuplication> voteDus = voteDuplicationRepository.findByMember(user);
         List<Vote> votes = voteRepository.findByMember(user);
 
-        return GetMemberRes.of(user, (long) (voteDus.size() + votes.size()), (long) voteAnswers.size());
+        return GetMemberRes.of(user, (long) voteAnswers.size(), (long) (voteDus.size() + votes.size()));
     }
 
     // 3번 api 투표
@@ -89,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
 
     // 4번 api 질문
     @Override
-    public List<MyPageVoteRes> getMyVote(String userId) {
+    public List<MyPageVoteRes> getMyVoteQuestion(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 

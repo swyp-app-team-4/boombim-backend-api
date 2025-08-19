@@ -17,7 +17,7 @@ public interface MemberService {
     List<MyPageVoteRes> getMyVoteAnswer(String userId);
 
     // 4번 구간
-    List<MyPageVoteRes> getMyVote(String userId);
+    List<MyPageVoteRes> getMyVoteQuestion(String userId);
 
     void updateNickname(String userId, String name);
 

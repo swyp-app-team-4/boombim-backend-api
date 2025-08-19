@@ -89,6 +89,8 @@ public class VoteServiceImpl implements VoteService {
                 .longitude(req.posLongitude()).build();
         voteRepository.save(vb);
 
+        vb.updateEndTime(30);
+
 
         //1. 지역 누르면 투표 생성 api  -
         // 중복 검사인지 확인해야됨
