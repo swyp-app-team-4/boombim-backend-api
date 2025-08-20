@@ -59,8 +59,8 @@ public class AlarmServiceImpl implements AlarmService {
         Member sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        boolean admin = isAdmin(sender);
-        if (!admin) throw new BoombimException(ErrorCode.ADMIN_PERMISSION_REQUIRED);
+        //boolean admin = isAdmin(sender);
+        //if (!admin) throw new BoombimException(ErrorCode.ADMIN_PERMISSION_REQUIRED);
 
         // 알림 엔티티 생성
         Alarm alarm = Alarm.builder()
