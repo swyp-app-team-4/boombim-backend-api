@@ -1,4 +1,4 @@
-package boombimapi.global.infra.init;
+package boombimapi.global.infra.init.member;
 
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class MemberDataInitializer {
@@ -29,14 +29,14 @@ public class MemberDataInitializer {
     @Transactional
     public void initializeMembers() {
         // 이미 데이터가 있으면 초기화하지 않음
-        if (memberRepository.count() > 0) {
-            log.info("회원 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
-            return;
-        }
+//        if (memberRepository.count() > 0) {
+//            log.info("회원 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
+//            return;
+//        }
 
-        log.info("회원 데이터 초기화를 시작합니다... (100명)");
 
-        for (int i = 1; i <= 100; i++) {
+
+        for (int i = 1; i <= 1000; i++) {
             // Member 생성
             Member member = Member.builder()
                     .id(UUID.randomUUID().toString())
