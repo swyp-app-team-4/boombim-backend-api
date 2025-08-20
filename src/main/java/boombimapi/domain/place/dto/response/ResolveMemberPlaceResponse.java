@@ -3,7 +3,7 @@ package boombimapi.domain.place.dto.response;
 import boombimapi.domain.place.entity.MemberPlace;
 
 public record ResolveMemberPlaceResponse(
-    Long id
+    Long memberPlaceId
 ) {
 
     public static ResolveMemberPlaceResponse from(
