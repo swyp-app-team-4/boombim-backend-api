@@ -9,6 +9,7 @@ import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
 import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
+import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
 import boombimapi.domain.vote.domain.repository.VoteDuplicationRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
@@ -171,6 +172,8 @@ public class VoteServiceImpl implements VoteService {
 
         List<Vote> votes = calculate500(latitude, longitude);
         for (Vote vote : votes) {
+            if(!vote.isVoteActivate() || vote.getVoteStatus().equals(VoteStatus.END)) continue;
+
             List<Long> voteAnswer = voteAnswerCnt(vote);
             boolean voteFlag = voteUsercheck(vote, user);
             voteResList.add(VoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
