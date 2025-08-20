@@ -51,12 +51,12 @@ public class VoteServiceImpl implements VoteService {
         Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
-        //위도 경도 500m 맞는지 true면 있음 false면 없음
-        boolean result = isWithin500Meters(
+        //위도 경도 100m 맞는지 true면 있음 false면 없음
+        boolean result = isWithin100Meters(
                 req.posLatitude(), req.posLongitude(),
                 req.userLatitude(), req.userLongitude()
         );
-        if (!result) throw new BoombimException(ErrorCode.OUT_OF_500M_RADIUS);
+        if (!result) throw new BoombimException(ErrorCode.OUT_OF_100M_RADIUS);
 
 
         // 중복 검사인지 확인
@@ -170,7 +170,7 @@ public class VoteServiceImpl implements VoteService {
 
         List<VoteRes> voteResList = new ArrayList<>();
 
-        List<Vote> votes = calculate500(latitude, longitude);
+        List<Vote> votes = calculate100(latitude, longitude);
         for (Vote vote : votes) {
             if(!vote.isVoteActivate() || vote.getVoteStatus().equals(VoteStatus.END)) continue;
 
@@ -212,7 +212,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     // 허버사인 공식 500m 반경 파악
-    public boolean isWithin500Meters(double posLatitude, double posLongitude,
+    public boolean isWithin100Meters(double posLatitude, double posLongitude,
                                      double userLatitude, double userLongitude) {
 
         final double EARTH_RADIUS = 6371000; // 지구 반지름 (m)
@@ -230,7 +230,7 @@ public class VoteServiceImpl implements VoteService {
 
         double distance = EARTH_RADIUS * c; // 두 점 사이 거리(m)
 
-        return distance <= 500; // 500m 이내면 true
+        return distance <= 100; // 500m 이내면 true
     }
 
     // 투표마다 투표 4개 답변 숫 얻어오기
@@ -253,8 +253,8 @@ public class VoteServiceImpl implements VoteService {
     }
 
 
-    private List<Vote> calculate500(double latitude, double longitude) {
-        final double RADIUS_M = 500.0;
+    private List<Vote> calculate100(double latitude, double longitude) {
+        final double RADIUS_M = 100.0;
 
         // 1) 바운딩 박스(사각형) 계산: 위도 1도 ≈ 111,320m, 경도 1도 ≈ 111,320 * cos(lat)
         double latDelta = RADIUS_M / 111_320d;
@@ -270,12 +270,12 @@ public class VoteServiceImpl implements VoteService {
         List<Vote> candidates = voteRepository.findAllInBoundingBox(latMin, latMax, lonMin, lonMax);
 
         // 3) 하버사인으로 500m 이내만 남기고, 거리 기준 정렬
-        List<Vote> within500m = candidates.stream()
+        List<Vote> within100m = candidates.stream()
                 .filter(v -> distanceMeters(latitude, longitude, v.getLatitude(), v.getLongitude()) <= RADIUS_M)
                 .sorted(Comparator.comparingDouble(v -> distanceMeters(latitude, longitude, v.getLatitude(), v.getLongitude())))
                 .toList();
 
-        return within500m;
+        return within100m;
     }
 
 
