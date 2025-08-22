@@ -2,7 +2,7 @@ package boombimapi.domain.congestion.entity;
 
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.place.entity.MemberPlace;
-import boombimapi.global.base.BaseEntity;
+import boombimapi.global.base.BaseExpiringEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +19,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "member_congestion")
+@Table(name = "member_congestions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberCongestion extends BaseEntity {
+public class MemberCongestion extends BaseExpiringEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,9 +34,6 @@ public class MemberCongestion extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_place_id", nullable = false)
     private MemberPlace memberPlace;
-
-    @Column(name = "name", length = 100, nullable = false)
-    private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "congestion_level_id", nullable = false)
@@ -52,14 +48,10 @@ public class MemberCongestion extends BaseEntity {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
-
     @Builder
     private MemberCongestion(
         Member member,
         MemberPlace memberPlace,
-        String name,
         CongestionLevel congestionLevel,
         String congestionMessage,
         Double latitude,
@@ -67,7 +59,6 @@ public class MemberCongestion extends BaseEntity {
     ) {
         this.member = member;
         this.memberPlace = memberPlace;
-        this.name = name;
         this.congestionLevel = congestionLevel;
         this.congestionMessage = congestionMessage;
         this.latitude = latitude;
@@ -77,7 +68,6 @@ public class MemberCongestion extends BaseEntity {
     public static MemberCongestion of(
         Member member,
         MemberPlace memberPlace,
-        String name,
         CongestionLevel congestionLevel,
         String congestionMessage,
         Double latitude,
@@ -86,7 +76,6 @@ public class MemberCongestion extends BaseEntity {
         return MemberCongestion.builder()
             .member(member)
             .memberPlace(memberPlace)
-            .name(name)
             .congestionLevel(congestionLevel)
             .congestionMessage(congestionMessage)
             .latitude(latitude)
