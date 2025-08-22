@@ -5,7 +5,8 @@ import boombimapi.global.dto.Coordinate;
 public record ViewportRequest(
     Coordinate topLeft,
     Coordinate bottomRight,
-    Coordinate memberCoordinate
+    Coordinate memberCoordinate,
+    Integer zoom
 ) {
 
 }
