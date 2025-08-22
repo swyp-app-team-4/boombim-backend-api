@@ -4,8 +4,11 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.MemberPlaceService;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
+import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
+import boombimapi.domain.place.dto.response.ViewportNodeResponse;
 import boombimapi.global.response.BaseResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +36,21 @@ public class MemberPlaceController {
             )
         );
     }
+
+    @PostMapping
+    public ResponseEntity<BaseResponse<List<ViewportNodeResponse>>> getMemberPlacesInViewport(
+        @RequestBody ViewportRequest request
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
+                memberPlaceService.getViewportNodes(request)
+            )
+        );
+    }
+
+//    @GetMapping("/{memberPlaceId}")
+//    public ResponseEntity<BaseResponse<>>
 
 }
