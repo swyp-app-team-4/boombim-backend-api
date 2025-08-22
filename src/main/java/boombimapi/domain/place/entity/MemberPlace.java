@@ -25,6 +25,9 @@ public class MemberPlace extends BaseEntity {
     @Column(name = "uuid", length = 32, nullable = false, unique = true)
     private String uuid;
 
+    @Column(name = "name", length = 32, nullable = false)
+    private String name;
+
     @Column(name = "latitude", nullable = false)
     private Double latitude;
 
@@ -34,21 +37,25 @@ public class MemberPlace extends BaseEntity {
     @Builder
     private MemberPlace(
         String uuid,
+        String name,
         Double latitude,
         Double longitude
     ) {
         this.uuid = uuid;
+        this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
     public static MemberPlace of(
         String uuid,
+        String name,
         Double latitude,
         Double longitude
     ) {
         return MemberPlace.builder()
             .uuid(uuid)
+            .name(name)
             .latitude(latitude)
             .longitude(longitude)
             .build();
