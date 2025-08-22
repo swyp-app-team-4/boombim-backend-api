@@ -7,7 +7,7 @@ public record ViewportClusterNodeResponse(
     MarkerType type,
     Coordinate coordinate,
     int clusterSize
-) {
+) implements ViewportNodeResponse {
 
     public static ViewportClusterNodeResponse of(
         Coordinate coordinate,
