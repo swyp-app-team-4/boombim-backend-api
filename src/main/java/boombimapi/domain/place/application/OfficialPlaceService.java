@@ -8,9 +8,9 @@ import boombimapi.domain.congestion.repository.OfficialCongestionDemographicsRep
 import boombimapi.domain.congestion.repository.OfficialCongestionForecastRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
-import boombimapi.domain.place.dto.response.OfficialPlaceDemographics;
-import boombimapi.domain.place.dto.response.OfficialPlaceForecast;
-import boombimapi.domain.place.dto.response.OfficialPlaceOverviewResponse;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceDemographics;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceForecast;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;

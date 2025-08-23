@@ -4,7 +4,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.OfficialPlaceService;
 import boombimapi.domain.place.dto.request.ViewportRequest;
-import boombimapi.domain.place.dto.response.OfficialPlaceOverviewResponse;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,4 +1,4 @@
-package boombimapi.domain.place.dto.response;
+package boombimapi.domain.place.dto.response.official;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package boombimapi.domain.place.dto.response;
+package boombimapi.domain.place.dto.response.official;
 
 import boombimapi.domain.congestion.entity.OfficialCongestionForecast;
 import java.time.LocalDateTime;
