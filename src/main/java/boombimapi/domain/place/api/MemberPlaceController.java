@@ -6,7 +6,7 @@ import boombimapi.domain.place.application.MemberPlaceService;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
-import boombimapi.domain.place.dto.response.ViewportNodeResponse;
+import boombimapi.domain.place.dto.response.node.ViewportNodeResponse;
 import boombimapi.global.response.BaseResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

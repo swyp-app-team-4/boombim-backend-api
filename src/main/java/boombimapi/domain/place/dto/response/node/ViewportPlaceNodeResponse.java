@@ -1,4 +1,4 @@
-package boombimapi.domain.place.dto.response;
+package boombimapi.domain.place.dto.response.node;
 
 import boombimapi.domain.place.dto.type.MarkerType;
 import boombimapi.global.dto.Coordinate;

@@ -1,22 +1,19 @@
 package boombimapi.domain.place.application;
 
-import boombimapi.domain.congestion.entity.CongestionLevel;
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.congestion.repository.MemberCongestionRepository;
 import boombimapi.domain.place.cluster.GridClusterer;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
-import boombimapi.domain.place.dto.response.ViewportClusterNodeResponse;
-import boombimapi.domain.place.dto.response.ViewportNodeResponse;
-import boombimapi.domain.place.dto.response.ViewportPlaceNodeResponse;
-import boombimapi.domain.place.dto.response.ViewportResponse;
+import boombimapi.domain.place.dto.response.node.ViewportClusterNodeResponse;
+import boombimapi.domain.place.dto.response.node.ViewportNodeResponse;
+import boombimapi.domain.place.dto.response.node.ViewportPlaceNodeResponse;
 import boombimapi.domain.place.entity.MemberPlace;
 import boombimapi.domain.place.repository.MemberPlaceRepository;
 import boombimapi.global.dto.Coordinate;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +35,7 @@ public class MemberPlaceService {
     ) {
         log.info("[MemberPlaceService] resolveMemberPlace()");
 
-        // TODO: 레이스 컨디션 처리 필요
-
+        // TODO: 레이스 컨디션 처리 필요(동일 uuid 동시 생성 방지)
         MemberPlace memberPlace = memberPlaceRepository.findByUuid(request.uuid())
             .orElseGet(() -> memberPlaceRepository.save(
                 MemberPlace.of(
@@ -53,9 +49,7 @@ public class MemberPlaceService {
         return ResolveMemberPlaceResponse.from(memberPlace);
     }
 
-    public List<ViewportNodeResponse> getViewportNodes(
-        ViewportRequest request
-    ) {
+    public List<ViewportNodeResponse> getViewportNodes(ViewportRequest request) {
 
         // 1) 뷰포트 경계 계산
         double lat1 = request.topLeft().latitude();
@@ -68,11 +62,11 @@ public class MemberPlaceService {
         double minLng = Math.min(lng1, lng2);
         double maxLng = Math.max(lng1, lng2);
 
-        // 2) 뷰포트 내 장소 조회 (파생 메서드)
+        // 2) 뷰포트 내 장소 조회
         List<MemberPlace> allPlaces = memberPlaceRepository
             .findByLatitudeBetweenAndLongitudeBetween(minLat, maxLat, minLng, maxLng);
 
-        // 3) 유효 혼잡도 존재 장소만 필터링 (exists 파생 메서드, N번 호출)
+        // 3) 유효 혼잡도 존재 장소만 필터링
         Instant now = Instant.now();
         List<GridClusterer.Point> points = new ArrayList<>();
         Map<Long, MemberPlace> placeById = new HashMap<>(allPlaces.size());
@@ -94,12 +88,7 @@ public class MemberPlaceService {
 
         // 4) 클러스터링
         List<GridClusterer.Bucket> buckets = GridClusterer.cluster(
-            points,
-            minLat,
-            maxLat,
-            minLng,
-            maxLng,
-            zoom
+            points, minLat, maxLat, minLng, maxLng, zoom
         );
 
         // 5) 분해 정책
@@ -107,40 +96,54 @@ public class MemberPlaceService {
         int detailZoom = 20;
         boolean highZoom = zoom >= detailZoom;
 
-        // 6) 응답 구성 (디테일로 푸는 경우에만 최신 혼잡도 N+1)
+        // 6) 응답 구성 (디테일로 푸는 경우에만 최신 혼잡도 조회)
         double memberLat = request.memberCoordinate().latitude();
         double memberLng = request.memberCoordinate().longitude();
 
         List<ViewportNodeResponse> nodes = new ArrayList<>(buckets.size());
 
-        for (GridClusterer.Bucket b : buckets) {
-            if (!highZoom && b.count() >= minClusterSize) {
+        for (GridClusterer.Bucket bucket : buckets) {
+            // (A) 클러스터 모드
+            if (!highZoom && bucket.count() >= minClusterSize) {
+                Map<String, Integer> levelCounts = new HashMap<>();
+
+                for (Long placeId : bucket.placeIds()) {
+                    Optional<MemberCongestion> mcOpt =
+                        memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
+                            placeId, now
+                        );
+                    if (mcOpt.isEmpty())
+                        continue;
+
+                    String levelName = mcOpt.get().getCongestionLevel().getName();
+                    levelCounts.merge(levelName, 1, Integer::sum);
+                }
+
                 nodes.add(
                     ViewportClusterNodeResponse.of(
-                        new Coordinate(b.lat(), b.lng()),
-                        b.count()
+                        new Coordinate(bucket.lat(), bucket.lng()),
+                        bucket.count(),
+                        levelCounts
                     )
                 );
                 continue;
             }
 
-            // 디테일: 버킷 내 장소들을 개별 마커로 전개
-            for (Long placeId : b.placeIds()) {
+            // (B) 디테일 모드: 버킷 내 장소들을 개별 마커로 전개
+            for (Long placeId : bucket.placeIds()) {
                 MemberPlace place = placeById.get(placeId);
-                if (place == null) {
+                if (place == null)
                     continue;
-                }
 
                 Optional<MemberCongestion> mcOpt =
                     memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
                         placeId, now
                     );
-
-                if (mcOpt.isEmpty()) {
+                if (mcOpt.isEmpty())
                     continue;
-                }
 
                 MemberCongestion mc = mcOpt.get();
+
                 double distanceMeters = haversine(
                     memberLat, memberLng, place.getLatitude(), place.getLongitude()
                 );
@@ -159,71 +162,6 @@ public class MemberPlaceService {
         }
 
         return nodes;
-
-    }
-
-    public List<ViewportResponse> getMemberPlacesInViewport(
-        ViewportRequest request
-    ) {
-
-        // TODO: 직선 거리 계산 부분 리팩터링 필요
-        double lat1 = request.topLeft().latitude();
-        double lng1 = request.topLeft().longitude();
-        double lat2 = request.bottomRight().latitude();
-        double lng2 = request.bottomRight().longitude();
-
-        double minLatitude = Math.min(lat1, lat2);
-        double maxLatitude = Math.max(lat1, lat2);
-        double minLongitude = Math.min(lng1, lng2);
-        double maxLongitude = Math.max(lng1, lng2);
-
-        List<MemberPlace> memberPlacesInViewport = memberPlaceRepository.findByLatitudeBetweenAndLongitudeBetween(
-            minLatitude,
-            maxLatitude,
-            minLongitude,
-            maxLongitude
-        );
-
-        double memberLatitude = request.memberCoordinate().latitude();
-        double memberLongitude = request.memberCoordinate().longitude();
-
-        ArrayList<ViewportResponse> result = new ArrayList<>(memberPlacesInViewport.size());
-
-        for (MemberPlace memberPlace : memberPlacesInViewport) {
-            Optional<MemberCongestion> optionalLatestMemberCongestion = memberCongestionRepository
-                .findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(memberPlace.getId(), Instant.now());
-
-            if (optionalLatestMemberCongestion.isEmpty()) {
-                continue;
-            }
-
-            MemberCongestion latestMemberCongestion = optionalLatestMemberCongestion.get();
-            CongestionLevel congestionLevel = latestMemberCongestion.getCongestionLevel();
-
-            Double memberPlaceLatitude = memberPlace.getLatitude();
-            Double memberPlaceLongitude = memberPlace.getLongitude();
-
-            double distanceMeters = haversine(
-                memberLatitude,
-                memberLongitude,
-                memberPlaceLatitude,
-                memberPlaceLongitude
-            );
-
-            result.add(new ViewportResponse(
-                memberPlace.getId(),
-                memberPlace.getName(),
-                new Coordinate(memberPlaceLatitude, memberPlaceLongitude),
-                distanceMeters,
-                congestionLevel.getName(),
-                latestMemberCongestion.getCongestionMessage()
-            ));
-        }
-
-        // TODO: 정렬을 DB 단에서 해줄지, 아니면 지금처럼 소스 코드 단에서 해줄지 고민 -> 추후 성능 확인
-        result.sort(Comparator.comparingDouble(ViewportResponse::distance));
-
-        return result;
     }
 
     private double haversine(double aLat, double aLng, double bLat, double bLng) {
@@ -234,6 +172,4 @@ public class MemberPlaceService {
             * Math.pow(Math.sin(dLng / 2), 2);
         return 2 * 6_371_000 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
     }
-
-
 }
