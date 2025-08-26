@@ -81,8 +81,11 @@ public class MemberServiceImpl implements MemberService {
             // 총 투표수
             Long voteALlCnt = vote4Answer.get(0) + vote4Answer.get(1) + vote4Answer.get(2) + vote4Answer.get(3);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, voteAnswerTypes,
-                    vote4Answer.get(0),vote4Answer.get(1),vote4Answer.get(2),vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+            // 상위 3건 유저 프로필 사진
+            List<String> profile = profileTopThree(vote);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
         if (bottomResult.isEmpty()) {
@@ -118,8 +121,11 @@ public class MemberServiceImpl implements MemberService {
             // 총 투표수
             Long voteALlCnt = vote4Answer.get(0) + vote4Answer.get(1) + vote4Answer.get(2) + vote4Answer.get(3);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, voteAnswerTypes,
-                    vote4Answer.get(0),vote4Answer.get(1),vote4Answer.get(2),vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+            // 상위 3건 유저 프로필 사진
+            List<String> profile = profileTopThree(vote);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
 
         }
 
@@ -139,8 +145,11 @@ public class MemberServiceImpl implements MemberService {
             // 총 투표수
             Long voteALlCnt = vote4Answer.get(0) + vote4Answer.get(1) + vote4Answer.get(2) + vote4Answer.get(3);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, voteAnswerTypes,
-                    vote4Answer.get(0),vote4Answer.get(1),vote4Answer.get(2),vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+            // 상위 3건 유저 프로필 사진
+            List<String> profile = profileTopThree(vote);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
 
@@ -257,5 +266,15 @@ public class MemberServiceImpl implements MemberService {
         result.add(crowdedCount);
         return result;
     }
+
+    // 상위 3건 유저 프로필 이미지 링크
+    public List<String> profileTopThree(Vote vote) {
+        return vote.getVoteAnswers().stream()
+                .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
+                .filter(Objects::nonNull)                               // null 값 제거 (안전)
+                .limit(3)                                               // 최대 3개만
+                .toList();
+    }
+
 
 }
