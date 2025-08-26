@@ -9,10 +9,13 @@ public record LoginToken(
         String accessToken,
 
         @Schema(description = "JWT 리프레시 토큰", example = "eyJhbGciOiJIUzI1NiJ9...")
-        String refreshToken
+        String refreshToken,
+
+        @Schema(description = "접속해서 닉네임 수정 호출할지, 즉 false면 호출해야됨", example = "false, true")
+        boolean nameFlag
 
 ) {
-    public static LoginToken of(String accessToken, String refreshToken) {
-        return new LoginToken(accessToken, refreshToken);
+    public static LoginToken of(String accessToken, String refreshToken, boolean nameFlag) {
+        return new LoginToken(accessToken, refreshToken, nameFlag);
     }
 }

@@ -210,7 +210,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public void updateAlarmStatus(String userId, UpdateAlarmStatusReq req) {
+    public void updateAlarmRead(String userId, UpdateAlarmStatusReq req) {
         Member member = userRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
@@ -221,6 +221,16 @@ public class AlarmServiceImpl implements AlarmService {
             throw new BoombimException(ErrorCode.ALARM_ACCESS_DENIED);
 
         ar.updateDeliveryStatus();
+    }
+
+    @Override
+    public void updateAlarmStatus(String userId) {
+        Member member = userRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        if(member.isAlarmFlag()) member.updateIsDeactivateAlarmFlag(); // 알림끔
+        else member.updateIsActivateAlarmFlag(); // 알림킴
+
     }
 
 
