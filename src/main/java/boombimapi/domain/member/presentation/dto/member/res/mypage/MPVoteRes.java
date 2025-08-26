@@ -15,6 +15,9 @@ public record MPVoteRes(
         @Schema(description = "투표 ID", example = "101")
         Long voteId,
 
+        @Schema(description = "사용자 별 프로필 사진", example = "http://k.kakaocdn.net/dn/bN0Hg2/btsIUhLSYs8/vrWzldpNSnycWKkRtYyIgk/img_640x640.jpg")
+        List<String> profile,
+
         @Schema(description = "투표 생성 시간", example = "2025-07-15T09:30:00")
         LocalDateTime day,
 
@@ -45,6 +48,7 @@ public record MPVoteRes(
 ) {
     public static MPVoteRes of(
             Long voteId,
+            List<String> profile,
             LocalDateTime day,
             String posName,
             List<VoteAnswerType> popularRes,
@@ -57,6 +61,7 @@ public record MPVoteRes(
     ) {
         return new MPVoteRes(
                 voteId,
+                profile,
                 day,
                 posName,
                 popularRes,
