@@ -1,8 +1,12 @@
 package boombimapi.domain.oauth2.application.service.impl;
 
+import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.oauth2.application.service.CreateAccessTokenAndRefreshTokenService;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.member.domain.entity.Role;
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.JsonWebToken;
 import boombimapi.global.jwt.domain.repository.JsonWebTokenRepository;
 import boombimapi.global.jwt.util.JWTUtil;
@@ -19,6 +23,7 @@ public class CreateAccessTokenAndRefreshTokenServiceImpl implements CreateAccess
 
     private final JWTUtil jwtUtil;
     private final JsonWebTokenRepository jsonWebTokenRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public LoginToken createAccessTokenAndRefreshToken(String userId, Role role, String email) {
@@ -34,6 +39,14 @@ public class CreateAccessTokenAndRefreshTokenServiceImpl implements CreateAccess
 
         jsonWebTokenRepository.save(jsonWebToken);
 
-        return LoginToken.of(accessToken, refreshToken);
+        boolean nameFlag = onBoarding(userId);
+        return LoginToken.of(accessToken, refreshToken, nameFlag);
+    }
+
+    public boolean onBoarding(String userId) {
+        Member member = memberRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        return member.isNameFlag();
     }
 }
