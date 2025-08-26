@@ -73,10 +73,16 @@ public class MemberServiceImpl implements MemberService {
             String posName = vote.getPosName();
 
             // 인기 투표 타입과 투표수
-            Map.Entry<String, Long> answerTypeAndCnt = popularCnt(vote);
+            List<VoteAnswerType> voteAnswerTypes = popularTypes(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, answerTypeAndCnt.getKey(),
-                    answerTypeAndCnt.getValue()));
+            // 각각의 투표 수들 파악
+            List<Long> vote4Answer = voteAnswerCnt(vote);
+
+            // 총 투표수
+            Long voteALlCnt = vote4Answer.get(0) + vote4Answer.get(1) + vote4Answer.get(2) + vote4Answer.get(3);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0),vote4Answer.get(1),vote4Answer.get(2),vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
         if (bottomResult.isEmpty()) {
@@ -104,10 +110,17 @@ public class MemberServiceImpl implements MemberService {
             String posName = vote.getPosName();
 
             // 인기 투표 타입과 투표수
-            Map.Entry<String, Long> answerTypeAndCnt = popularCnt(vote);
+            List<VoteAnswerType> voteAnswerTypes = popularTypes(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, answerTypeAndCnt.getKey(),
-                    answerTypeAndCnt.getValue()));
+            // 각각의 투표 수들 파악
+            List<Long> vote4Answer = voteAnswerCnt(vote);
+
+            // 총 투표수
+            Long voteALlCnt = vote4Answer.get(0) + vote4Answer.get(1) + vote4Answer.get(2) + vote4Answer.get(3);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0),vote4Answer.get(1),vote4Answer.get(2),vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+
         }
 
         // 투표 중복 올린거
@@ -118,10 +131,16 @@ public class MemberServiceImpl implements MemberService {
             String posName = vote.getPosName();
 
             // 인기 투표 타입과 투표수
-            Map.Entry<String, Long> answerTypeAndCnt = popularCnt(vote);
+            List<VoteAnswerType> voteAnswerTypes = popularTypes(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, answerTypeAndCnt.getKey(),
-                    answerTypeAndCnt.getValue()));
+            // 각각의 투표 수들 파악
+            List<Long> vote4Answer = voteAnswerCnt(vote);
+
+            // 총 투표수
+            Long voteALlCnt = vote4Answer.get(0) + vote4Answer.get(1) + vote4Answer.get(2) + vote4Answer.get(3);
+
+            bottomResult.add(MPVoteRes.of(vote.getId(), vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0),vote4Answer.get(1),vote4Answer.get(2),vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
 
@@ -150,6 +169,36 @@ public class MemberServiceImpl implements MemberService {
 
         return GetNicknameRes.of(member.isNameFlag());
     }
+
+    // 인기 투표 타입 리스트 반환 (동점 허용)
+    public List<VoteAnswerType> popularTypes(Vote vote) {
+        List<VoteAnswer> voteAnswers = vote.getVoteAnswers();
+
+        if (voteAnswers == null || voteAnswers.isEmpty()) {
+            return Collections.emptyList(); // 없을 때는 빈 리스트 반환
+        }
+
+        // 타입별 카운팅
+        Map<VoteAnswerType, Long> countMap = voteAnswers.stream()
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+
+        // 최대 투표 수 찾기
+        long maxCount = countMap.values().stream()
+                .mapToLong(Long::longValue)
+                .max()
+                .orElse(0L);
+
+        if (maxCount == 0L) {
+            return Collections.emptyList();
+        }
+
+        // 최대값과 같은 타입들만 추출
+        return countMap.entrySet().stream()
+                .filter(e -> e.getValue().equals(maxCount))
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
 
     // 인기 투표 즉 값 많은거 찾기
     public Map.Entry<String, Long> popularCnt(Vote vote) {
@@ -187,6 +236,25 @@ public class MemberServiceImpl implements MemberService {
                     return MyPageVoteRes.of(headerDay, items);
                 })
                 .toList();
+        return result;
+    }
+
+    // 투표마다 투표 4개 답변 숫 얻어오기
+    public List<Long> voteAnswerCnt(Vote vote) {
+        List<VoteAnswer> voteAnswer = voteAnswerRepository.findByVote(vote);
+        Map<VoteAnswerType, Long> counts = voteAnswer.stream()
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+
+        long relaxedCount = counts.getOrDefault(VoteAnswerType.RELAXED, 0L);
+        long commonlyCount = counts.getOrDefault(VoteAnswerType.COMMONLY, 0L);
+        long slightlyBusyCount = counts.getOrDefault(VoteAnswerType.BUSY, 0L);
+        long crowdedCount = counts.getOrDefault(VoteAnswerType.CROWDED, 0L);
+
+        List<Long> result = new ArrayList<>();
+        result.add(relaxedCount);
+        result.add(commonlyCount);
+        result.add(slightlyBusyCount);
+        result.add(crowdedCount);
         return result;
     }
 
