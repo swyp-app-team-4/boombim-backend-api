@@ -45,6 +45,7 @@ public class VoteServiceImpl implements VoteService {
 
     private final AlarmService alarmService;
 
+    // 투표 등록
     @Override
     @Transactional(noRollbackFor = BoombimException.class)
     public void registerVote(String userId, VoteRegisterReq req) {
@@ -100,6 +101,7 @@ public class VoteServiceImpl implements VoteService {
 
     }
 
+    // 투표하기
     @Override
     public void answerVote(String userId, VoteAnswerReq req) {
         Member user = userRepository.findById(userId).orElse(null);
@@ -129,6 +131,7 @@ public class VoteServiceImpl implements VoteService {
 
     }
 
+    // 투표 종료
     @Override
     public void endVote(String userId, VoteDeleteReq req) {
         Member user = userRepository.findById(userId).orElse(null);
@@ -150,6 +153,7 @@ public class VoteServiceImpl implements VoteService {
 
     }
 
+    // 투표 리스트들
     @Override
     public VoteListRes listVote(String userId, double latitude, double longitude) {
         Member user = userRepository.findById(userId).orElse(null);
@@ -172,11 +176,13 @@ public class VoteServiceImpl implements VoteService {
 
         List<Vote> votes = calculate100(latitude, longitude);
         for (Vote vote : votes) {
-            if(!vote.isVoteActivate() || vote.getVoteStatus().equals(VoteStatus.END)) continue;
+            if (!vote.isVoteActivate() || vote.getVoteStatus().equals(VoteStatus.END)) continue;
 
             List<Long> voteAnswer = voteAnswerCnt(vote);
             boolean voteFlag = voteUsercheck(vote, user);
-            voteResList.add(VoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+
+
+            voteResList.add(VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
                     voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기", voteFlag));
         }
 
@@ -191,7 +197,7 @@ public class VoteServiceImpl implements VoteService {
             //// 각 투표마다 투표자들 가져오기
             List<Long> voteAnswer = voteAnswerCnt(vote);
             boolean voteFlag = voteUsercheck(vote, user);
-            myVoteRes.add(MyVoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+            myVoteRes.add(MyVoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
                     voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3),
                     "내 질문", vote.getVoteStatus(), voteFlag));
         }
@@ -204,7 +210,7 @@ public class VoteServiceImpl implements VoteService {
 
             List<Long> voteAnswer = voteAnswerCnt(vote);
             boolean voteFlag = voteUsercheck(vote, user);
-            myVoteRes.add(MyVoteRes.of(vote.getId(), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+            myVoteRes.add(MyVoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
                     voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus(), voteFlag));
         }
 
@@ -300,6 +306,16 @@ public class VoteServiceImpl implements VoteService {
         }
 
         return voteFlag;
+    }
+
+
+    // 상위 3건 유저 프로필 이미지 링크
+    public List<String> profileTopThree(Vote vote) {
+        return vote.getVoteAnswers().stream()
+                .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
+                .filter(Objects::nonNull)                               // null 값 제거 (안전)
+                .limit(3)                                               // 최대 3개만
+                .toList();
     }
 
 }

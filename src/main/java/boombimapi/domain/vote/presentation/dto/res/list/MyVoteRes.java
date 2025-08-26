@@ -4,12 +4,15 @@ import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "내 질문 리스트 응답 DTO")
 public record MyVoteRes(
 
         @Schema(description = "투표 ID", example = "1")
         Long voteId,
+        @Schema(description = "사용자 별 프로필 사진", example = "http://k.kakaocdn.net/dn/bN0Hg2/btsIUhLSYs8/vrWzldpNSnycWKkRtYyIgk/img_640x640.jpg")
+        List<String> profile,
 
         @Schema(description = "투표 중복자 수 (궁금해하는 사람 수)", example = "3")
         Long voteDuplicationCnt,
@@ -42,9 +45,9 @@ public record MyVoteRes(
         boolean voteFlag
 
 ) {
-    public static MyVoteRes of(Long voteId, Long voteDuplicationCnt, LocalDateTime createdAt, String posName, Long relaxedCnt,
+    public static MyVoteRes of(Long voteId, List<String> profile, Long voteDuplicationCnt, LocalDateTime createdAt, String posName, Long relaxedCnt,
                                Long commonly, Long slightlyBusyCnt, Long crowedCnt, String allType, VoteStatus voteStatus, boolean voteFlag) {
-        return new MyVoteRes(voteId, voteDuplicationCnt, createdAt, posName, relaxedCnt,
+        return new MyVoteRes(voteId, profile, voteDuplicationCnt, createdAt, posName, relaxedCnt,
                 commonly, slightlyBusyCnt, crowedCnt, allType, voteStatus, voteFlag);
     }
 }
