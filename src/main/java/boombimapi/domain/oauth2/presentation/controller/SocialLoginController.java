@@ -20,7 +20,7 @@ public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
 
-    @Operation(summary = "소셜 로그인 URL 조회", description = "각 플랫폼별 소셜 로그인 URL을 반환합니다. (테스트용)")
+    @Operation(summary = "[테스트 용] 소셜 로그인 URL 조회", description = "각 플랫폼별 소셜 로그인 URL을 반환합니다. (테스트용)")
     @GetMapping("/login/{provider}")
     public ResponseEntity<String> getLoginUrl(@PathVariable SocialProvider provider) {
         log.info("소셜 로그인 URL 요청: {}", provider);
@@ -45,7 +45,7 @@ public class SocialLoginController {
     }
 
     // 기존 콜백 방식은 테스트용으로 유지 (필요시 제거 가능)
-    @Operation(summary = "소셜 로그인 콜백 (테스트용)", description = "테스트용 콜백 API")
+    @Operation(summary = "[테스트 용] 소셜 로그인 콜백", description = "테스트용 콜백 API")
     @GetMapping("/callback/{provider}")
     public ResponseEntity<LoginToken> socialLogin(
             @PathVariable SocialProvider provider,
@@ -56,7 +56,7 @@ public class SocialLoginController {
         return ResponseEntity.ok(loginToken);
     }
 
-    @Operation(summary = "소셜 로그인 콜백 (테스트용)", description = "테스트용 콜백 API")
+    @Operation(summary = "[테스트 용] 소셜 로그인 콜백", description = "테스트용 콜백 API")
     @PostMapping("/callback/apple")
     public ResponseEntity<LoginToken> socialAppleLogin(
             @RequestParam("code") String code) {

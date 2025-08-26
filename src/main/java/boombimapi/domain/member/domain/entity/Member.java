@@ -104,6 +104,9 @@ public class Member {
 
     public void updateName(String name) {
         this.name=name;
+    }
+
+    public void updateIsActivateNameFlag() {
         this.nameFlag=true;
     }
 

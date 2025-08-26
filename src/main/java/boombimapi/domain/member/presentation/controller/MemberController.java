@@ -37,7 +37,7 @@ public class MemberController {
     }
 
 
-    @Operation(summary = "첫 닉네임 수정 API", description = "처음 로그인 할 시 닉네임 수정 화면 뜨는지 안뜨는지 확인하는 API 입니다.")
+    @Operation(summary = "[폐기 - 로그인으로 통합] 첫 닉네임 호출 수정 API", description = "처음 로그인 할 시 닉네임 수정 화면 뜨는지 안뜨는지 확인하는 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")

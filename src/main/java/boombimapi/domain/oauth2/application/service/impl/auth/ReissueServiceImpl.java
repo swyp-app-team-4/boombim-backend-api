@@ -1,5 +1,7 @@
 package boombimapi.domain.oauth2.application.service.impl.auth;
 
+import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.oauth2.application.service.ReissueService;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.member.domain.entity.Role;
@@ -21,6 +23,7 @@ public class ReissueServiceImpl implements ReissueService {
 
     private final JWTUtil jwtUtil;
     private final JsonWebTokenRepository jsonWebTokenRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public LoginToken reissue(String refreshToken) {
@@ -53,6 +56,13 @@ public class ReissueServiceImpl implements ReissueService {
         jsonWebTokenRepository.save(newJsonWebToken);
 
 
-        return LoginToken.of(newAccessToken, newRefreshToken);
+        return LoginToken.of(newAccessToken, newRefreshToken, onBoarding(userId));
+    }
+
+    public boolean onBoarding(String userId) {
+        Member member = memberRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        return member.isNameFlag();
     }
 }
