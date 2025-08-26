@@ -77,5 +77,15 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getMyVoteQuestion(userId));
     }
 
+    @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @DeleteMapping
+    public void memberDelete(@AuthenticationPrincipal String userId) {
+        memberService.memberDelete(userId);
+    }
+
 
 }

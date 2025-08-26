@@ -179,6 +179,14 @@ public class MemberServiceImpl implements MemberService {
         return GetNicknameRes.of(member.isNameFlag());
     }
 
+    @Override
+    public void memberDelete(String userId) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        userRepository.delete(member);
+    }
+
     // 인기 투표 타입 리스트 반환 (동점 허용)
     public List<VoteAnswerType> popularTypes(Vote vote) {
         List<VoteAnswer> voteAnswers = vote.getVoteAnswers();

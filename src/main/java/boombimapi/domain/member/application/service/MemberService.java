@@ -23,4 +23,8 @@ public interface MemberService {
 
     GetNicknameRes getNameFlag(String userId);
 
+    // 회원 탈퇴
+    void memberDelete(String userId);
+
+
 }
