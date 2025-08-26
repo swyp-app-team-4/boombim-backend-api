@@ -7,6 +7,11 @@ import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.alarm.domain.repository.FcmTokenRepository;
+import boombimapi.domain.vote.domain.entity.Vote;
+import boombimapi.domain.vote.domain.entity.VoteAnswer;
+import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
+import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
+import boombimapi.domain.vote.domain.repository.VoteRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +27,8 @@ public class MemberDataInitializer {
 
     private final MemberRepository memberRepository;
     private final FcmTokenRepository fcmTokenRepository;
+    private final VoteRepository voteRepository;
+    private final VoteAnswerRepository voteAnswerRepository;
 
     private static final String FCM_TOKEN = "e5y6VivpfCYAjx2g8r5-Kx:APA91bGfCtdsZ7jqYn7G-U8lLICS4QvzA6Lp__AdSnyAOEZe99icXeNlMQFfxapLNeUVW1J-agbBCj36OBWzyXG7c_UihrOQZLLEGFdGXSo1qPoyfO-r8hU";
 
@@ -35,11 +42,11 @@ public class MemberDataInitializer {
 //        }
 
 
-
+        Vote vote = voteRepository.findById(8L).orElse(null);
         for (int i = 1; i <= 1000; i++) {
             // Member 생성
             Member member = Member.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id(i+"test")
                     .email("test" + i + "@kakao.com")
                     .name("테스트유저" + i)
                     .profile("https://example.com/profile" + i + ".jpg")
@@ -48,6 +55,16 @@ public class MemberDataInitializer {
                     .build();
 
             Member savedMember = memberRepository.save(member);
+
+
+            // 투표자 생성
+            VoteAnswer voteAnswer = VoteAnswer.builder()
+                    .member(member)
+                    .vote(vote)
+                    .answerType(VoteAnswerType.BUSY)
+                    .build();
+
+            voteAnswerRepository.save(voteAnswer);
 
             // FCM 토큰 생성
             FcmToken fcmToken = FcmToken.builder()
@@ -62,6 +79,8 @@ public class MemberDataInitializer {
                 log.info("회원 {}명 초기화 완료", i);
             }
         }
+
+
 
         log.info("회원 데이터 초기화가 완료되었습니다. 총 100명의 회원과 FCM 토큰이 생성되었습니다.");
     }

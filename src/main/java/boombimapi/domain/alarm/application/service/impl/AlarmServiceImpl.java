@@ -1,7 +1,7 @@
 package boombimapi.domain.alarm.application.service.impl;
 
 
-import boombimapi.domain.alarm.application.messaging.PushNowMessage;
+import boombimapi.domain.alarm.application.messaging.NotifyMessage;
 import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
@@ -53,40 +53,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Value("${admin.id}")
     private String adminId;
 
-    /**
-     * 관리자가 알림 전송
-     */
-    //@Override
-    public SendAlarmResponse sendAllAlarmV0(String senderUserId, SendAlarmRequest request) {
-        Member sender = userRepository.findById(senderUserId)
-                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        // 관리자 권한 체크는 필요 시 활성화
-        // if (!isAdmin(sender)) throw new BoombimException(ErrorCode.ADMIN_PERMISSION_REQUIRED);
-
-        // 1) 알림 엔티티 생성 (상태: QUEUED)
-        Alarm alarm = Alarm.builder()
-                .title(request.title())
-                .message(request.message())
-                .type(request.type())
-                .sender(sender)
-                .build();
-        alarm.updateStatus(AlarmStatus.QUEUED);
-        Alarm saved = alarmRepository.save(alarm);
-
-        // 2) MQ 발행 (즉시 반환)
-        PushNowMessage msg = PushNowMessage.builder()
-                .alarmId(saved.getId())
-                .title(request.title())
-                .body(request.message())
-                .retryCount(0)
-                .build();
-        pushProducer.publishNow(msg);
-        log.info("푸시요청 발행 완료: alarmId={}", saved.getId());
-
-        // 3) 응답 (전송은 비동기 처리)
-        return SendAlarmResponse.of(saved, 0, 0, 0);
-    }
 
     /**
      * FCM 토큰 등록
@@ -240,7 +207,40 @@ public class AlarmServiceImpl implements AlarmService {
 
 
 
+
+    @Override
     public SendAlarmResponse sendAllAlarm(String senderUserId, SendAlarmRequest request) {
+        Member sender = userRepository.findById(senderUserId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        // 관리자 권한 체크는 필요 시 활성화
+        // if (!isAdmin(sender)) throw new BoombimException(ErrorCode.ADMIN_PERMISSION_REQUIRED);
+
+        // 1) 알림 엔티티 생성 (상태: QUEUED)
+        Alarm alarm = Alarm.builder()
+                .title(request.title())
+                .message(request.message())
+                .type(request.type())
+                .sender(sender)
+                .build();
+        alarm.updateStatus(AlarmStatus.QUEUED);
+        Alarm saved = alarmRepository.save(alarm);
+
+        // 2) MQ 발행 (즉시 반환)
+        NotifyMessage msg = NotifyMessage.builder()
+                .alarmId(saved.getId())
+                .title(request.title())
+                .body(request.message())
+                .retryCount(0)
+                .build();
+        pushProducer.publishNow(msg);
+        log.info("푸시요청 발행 완료: alarmId={}", saved.getId());
+
+        // 3) 응답 (전송은 비동기 처리)
+        return SendAlarmResponse.of(saved, 0, 0, 0);
+    }
+
+    public SendAlarmResponse sendAllAlarmVo(String senderUserId, SendAlarmRequest request) {
         Member sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 

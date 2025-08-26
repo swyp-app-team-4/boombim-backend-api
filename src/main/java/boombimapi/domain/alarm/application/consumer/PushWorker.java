@@ -1,6 +1,6 @@
 package boombimapi.domain.alarm.application.consumer;
 
-import boombimapi.domain.alarm.application.messaging.PushNowMessage;
+import boombimapi.domain.alarm.application.messaging.NotifyMessage;
 import boombimapi.domain.alarm.application.service.impl.FcmSender;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
@@ -39,7 +39,7 @@ public class PushWorker {
     private static final int BATCH_SIZE = 500;
 
     @RabbitListener(queues = RabbitMQConfig.Q_PUSH_NOW)
-    public void onPushNow(PushNowMessage msg) {
+    public void onPushNow(NotifyMessage msg) {
         Long alarmId = msg.getAlarmId();
         Alarm alarm = alarmRepository.findById(alarmId)
                 .orElseThrow(() -> new IllegalStateException("Alarm not found: " + alarmId));
@@ -106,7 +106,7 @@ public class PushWorker {
             int nextRetry = (msg.getRetryCount() == null ? 0 : msg.getRetryCount()) + 1;
             if (nextRetry <= MAX_RETRY) {
                 long delay = computeBackoffMillis(nextRetry); // 지수 백오프
-                pushProducer.publishRetry(PushNowMessage.builder()
+                pushProducer.publishRetry(NotifyMessage.builder()
                         .alarmId(alarmId)
                         .title(msg.getTitle())
                         .body(msg.getBody())

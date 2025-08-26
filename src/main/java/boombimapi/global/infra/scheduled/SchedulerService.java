@@ -1,5 +1,7 @@
 package boombimapi.global.infra.scheduled;
 
+import boombimapi.domain.alarm.application.messaging.EndVoteMessage;
+import boombimapi.domain.alarm.infra.messaging.PushProducer;
 import boombimapi.domain.alarm.application.service.AlarmService;
 import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
@@ -34,6 +36,7 @@ public class SchedulerService {
     private final VoteAnswerRepository voteAnswerRepository;
     private final AlarmService alarmService;
     private final MessageService messageService;
+    private final PushProducer pushProducer;
 
     @Value("${admin.id}")
     private String adminId;
@@ -54,11 +57,13 @@ public class SchedulerService {
     // 투표 종류 후 알림
     @Scheduled(fixedDelay = 60_000L, initialDelay = 30_000L) // 1분마다, 앱 시작 30초 후 시작
     public void sweepExpiredVotes() {
-        // 자동
-        auto();
+//        // 자동
+//        auto();
+//        // 수동
+//        passivity();
 
-        // 수동
-        passivity();
+        autoV0();
+        passivityV0();
     }
 
 
@@ -79,8 +84,52 @@ public class SchedulerService {
         }
     }
 
-
     private void auto() {
+        List<Vote> autoVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(
+                VoteStatus.PROGRESS, LocalDateTime.now());
+
+        voteRepository.bulkCloseExpired(VoteStatus.PROGRESS, VoteStatus.END, LocalDateTime.now());
+
+        for (Vote autoVote : autoVotes) {
+            pushProducer.publishEndVote(
+                    EndVoteMessage.builder()
+                            .voteId(autoVote.getId())
+                            .isQuestioner(true)
+                            .build()
+            );
+            pushProducer.publishEndVote(
+                    EndVoteMessage.builder()
+                            .voteId(autoVote.getId())
+                            .isQuestioner(false)
+                            .build()
+            );
+        }
+    }
+
+    private void passivity() {
+        List<Vote> passivityVotes = voteRepository.findByPassivityAlarmFlagTrue();
+
+        for (Vote passivityVote : passivityVotes) {
+            passivityVote.updatePassivityAlarmDeactivate();
+            passivityVote.updateIsVoteDeactivate();
+            passivityVote.updateStatusDeactivate();
+
+            pushProducer.publishEndVote(
+                    EndVoteMessage.builder()
+                            .voteId(passivityVote.getId())
+                            .isQuestioner(true)
+                            .build()
+            );
+            pushProducer.publishEndVote(
+                    EndVoteMessage.builder()
+                            .voteId(passivityVote.getId())
+                            .isQuestioner(false)
+                            .build()
+            );
+        }
+    }
+
+    private void autoV0() {
         List<Vote> autoVotes = voteRepository.findByVoteStatusAndEndTimeLessThanEqual(VoteStatus.PROGRESS, LocalDateTime.now());
 
         // 투포 시간 된거 종료로 바꾸기
@@ -98,7 +147,7 @@ public class SchedulerService {
         }
     }
 
-    private void passivity() {
+    private void passivityV0() {
         List<Vote> passivityVotes = voteRepository.findByPassivityAlarmFlagTrue();
 
         // 수동 종료 알림
@@ -147,25 +196,6 @@ public class SchedulerService {
                 .filter(m -> !baseIds.contains(m.getId()))
                 .distinct() // 혹시 쿼리 중복 대비
                 .collect(Collectors.toList());
-    }
-
-
-    private List<Member> getMembers(Vote vote) {
-        // 종료 알람 넣기
-        Set<Member> memberSet = new HashSet<>();
-
-        // 1) 투표 생성자
-        memberSet.addAll(voteRepository.findMembersByVote(vote));
-
-        // 2) 중복투표한 유저
-        memberSet.addAll(voteDuplicationRepository.findMembersByVote(vote));
-
-        // 3) 답변한 유저
-        memberSet.addAll(voteAnswerRepository.findMembersByVote(vote));
-
-        // 최종 리스트
-        List<Member> memberList = new ArrayList<>(memberSet);
-        return memberList;
     }
 
 }
