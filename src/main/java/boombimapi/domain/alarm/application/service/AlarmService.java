@@ -32,7 +32,8 @@ public interface AlarmService {
     SendAlarmResponse sendEndVoteAlarm(Vote vote, List<Member> userList, boolean flag);
 
     // 알림 상태 업데이트 읽었는지 안읽었는지
-    void updateAlarmStatus(String userId, UpdateAlarmStatusReq req);
+    void updateAlarmRead(String userId, UpdateAlarmStatusReq req);
+    void updateAlarmStatus(String userId);
 
 
 }
