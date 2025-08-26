@@ -21,6 +21,9 @@ public record VoteRes(
         @Schema(description = "장소 이름", example = "서울역")
         String posName,
 
+        @Schema(description = "장소 사진", example = "http://imgnews.naver.net/image/5817/2024/02/08/0000024151_001_20240208111202892.jpg")
+        String posImage,
+
         @Schema(description = "여유 투표 수", example = "5")
         Long relaxedCnt,
 
@@ -40,9 +43,9 @@ public record VoteRes(
         boolean voteFlag
 ) {
     public static VoteRes of(Long voteId, List<String> profile, Long voteDuplicationCnt, LocalDateTime createdAt,
-                             String posName, Long relaxedCnt, Long commonly, Long slightlyBusyCnt,
+                             String posName, String posImage, Long relaxedCnt, Long commonly, Long slightlyBusyCnt,
                              Long crowedCnt, String allType, boolean voteFlag) {
-        return new VoteRes(voteId, profile, voteDuplicationCnt, createdAt, posName, relaxedCnt,
+        return new VoteRes(voteId, profile, voteDuplicationCnt, createdAt, posName, posImage, relaxedCnt,
                 commonly, slightlyBusyCnt, crowedCnt, allType, voteFlag);
     }
 }

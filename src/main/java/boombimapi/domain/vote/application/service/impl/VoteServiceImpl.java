@@ -21,6 +21,9 @@ import boombimapi.domain.vote.presentation.dto.res.list.MyVoteRes;
 import boombimapi.domain.vote.presentation.dto.res.list.VoteRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
+import boombimapi.global.infra.feignclient.naver.NaverImageClient;
+import boombimapi.global.infra.feignclient.naver.dto.res.NaverImageSearchRes;
+import feign.FeignException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +46,7 @@ public class VoteServiceImpl implements VoteService {
 
     private final MemberRepository userRepository;
 
-    private final AlarmService alarmService;
+    private final NaverImageClient naverImageClient;
 
     // 투표 등록
     @Override
@@ -83,9 +86,14 @@ public class VoteServiceImpl implements VoteService {
             voteDuplicationRepository.save(vd);
             throw new BoombimException(ErrorCode.DUPLICATE_POS_ID);
         }
+
+        String posImage = getPosImage(req.posName());
+
+        log.info(posImage);
         Vote vb = Vote.builder()
                 .member(user)
                 .posId(req.posId())
+                .posImage(posImage)
                 .posName(req.posName())
                 .latitude(req.posLatitude())
                 .longitude(req.posLongitude()).build();
@@ -182,7 +190,7 @@ public class VoteServiceImpl implements VoteService {
             boolean voteFlag = voteUsercheck(vote, user);
 
 
-            voteResList.add(VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+            voteResList.add(VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(), vote.getPosImage(),
                     voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기", voteFlag));
         }
 
@@ -316,6 +324,38 @@ public class VoteServiceImpl implements VoteService {
                 .filter(Objects::nonNull)                               // null 값 제거 (안전)
                 .limit(3)                                               // 최대 3개만
                 .toList();
+    }
+
+    private String getPosImage(String posName) {
+        try {
+            // 네이버 이미지 검색 API 호출
+            NaverImageSearchRes response = naverImageClient.searchImages(
+                    posName + " 전경",   // 검색어 보정 (예: "부평남초등학교 전경")
+                    10,                 // 여러 개 가져오기
+                    1,
+                    "sim",              // 정확도순
+                    "large"             // 큰 이미지 우선
+            );
+
+            if (response.items() == null || response.items().isEmpty()) {
+                log.warn("🔍 이미지 검색 결과 없음: {}", posName);
+                return null;
+            }
+
+            // 후보 중에서 "급식/식단/메뉴" 같은 거 제외하고 첫 번째 반환
+            return response.items().stream()
+                    .filter(item -> !item.title().contains("급식"))
+                    .filter(item -> !item.title().contains("식단"))
+                    .filter(item -> !item.title().contains("메뉴"))
+                    .filter(item -> !item.title().contains("사람"))
+                    .findFirst()
+                    .map(NaverImageSearchRes.Item::link)   // DTO 맞게 수정
+                    .orElse(response.items().get(0).link());
+
+        } catch (FeignException e) {
+            log.error("❌ 네이버 이미지 API 호출 실패: {}", e.getMessage(), e);
+            return null;
+        }
     }
 
 }
