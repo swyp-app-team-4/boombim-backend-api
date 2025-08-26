@@ -76,7 +76,7 @@ public class Member {
     // 관리자 비번 null이어도됨
     private String password;
 
-    // false면 알림감 true면 알림 안감
+    // false면 알림끔 true면 알림 감
     @Column(name = "alarm_flag", nullable = false)
     private boolean alarmFlag;
 
@@ -93,7 +93,7 @@ public class Member {
         this.profile = profile;
         this.socialProvider = socialProvider;
         this.role = role;
-        this.alarmFlag = false;
+        this.alarmFlag = true;
         this.nameFlag = false;
     }
 
@@ -108,6 +108,13 @@ public class Member {
 
     public void updateIsActivateNameFlag() {
         this.nameFlag=true;
+    }
+
+    public void updateIsActivateAlarmFlag() {
+        this.alarmFlag=true;
+    }
+    public void updateIsDeactivateAlarmFlag() {
+        this.alarmFlag=false;
     }
 
     @PrePersist

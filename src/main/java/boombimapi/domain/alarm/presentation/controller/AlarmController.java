@@ -85,11 +85,23 @@ public class AlarmController {
             @ApiResponse(responseCode = "404", description = "알림 및 유저 존재하지 않음"),
     })
     @PatchMapping
-    public void updateAlarmStatus(
+    public void updateAlarmRead(
             @AuthenticationPrincipal String userId,
             @RequestBody UpdateAlarmStatusReq req
     ) {
-        alarmService.updateAlarmStatus(userId, req);
+        alarmService.updateAlarmRead(userId, req);
+    }
+
+    @Operation(summary = "알림 설정 활성화", description = "알림을 활성화 및 비활성화를 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음"),
+    })
+    @PatchMapping("/status")
+    public void updateAlarmStatus(
+            @AuthenticationPrincipal String userId
+    ) {
+        alarmService.updateAlarmStatus(userId);
     }
 
 
