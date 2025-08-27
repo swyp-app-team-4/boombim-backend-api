@@ -29,14 +29,12 @@ public class S3ServiceImpl implements S3Service {
 
     private final S3Client s3Client; // AmazonS3Client 대신 S3Client 사용
 
-    private final MemberRepository memberRepository;
 
     @Override
     public String storeUserProFile(MultipartFile multipartFile, String userId) throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
         }
-
         // 원본 파일 이름 가져오기
         String originalFilename = multipartFile.getOriginalFilename();
         String finalFile = createStoreFileName(originalFilename);
