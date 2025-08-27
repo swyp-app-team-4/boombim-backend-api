@@ -41,6 +41,9 @@ public class Vote {
     @Column(nullable = false)
     private String posId;
 
+    @Column(nullable = true)
+    private String posImage;
+
     // 위도
     @Column(nullable = false)
     private double latitude;
@@ -76,9 +79,10 @@ public class Vote {
 
 
     @Builder
-    public Vote(Member member, String posId, double latitude, double longitude, String posName) {
+    public Vote(Member member, String posId, String posImage, double latitude, double longitude, String posName) {
         this.member = member;
         this.posId = posId;
+        this.posImage = posImage;
         this.latitude = latitude;
         this.longitude = longitude;
         this.posName = posName;

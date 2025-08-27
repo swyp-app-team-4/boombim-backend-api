@@ -8,6 +8,7 @@ import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
 import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.ProfileRes;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.MPVoteRes;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -18,11 +19,14 @@ import boombimapi.domain.vote.domain.repository.VoteDuplicationRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
+import boombimapi.global.infra.s3.presentation.application.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
     private final VoteAnswerRepository voteAnswerRepository;
     private final VoteDuplicationRepository voteDuplicationRepository;
     private final VoteRepository voteRepository;
-
+    private final S3Service s3Service;
 
     @Override
     public GetMemberRes getMember(String userId) {
@@ -177,6 +181,25 @@ public class MemberServiceImpl implements MemberService {
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         return GetNicknameRes.of(member.isNameFlag());
+    }
+
+    @Override
+    public void memberDelete(String userId) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        userRepository.delete(member);
+    }
+
+    @Override
+    public ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+
+        String profile = s3Service.storeUserProFile(multipartFile, userId);
+        member.updateProfile(profile);
+        return ProfileRes.of(profile);
     }
 
     // 인기 투표 타입 리스트 반환 (동점 허용)

@@ -97,14 +97,15 @@ public class Member {
         this.nameFlag = false;
     }
 
-    public void updateEmailAndProfile(String email, String profile) {
+    public void updateEmail(String email) {
         this.email = email;
-        this.profile = profile;
     }
 
     public void updateName(String name) {
         this.name=name;
     }
+
+    public void updateProfile(String profile){this.profile= profile;}
 
     public void updateIsActivateNameFlag() {
         this.nameFlag=true;

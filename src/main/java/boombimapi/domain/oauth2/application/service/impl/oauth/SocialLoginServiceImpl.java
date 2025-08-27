@@ -209,7 +209,7 @@ public class SocialLoginServiceImpl implements SocialLoginService {
                 }
             }
             log.info("기존 {} 사용자 정보 업데이트: {}", provider, userResponse.getName());
-            user.updateEmailAndProfile(userResponse.getEmail(), userResponse.getProfile());
+            user.updateEmail(userResponse.getEmail());
             user.updateIsActivateNameFlag();
         }
 
