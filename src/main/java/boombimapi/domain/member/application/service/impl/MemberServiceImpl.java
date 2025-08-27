@@ -4,7 +4,10 @@ package boombimapi.domain.member.application.service.impl;
 import boombimapi.domain.member.application.service.MemberService;
 
 import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.entity.MemberLeave;
+import boombimapi.domain.member.domain.repository.MemberLeaveRepository;
 import boombimapi.domain.member.domain.repository.MemberRepository;
+import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
 import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
@@ -43,6 +46,7 @@ public class MemberServiceImpl implements MemberService {
     private final VoteDuplicationRepository voteDuplicationRepository;
     private final VoteRepository voteRepository;
     private final S3Service s3Service;
+    private final MemberLeaveRepository memberLeaveRepository;
 
     @Override
     public GetMemberRes getMember(String userId) {
@@ -184,9 +188,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void memberDelete(String userId) {
+    public void memberDelete(String userId, MemberLeaveReq req) {
         Member member = userRepository.findById(userId).orElse(null);
         if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        memberLeaveRepository.save(MemberLeave.builder().leaveReason(req.leaveReason()).build());
 
         userRepository.delete(member);
     }
