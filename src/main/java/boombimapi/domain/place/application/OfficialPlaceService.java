@@ -134,6 +134,7 @@ public class OfficialPlaceService {
             officialPlace.getId(),
             officialPlace.getName(),
             officialPlace.getPoiCode(),
+            latestOfficialCongestion.getObservedAt(),
             officialPlace.getCentroidLatitude(),
             officialPlace.getCentroidLongitude(),
             officialPlace.getPolygonCoordinates(),
