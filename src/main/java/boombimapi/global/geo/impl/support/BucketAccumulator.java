@@ -35,15 +35,6 @@ public final class BucketAccumulator {
         this.memberPlaceIds.add(memberPlaceId);
     }
 
-    public void merge(
-        BucketAccumulator otherAccumulator
-    ) {
-        this.sumWorldX += otherAccumulator.sumWorldX;
-        this.sumWorldY += otherAccumulator.sumWorldY;
-        this.count += otherAccumulator.count;
-        this.memberPlaceIds.addAll(otherAccumulator.memberPlaceIds);
-    }
-
     public double centerWorldX() {
         if (count == 0) {
             return sumWorldX;
