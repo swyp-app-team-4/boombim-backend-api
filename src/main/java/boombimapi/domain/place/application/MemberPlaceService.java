@@ -118,15 +118,15 @@ public class MemberPlaceService {
                 Map<String, Integer> levelCounts = new HashMap<>();
 
                 for (Long placeId : clusterMarker.memberPlaceIds()) {
-                    Optional<MemberCongestion> memberCongestionOptional =
+                    Optional<MemberCongestion> optionalMemberCongestion =
                         memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
                             placeId, now
                         );
 
-                    if (memberCongestionOptional.isEmpty())
+                    if (optionalMemberCongestion.isEmpty())
                         continue;
 
-                    String levelName = memberCongestionOptional.get().getCongestionLevel().getName();
+                    String levelName = optionalMemberCongestion.get().getCongestionLevel().getName();
                     levelCounts.merge(levelName, 1, Integer::sum);
                 }
 
@@ -147,15 +147,15 @@ public class MemberPlaceService {
                 if (memberPlace == null)
                     continue;
 
-                Optional<MemberCongestion> memberCongestionOptional =
+                Optional<MemberCongestion> optionalMemberCongestion =
                     memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
                         placeId, now
                     );
 
-                if (memberCongestionOptional.isEmpty())
+                if (optionalMemberCongestion.isEmpty())
                     continue;
 
-                MemberCongestion memberCongestion = memberCongestionOptional.get();
+                MemberCongestion memberCongestion = optionalMemberCongestion.get();
 
                 double distanceMeters = GeoDistance.haversineMeters(
                     memberLatitude,
