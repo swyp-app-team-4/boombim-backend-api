@@ -8,9 +8,9 @@ import boombimapi.domain.congestion.repository.OfficialCongestionDemographicsRep
 import boombimapi.domain.congestion.repository.OfficialCongestionForecastRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
-import boombimapi.domain.place.dto.response.OfficialPlaceDemographics;
-import boombimapi.domain.place.dto.response.OfficialPlaceForecast;
-import boombimapi.domain.place.dto.response.OfficialPlaceOverviewResponse;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceDemographics;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceForecast;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
@@ -40,6 +40,7 @@ public class OfficialPlaceService {
         ViewportRequest request
     ) {
 
+        // TODO: 직선 거리 계산 부분 리팩터링 필요
         // 1. 뷰포트 범위 계산
         double lat1 = request.topLeft().latitude();
         double lng1 = request.topLeft().longitude();
@@ -52,12 +53,13 @@ public class OfficialPlaceService {
         double maxLongitude = Math.max(lng1, lng2);
 
         // 2. 뷰포트 내 공식 장소 리스트로 조회
-        List<OfficialPlace> officialPlaces = findOfficialPlacesInViewport(
-            minLatitude,
-            maxLatitude,
-            minLongitude,
-            maxLongitude
-        );
+        List<OfficialPlace> officialPlaces = officialPlaceRepository
+            .findByCentroidLatitudeBetweenAndCentroidLongitudeBetween(
+                minLatitude,
+                maxLatitude,
+                minLongitude,
+                maxLongitude
+            );
 
         double memberLatitude = request.memberCoordinate().latitude();
         double memberLongitude = request.memberCoordinate().longitude();
@@ -95,6 +97,7 @@ public class OfficialPlaceService {
                 congestionLevel.getMessage()));
         }
 
+        // TODO: 정렬을 DB 단에서 해줄지, 아니면 지금처럼 소스 코드 단에서 해줄지 고민
         result.sort(Comparator.comparingDouble(ViewportResponse::distance));
 
         return result;
@@ -137,21 +140,6 @@ public class OfficialPlaceService {
             demographics,
             forecasts
         );
-    }
-
-    private List<OfficialPlace> findOfficialPlacesInViewport(
-        double minLatitude,
-        double maxLatitude,
-        double minLongitude,
-        double maxLongitude
-    ) {
-        return officialPlaceRepository
-            .findByCentroidLatitudeBetweenAndCentroidLongitudeBetween(
-                minLatitude,
-                maxLatitude,
-                minLongitude,
-                maxLongitude
-            );
     }
 
     private double haversine(double aLat, double aLng, double bLat, double bLng) {
