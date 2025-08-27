@@ -4,7 +4,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.OfficialPlaceService;
 import boombimapi.domain.place.dto.request.ViewportRequest;
-import boombimapi.domain.place.dto.response.OfficialPlaceOverviewResponse;
+import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/official-places")
+@RequestMapping("/official-place")
 @Tag(name = "Official Place", description = "공식 장소 관련 API")
 public class OfficialPlaceController {
 
