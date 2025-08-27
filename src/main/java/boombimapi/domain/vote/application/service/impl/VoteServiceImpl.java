@@ -1,9 +1,16 @@
 package boombimapi.domain.vote.application.service.impl;
 
-import boombimapi.domain.alarm.application.service.AlarmService;
-
+import boombimapi.domain.congestion.application.MemberCongestionService;
+import boombimapi.domain.congestion.dto.request.CreateMemberCongestionRequest;
+import boombimapi.domain.congestion.entity.CongestionLevel;
+import boombimapi.domain.congestion.repository.CongestionLevelRepository;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
+import boombimapi.domain.place.application.MemberPlaceService;
+import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
+import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
+import boombimapi.domain.place.entity.MemberPlace;
+import boombimapi.domain.place.repository.MemberPlaceRepository;
 import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -32,6 +39,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static boombimapi.global.infra.exception.error.ErrorCode.MEMBER_PLACE_NOT_FOUND;
+
 @Service
 @Transactional
 @Slf4j
@@ -48,12 +57,21 @@ public class VoteServiceImpl implements VoteService {
 
     private final NaverImageClient naverImageClient;
 
+    private final MemberCongestionService memberCongestionService;
+
+    private final MemberPlaceService memberPlaceService;
+
+    private final MemberPlaceRepository memberPlaceRepository;
+
+    private final CongestionLevelRepository congestionLevelRepository;
+
     // 투표 등록
     @Override
     @Transactional(noRollbackFor = BoombimException.class)
     public void registerVote(String userId, VoteRegisterReq req) {
         Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
 
         //위도 경도 100m 맞는지 true면 있음 false면 없음
         boolean result = isWithin100Meters(
@@ -90,8 +108,15 @@ public class VoteServiceImpl implements VoteService {
         String posImage = getPosImage(req.posName());
 
         log.info(posImage);
+
+        // 공식 장소 테이블 추가
+        ResolveMemberPlaceResponse resolveMemberPlaceResponse = memberPlaceService.resolveMemberPlace(ResolveMemberPlaceRequest.of(req.posId(), req.posName(), req.posLatitude(), req.posLongitude()));
+        MemberPlace memberPlace = memberPlaceRepository.findById(resolveMemberPlaceResponse.memberPlaceId())
+                .orElseThrow(() -> new BoombimException(MEMBER_PLACE_NOT_FOUND));
+
         Vote vb = Vote.builder()
                 .member(user)
+                .memberPlace(memberPlace)
                 .posId(req.posId())
                 .posImage(posImage)
                 .posName(req.posName())
@@ -134,7 +159,8 @@ public class VoteServiceImpl implements VoteService {
                 .answerType(req.voteAnswerType()).build());
 
         // =======
-        // 여기서 혼잡도 정보한테도 넘겨야됨 이건 추후!!
+        // 여기서 혼잡도 정보한테도 넘겨야됨
+        createCongestion(vote, req.voteAnswerType(), userId);
         // =======
 
     }
@@ -357,5 +383,16 @@ public class VoteServiceImpl implements VoteService {
             return null;
         }
     }
+
+    private void createCongestion(Vote vote, VoteAnswerType answerType, String userId) {
+
+        String displayName = answerType.getDisplayName();
+
+        CongestionLevel congestionLevel = congestionLevelRepository.findByName(displayName).orElse(null);
+        if (congestionLevel == null) throw new BoombimException(ErrorCode.CONGESTION_LEVEL_NOT_FOUND);
+
+        memberCongestionService.createMemberCongestion(userId, CreateMemberCongestionRequest.of(vote.getMemberPlace().getId(), congestionLevel.getId(), "", vote.getLatitude(), vote.getLongitude()));
+    }
+
 
 }
