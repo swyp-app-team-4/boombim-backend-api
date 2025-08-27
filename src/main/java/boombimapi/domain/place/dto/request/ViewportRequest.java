@@ -6,7 +6,7 @@ public record ViewportRequest(
     Coordinate topLeft,
     Coordinate bottomRight,
     Coordinate memberCoordinate,
-    Integer zoom
+    Integer zoomLevel
 ) {
 
 }
