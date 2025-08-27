@@ -84,3 +84,9 @@ firebase:
 
 admin:
   id: ${ADMIN_ID}
+
+cluster:
+  zoom-ref: 20
+  base-cell-pixel: 64
+  merge-factor: 1.05
+  tile-size: 256.0
