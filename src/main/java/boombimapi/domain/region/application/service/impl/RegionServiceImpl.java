@@ -28,7 +28,7 @@ public class RegionServiceImpl implements RegionService {
 
         for (Region region : findDate) {
             result.add(RegionRes.of(region.getRegionDate(), region.getStartTime(),
-                    region.getEndTime(), region.getPosName(), region.getPeopleCnt()));
+                    region.getEndTime(), region.getPosName(), region.getArea(), region.getPeopleCnt()));
         }
 
         return result;

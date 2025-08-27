@@ -10,6 +10,8 @@ public record RegionRes(
         LocalDateTime startTime, // 시작 시간
         LocalDateTime endTime,   // 끝나는 시간
         String posName,          // 장소
+
+        String area, // 지역
         Long peopleCnt           // 인원 수
 ) {
     // 정적 팩토리 메서드
@@ -18,8 +20,9 @@ public record RegionRes(
             LocalDateTime startTime,
             LocalDateTime endTime,
             String posName,
+            String area,
             Long peopleCnt
     ) {
-        return new RegionRes(regionDate, startTime, endTime, posName, peopleCnt);
+        return new RegionRes(regionDate, startTime, endTime, posName, area, peopleCnt);
     }
 }
