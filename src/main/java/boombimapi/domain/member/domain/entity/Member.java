@@ -71,6 +71,7 @@ public class Member {
     private SocialProvider socialProvider;
 
     @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
