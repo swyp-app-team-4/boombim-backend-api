@@ -175,52 +175,68 @@ public class FcmServiceImpl implements FcmService {
     private AlarmSendResult sendBatchNotification(List<FcmToken> tokens, String title, String body) {
         List<String> tokenStrings = tokens.stream()
                 .map(FcmToken::getToken)
+                .filter(Objects::nonNull)
+                .filter(s -> !s.isBlank())
                 .toList();
 
-        log.info("=== FCM 개별 전송 시작 ===");
-        log.info("전송할 토큰 수: {}", tokenStrings.size());
+        log.info("=== FCM 전송 시작 (sendEachForMulticast) ===");
+        log.info("전송할 유효 토큰 수: {}", tokenStrings.size());
+
+        if (tokenStrings.isEmpty()) return new AlarmSendResult(0, 0, List.of());
 
         int successCount = 0;
         int failureCount = 0;
         List<String> invalidTokens = new ArrayList<>();
 
-        for (String token : tokenStrings) {
-            try {
-                Message message = Message.builder()
-                        .setNotification(Notification.builder()
-                                .setTitle(title)
-                                .setBody(body)
-                                .build())
-                        .setAndroidConfig(AndroidConfig.builder()
-                                .setNotification(AndroidNotification.builder()
-                                        .setIcon("ic_notification")
-                                        .setColor("#FF6B35")
-                                        .build())
-                                .build())
-                        .setApnsConfig(ApnsConfig.builder()
-                                .setAps(Aps.builder()
-                                        .setSound("default")
-                                        .build())
-                                .build())
-                        .setToken(token)
-                        .build();
+        final int BATCH_SIZE = 500; // FCM 권고
+        for (int start = 0; start < tokenStrings.size(); start += BATCH_SIZE) {
+            List<String> batch = tokenStrings.subList(start, Math.min(start + BATCH_SIZE, tokenStrings.size()));
 
-                String response = firebaseMessaging.send(message);
-                log.info("개별 전송 성공: {}", response);
-                successCount++;
+            MulticastMessage mm = MulticastMessage.builder()
+                    .setNotification(Notification.builder().setTitle(title).setBody(body).build())
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setNotification(AndroidNotification.builder()
+                                    .setIcon("ic_notification")
+                                    .setColor("#FF6B35")
+                                    .build())
+                            .build())
+                    .setApnsConfig(ApnsConfig.builder().setAps(Aps.builder().setSound("default").build()).build())
+                    .addAllTokens(batch)
+                    .build();
+
+            try {
+                // ✅ 핵심 변경: sendMulticast() → sendEachForMulticast()
+                BatchResponse br = firebaseMessaging.sendEachForMulticast(mm);
+
+                successCount += br.getSuccessCount();
+                failureCount += br.getFailureCount();
+
+                List<SendResponse> rs = br.getResponses();
+                for (int i = 0; i < rs.size(); i++) {
+                    SendResponse r = rs.get(i);
+                    FirebaseMessagingException fme = r.getException();
+                    if (!r.isSuccessful()) {
+                        var code = fme.getMessagingErrorCode();
+                        if (code == MessagingErrorCode.UNREGISTERED || code == MessagingErrorCode.INVALID_ARGUMENT) {
+                            invalidTokens.add(batch.get(i)); // 만료/잘못된 토큰 정리
+                        }
+                        log.warn("전송 실패(코드: {}): {}", code, fme.getMessage());
+                    }
+                }
+
+                log.info("배치 완료 - 성공: {}, 실패: {}, 누적성공: {}, 누적실패: {}",
+                        br.getSuccessCount(), br.getFailureCount(), successCount, failureCount);
 
             } catch (Exception e) {
-                log.error("개별 전송 실패 - 토큰: {}, 오류: {}", token.substring(0, 20) + "...", e.getMessage());
-                failureCount++;
-
-                // 토큰 관련 오류인 경우 invalid 목록에 추가
-                if (e.getMessage() != null) {
-                    invalidTokens.add(token);
-                }
+                // 배치 단위 예외 시 해당 배치 실패 처리
+                failureCount += batch.size();
+                log.error("배치 전송 예외 - 시작 인덱스 {}: {}", start, e.getMessage(), e);
             }
         }
 
-        log.info("FCM 전송 완료 - 성공: {}, 실패: {}", successCount, failureCount);
+        log.info("FCM 전송 완료 - 총 성공: {}, 총 실패: {}, invalidTokens: {}",
+                successCount, failureCount, invalidTokens.size());
+
         return new AlarmSendResult(successCount, failureCount, invalidTokens);
     }
 

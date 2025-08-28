@@ -67,7 +67,7 @@ public enum ErrorCode {
     // vote
     DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다. 추가 저장하겠습니다.", 409),
     DUPLICATE_USER(-501, "장소는 또 저장할 수 없습니다.", 409),
-    OUT_OF_100M_RADIUS(-502, "현재 위치가 반경 100m를 초과했습니다.", 403),
+    OUT_OF_300M_RADIUS(-502, "현재 위치가 반경 300m를 초과했습니다.", 403),
     VOTE_NOT_EXIST(-503, "존재하지 않는 투표입니다.", 404),
     DUPLICATE_VOTE_USER(-504, "이미 투표했습니다.", 409),
     NO_PERMISSION_TO_CLOSE_VOTE(-505, "투표 종료 권한이 없습니다.", 403),

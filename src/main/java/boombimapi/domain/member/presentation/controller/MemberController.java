@@ -1,6 +1,7 @@
 package boombimapi.domain.member.presentation.controller;
 
 import boombimapi.domain.member.application.service.MemberService;
+import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
@@ -75,8 +76,8 @@ public class MemberController {
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @DeleteMapping
-    public void memberDelete(@AuthenticationPrincipal String userId) {
-        memberService.memberDelete(userId);
+    public void memberDelete(@AuthenticationPrincipal String userId, @RequestBody MemberLeaveReq req) {
+        memberService.memberDelete(userId, req);
     }
 
     @Operation(summary = "프로필 사진 바꾸기 API", description = "회원의 프로필 사진을 바꿉니다.")
