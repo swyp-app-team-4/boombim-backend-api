@@ -1,6 +1,7 @@
 package boombimapi.domain.member.application.service;
 
 
+import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
 
@@ -27,7 +28,7 @@ public interface MemberService {
     GetNicknameRes getNameFlag(String userId);
 
     // 회원 탈퇴
-    void memberDelete(String userId);
+    void memberDelete(String userId, MemberLeaveReq req);
 
     // 프로필 수정
     ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException;

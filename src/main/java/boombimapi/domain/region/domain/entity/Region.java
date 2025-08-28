@@ -34,6 +34,10 @@ public class Region {
     @Column(nullable = false)
     private String posName;
 
+    // 장소
+    @Column(nullable = false)
+    private String area;
+
     // 인원 수
     @Column(nullable = false)
     private Long peopleCnt;
