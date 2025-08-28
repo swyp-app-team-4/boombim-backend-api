@@ -17,7 +17,11 @@ public enum ResponseMessage {
     RESOLVE_MEMBER_PLACE_SUCCESS("사용자 장소 ID 조회 성공"),
 
     // member congestion
-    CREATE_MEMBER_CONGESTION_SUCCESS("사용자 혼잡도 생성 성공");
+    CREATE_MEMBER_CONGESTION_SUCCESS("사용자 혼잡도 생성 성공"),
+
+    // favorite
+    ADD_FAVORITE_SUCCESS("즐겨찾기 추가 성공"),
+    DELETE_FAVORITE_SUCCESS("즐겨찾기 삭제 성공");
 
     private final String message;
 
