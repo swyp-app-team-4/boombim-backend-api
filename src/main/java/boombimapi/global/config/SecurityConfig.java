@@ -37,6 +37,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/favicon.ico",
             "/api/reissue",
+            "/api/region",
             "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
             "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
             "/api/oauth2/logout",
@@ -56,7 +57,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOriginPatterns(List.of( "http://localhost:3000", "https://boombim.netlify.app"));
+                    config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://boombim.netlify.app"));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
@@ -70,7 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
                         .requestMatchers("/api/oauth2/logout", "/api/admin/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/favicon.ico").permitAll()
+                        .requestMatchers("/favicon.ico", "/api/region").permitAll()
                         .requestMatchers("/api/reissue").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session

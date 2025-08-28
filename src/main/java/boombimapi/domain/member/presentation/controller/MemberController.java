@@ -1,10 +1,12 @@
 package boombimapi.domain.member.presentation.controller;
 
 import boombimapi.domain.member.application.service.MemberService;
+import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
 import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.ProfileRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,7 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -31,20 +35,9 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PatchMapping
+    @PatchMapping("/name")
     public void updateNickname(@AuthenticationPrincipal String userId, @RequestBody NicknameReq req) {
         memberService.updateNickname(userId, req.name());
-    }
-
-
-    @Operation(summary = "[폐기 - 로그인으로 통합] 첫 닉네임 호출 수정 API", description = "처음 로그인 할 시 닉네임 수정 화면 뜨는지 안뜨는지 확인하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
-    })
-    @GetMapping("/name")
-    public ResponseEntity<GetNicknameRes> getNameFlag(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getNameFlag(userId));
     }
 
     @Operation(summary = "마이페이지(1번 구간) 사용자 정보 조회 API", description = "사용자 정보를 조회합니다.")
@@ -75,6 +68,26 @@ public class MemberController {
     @GetMapping("/my-question")
     public ResponseEntity<List<MyPageVoteRes>> getMpVote(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService.getMyVoteQuestion(userId));
+    }
+
+    @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @DeleteMapping
+    public void memberDelete(@AuthenticationPrincipal String userId, @RequestBody MemberLeaveReq req) {
+        memberService.memberDelete(userId, req);
+    }
+
+    @Operation(summary = "프로필 사진 바꾸기 API", description = "회원의 프로필 사진을 바꿉니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @PatchMapping("/profile")
+    public ResponseEntity<ProfileRes> updateProfile(@AuthenticationPrincipal String userId, MultipartFile multipartFile) throws IOException {
+        return ResponseEntity.ok(memberService.updateProfile(userId, multipartFile));
     }
 
 

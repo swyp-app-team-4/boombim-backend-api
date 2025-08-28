@@ -60,20 +60,24 @@ public enum ErrorCode {
     FIREBASE_INITIALIZATION_FAILED(-304, "Firebase 초기화에 실패했습니다.", 500),
     INVALID_DEVICE_TYPE(-305, "유효하지 않은 디바이스 타입입니다.", 400),
 
-    // official
+    // official place & official congestion
     OFFICIAL_PLACE_NOT_FOUND(-400, "공식 장소가 존재하지 않습니다.", 406),
     OFFICIAL_CONGESTION_NOT_FOUND(-401, "공식 혼잡도 데이터가 존재하지 않습니다.", 406),
-
 
     // vote
     DUPLICATE_POS_ID(-500, "이미 중복된 장소입니다. 추가 저장하겠습니다.", 409),
     DUPLICATE_USER(-501, "장소는 또 저장할 수 없습니다.", 409),
-    OUT_OF_100M_RADIUS(-502, "현재 위치가 반경 100m를 초과했습니다.", 403),
+    OUT_OF_300M_RADIUS(-502, "현재 위치가 반경 300m를 초과했습니다.", 403),
     VOTE_NOT_EXIST(-503, "존재하지 않는 투표입니다.", 404),
     DUPLICATE_VOTE_USER(-504, "이미 투표했습니다.", 409),
     NO_PERMISSION_TO_CLOSE_VOTE(-505, "투표 종료 권한이 없습니다.", 403),
-    VOTE_ALREADY_CLOSED(-506, "종료된 투표입니다.", 400);
+    VOTE_ALREADY_CLOSED(-506, "종료된 투표입니다.", 400),
 
+    // member place & member congestion
+    MEMBER_PLACE_NOT_FOUND(-600, "해당 장소가 등록되지 않았습니다.", 406),
+
+    // congestion level
+    CONGESTION_LEVEL_NOT_FOUND(-700, "해당 혼잡도 수준이 존재하지 않습니다.", 406);
 
     private final int code;
     private final String message;

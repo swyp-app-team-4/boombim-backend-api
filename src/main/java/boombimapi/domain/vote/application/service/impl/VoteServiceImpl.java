@@ -1,9 +1,16 @@
 package boombimapi.domain.vote.application.service.impl;
 
-import boombimapi.domain.alarm.application.service.AlarmService;
-
+import boombimapi.domain.congestion.application.MemberCongestionService;
+import boombimapi.domain.congestion.dto.request.CreateMemberCongestionRequest;
+import boombimapi.domain.congestion.entity.CongestionLevel;
+import boombimapi.domain.congestion.repository.CongestionLevelRepository;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
+import boombimapi.domain.place.application.MemberPlaceService;
+import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
+import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
+import boombimapi.domain.place.entity.MemberPlace;
+import boombimapi.domain.place.repository.MemberPlaceRepository;
 import boombimapi.domain.vote.application.service.VoteService;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -21,6 +28,9 @@ import boombimapi.domain.vote.presentation.dto.res.list.MyVoteRes;
 import boombimapi.domain.vote.presentation.dto.res.list.VoteRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
+import boombimapi.global.infra.feignclient.naver.NaverImageClient;
+import boombimapi.global.infra.feignclient.naver.dto.res.NaverImageSearchRes;
+import feign.FeignException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +38,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static boombimapi.global.infra.exception.error.ErrorCode.MEMBER_PLACE_NOT_FOUND;
 
 @Service
 @Transactional
@@ -43,7 +55,15 @@ public class VoteServiceImpl implements VoteService {
 
     private final MemberRepository userRepository;
 
-    private final AlarmService alarmService;
+    private final NaverImageClient naverImageClient;
+
+    private final MemberCongestionService memberCongestionService;
+
+    private final MemberPlaceService memberPlaceService;
+
+    private final MemberPlaceRepository memberPlaceRepository;
+
+    private final CongestionLevelRepository congestionLevelRepository;
 
     // 투표 등록
     @Override
@@ -52,12 +72,13 @@ public class VoteServiceImpl implements VoteService {
         Member user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
+
         //위도 경도 100m 맞는지 true면 있음 false면 없음
-        boolean result = isWithin100Meters(
+        boolean result = isWithin300Meters(
                 req.posLatitude(), req.posLongitude(),
                 req.userLatitude(), req.userLongitude()
         );
-        if (!result) throw new BoombimException(ErrorCode.OUT_OF_100M_RADIUS);
+        if (!result) throw new BoombimException(ErrorCode.OUT_OF_300M_RADIUS);
 
 
         // 중복 검사인지 확인
@@ -83,9 +104,21 @@ public class VoteServiceImpl implements VoteService {
             voteDuplicationRepository.save(vd);
             throw new BoombimException(ErrorCode.DUPLICATE_POS_ID);
         }
+
+        String posImage = getPosImage(req.posName());
+
+        log.info(posImage);
+
+        // 공식 장소 테이블 추가
+        ResolveMemberPlaceResponse resolveMemberPlaceResponse = memberPlaceService.resolveMemberPlace(ResolveMemberPlaceRequest.of(req.posId(), req.posName(), req.posLatitude(), req.posLongitude()));
+        MemberPlace memberPlace = memberPlaceRepository.findById(resolveMemberPlaceResponse.memberPlaceId())
+                .orElseThrow(() -> new BoombimException(MEMBER_PLACE_NOT_FOUND));
+
         Vote vb = Vote.builder()
                 .member(user)
+                .memberPlace(memberPlace)
                 .posId(req.posId())
+                .posImage(posImage)
                 .posName(req.posName())
                 .latitude(req.posLatitude())
                 .longitude(req.posLongitude()).build();
@@ -126,7 +159,8 @@ public class VoteServiceImpl implements VoteService {
                 .answerType(req.voteAnswerType()).build());
 
         // =======
-        // 여기서 혼잡도 정보한테도 넘겨야됨 이건 추후!!
+        // 여기서 혼잡도 정보한테도 넘겨야됨
+        createCongestion(vote, req.voteAnswerType(), userId);
         // =======
 
     }
@@ -174,7 +208,7 @@ public class VoteServiceImpl implements VoteService {
 
         List<VoteRes> voteResList = new ArrayList<>();
 
-        List<Vote> votes = calculate100(latitude, longitude);
+        List<Vote> votes = calculate300(latitude, longitude);
         for (Vote vote : votes) {
             if (!vote.isVoteActivate() || vote.getVoteStatus().equals(VoteStatus.END)) continue;
 
@@ -182,7 +216,7 @@ public class VoteServiceImpl implements VoteService {
             boolean voteFlag = voteUsercheck(vote, user);
 
 
-            voteResList.add(VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+            voteResList.add(VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(), vote.getPosImage(),
                     voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기", voteFlag));
         }
 
@@ -218,7 +252,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     // 허버사인 공식 500m 반경 파악
-    public boolean isWithin100Meters(double posLatitude, double posLongitude,
+    public boolean isWithin300Meters(double posLatitude, double posLongitude,
                                      double userLatitude, double userLongitude) {
 
         final double EARTH_RADIUS = 6371000; // 지구 반지름 (m)
@@ -236,7 +270,7 @@ public class VoteServiceImpl implements VoteService {
 
         double distance = EARTH_RADIUS * c; // 두 점 사이 거리(m)
 
-        return distance <= 100; // 500m 이내면 true
+        return distance <= 300; // 500m 이내면 true
     }
 
     // 투표마다 투표 4개 답변 숫 얻어오기
@@ -259,8 +293,8 @@ public class VoteServiceImpl implements VoteService {
     }
 
 
-    private List<Vote> calculate100(double latitude, double longitude) {
-        final double RADIUS_M = 100.0;
+    private List<Vote> calculate300(double latitude, double longitude) {
+        final double RADIUS_M = 300.0;
 
         // 1) 바운딩 박스(사각형) 계산: 위도 1도 ≈ 111,320m, 경도 1도 ≈ 111,320 * cos(lat)
         double latDelta = RADIUS_M / 111_320d;
@@ -276,12 +310,12 @@ public class VoteServiceImpl implements VoteService {
         List<Vote> candidates = voteRepository.findAllInBoundingBox(latMin, latMax, lonMin, lonMax);
 
         // 3) 하버사인으로 500m 이내만 남기고, 거리 기준 정렬
-        List<Vote> within100m = candidates.stream()
+        List<Vote> within300m = candidates.stream()
                 .filter(v -> distanceMeters(latitude, longitude, v.getLatitude(), v.getLongitude()) <= RADIUS_M)
                 .sorted(Comparator.comparingDouble(v -> distanceMeters(latitude, longitude, v.getLatitude(), v.getLongitude())))
                 .toList();
 
-        return within100m;
+        return within300m;
     }
 
 
@@ -317,5 +351,48 @@ public class VoteServiceImpl implements VoteService {
                 .limit(3)                                               // 최대 3개만
                 .toList();
     }
+
+    private String getPosImage(String posName) {
+        try {
+            // 네이버 이미지 검색 API 호출
+            NaverImageSearchRes response = naverImageClient.searchImages(
+                    posName + " 전경",   // 검색어 보정 (예: "부평남초등학교 전경")
+                    10,                 // 여러 개 가져오기
+                    1,
+                    "sim",              // 정확도순
+                    "large"             // 큰 이미지 우선
+            );
+
+            if (response.items() == null || response.items().isEmpty()) {
+                log.warn("🔍 이미지 검색 결과 없음: {}", posName);
+                return null;
+            }
+
+            // 후보 중에서 "급식/식단/메뉴" 같은 거 제외하고 첫 번째 반환
+            return response.items().stream()
+                    .filter(item -> !item.title().contains("급식"))
+                    .filter(item -> !item.title().contains("식단"))
+                    .filter(item -> !item.title().contains("메뉴"))
+                    .filter(item -> !item.title().contains("사람"))
+                    .findFirst()
+                    .map(NaverImageSearchRes.Item::link)   // DTO 맞게 수정
+                    .orElse(response.items().get(0).link());
+
+        } catch (FeignException e) {
+            log.error("❌ 네이버 이미지 API 호출 실패: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private void createCongestion(Vote vote, VoteAnswerType answerType, String userId) {
+
+        String displayName = answerType.getDisplayName();
+
+        CongestionLevel congestionLevel = congestionLevelRepository.findByName(displayName).orElse(null);
+        if (congestionLevel == null) throw new BoombimException(ErrorCode.CONGESTION_LEVEL_NOT_FOUND);
+
+        memberCongestionService.createMemberCongestion(userId, CreateMemberCongestionRequest.of(vote.getMemberPlace().getId(), congestionLevel.getId(), "", vote.getLatitude(), vote.getLongitude()));
+    }
+
 
 }

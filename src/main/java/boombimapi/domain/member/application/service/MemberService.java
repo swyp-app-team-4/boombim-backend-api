@@ -1,11 +1,15 @@
 package boombimapi.domain.member.application.service;
 
 
+import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
 import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
 
 import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
+import boombimapi.domain.member.presentation.dto.member.res.ProfileRes;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface MemberService {
@@ -22,5 +26,12 @@ public interface MemberService {
     void updateNickname(String userId, String name);
 
     GetNicknameRes getNameFlag(String userId);
+
+    // 회원 탈퇴
+    void memberDelete(String userId, MemberLeaveReq req);
+
+    // 프로필 수정
+    ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException;
+
 
 }

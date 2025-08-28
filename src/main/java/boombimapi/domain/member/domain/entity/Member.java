@@ -3,6 +3,7 @@ package boombimapi.domain.member.domain.entity;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
+import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -30,7 +31,7 @@ public class Member {
 
 
     // 1) 내가 "보낸" 알림들 (Alarm.sender)
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> sentAlarms = new ArrayList<>();
 
     // 2) 내가 "받는" 알림들 (조인 엔티티 AlarmRecipient.user)
@@ -52,6 +53,9 @@ public class Member {
     // 6) 내 투표 답변들
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteAnswer> voteAnswers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberCongestion> memberCongestions = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;
@@ -97,14 +101,15 @@ public class Member {
         this.nameFlag = false;
     }
 
-    public void updateEmailAndProfile(String email, String profile) {
+    public void updateEmail(String email) {
         this.email = email;
-        this.profile = profile;
     }
 
     public void updateName(String name) {
         this.name=name;
     }
+
+    public void updateProfile(String profile){this.profile= profile;}
 
     public void updateIsActivateNameFlag() {
         this.nameFlag=true;

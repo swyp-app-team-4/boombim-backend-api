@@ -2,6 +2,7 @@ package boombimapi.domain.vote.domain.entity;
 
 
 import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.place.entity.MemberPlace;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -30,6 +31,10 @@ public class Vote {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_place_id", nullable = false)
+    private MemberPlace memberPlace;
+
     @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteDuplication> voteDuplications = new ArrayList<>();
 
@@ -40,6 +45,9 @@ public class Vote {
     // 장소 id
     @Column(nullable = false)
     private String posId;
+
+    @Column(nullable = true)
+    private String posImage;
 
     // 위도
     @Column(nullable = false)
@@ -76,9 +84,11 @@ public class Vote {
 
 
     @Builder
-    public Vote(Member member, String posId, double latitude, double longitude, String posName) {
+    public Vote(Member member,MemberPlace memberPlace ,String posId, String posImage, double latitude, double longitude, String posName) {
         this.member = member;
+        this.memberPlace=memberPlace;
         this.posId = posId;
+        this.posImage = posImage;
         this.latitude = latitude;
         this.longitude = longitude;
         this.posName = posName;

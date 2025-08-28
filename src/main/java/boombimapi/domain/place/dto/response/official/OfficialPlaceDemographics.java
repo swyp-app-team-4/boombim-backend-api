@@ -1,7 +1,6 @@
-package boombimapi.domain.place.dto.response;
+package boombimapi.domain.place.dto.response.official;
 
 import boombimapi.domain.congestion.entity.OfficialCongestionDemographics;
-import boombimapi.domain.congestion.entity.OfficialCongestionForecast;
 
 // TODO: 여기 열거형으로 처리하기
 public record OfficialPlaceDemographics(
