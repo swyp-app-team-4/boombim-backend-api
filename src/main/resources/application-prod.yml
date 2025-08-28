@@ -15,7 +15,12 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        default_schema: root
+        default_schema: root        # 기본 스키마
+        jdbc:
+          batch_size: 1000          # 배치 insert/update 사이즈
+        order_inserts: true         # insert 정렬
+        order_updates: true         # update 정렬
+        batch_versioned_data: true
 
 
   servlet:
@@ -38,6 +43,23 @@ spring:
         max-size: 10
         queue-capacity: 100
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    cache:
+      channel:
+        size: 50
+      connection:
+        mode: channel
+    requested-heartbeat: 30
+    connection-timeout: 5000
+
 jwt:
   secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION}
@@ -52,7 +74,7 @@ logging:
 
 # 보류
 oauth2:
-  front-uri: ${OAUTH2_FRONT_URL}
+  front-url: ${OAUTH2_FRONT_URL}
 
   # Kakao 설정
   kakao:
@@ -60,6 +82,7 @@ oauth2:
     client-id: ${KAKAO_CLIENT_ID}
     client-secret: ${KAKAO_CLIENT_SECRET}
     redirect-uri: ${KAKAO_REDIRECT_URI}
+    front-redirect-uri: ${KAKAO_FRONT_REDIRECT_URI}
 
   # Naver 설정
   naver:
@@ -91,6 +114,7 @@ cluster:
   merge-factor: 1.05
   tile-size: 256.0
 
+# S3
 cloud:
   aws:
     stack:
