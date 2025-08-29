@@ -57,13 +57,13 @@ public class SchedulerService {
     // 투표 종류 후 알림
     @Scheduled(fixedDelay = 60_000L, initialDelay = 30_000L) // 1분마다, 앱 시작 30초 후 시작
     public void sweepExpiredVotes() {
-//        // 자동
-//        auto();
-//        // 수동
-//        passivity();
+        // 자동
+        auto();
+        // 수동
+        passivity();
 
-        autoV0();
-        passivityV0();
+//        autoV0();
+  //      passivityV0();
     }
 
 
