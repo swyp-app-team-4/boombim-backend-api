@@ -21,7 +21,8 @@ public enum ResponseMessage {
 
     // favorite
     ADD_FAVORITE_SUCCESS("즐겨찾기 추가 성공"),
-    DELETE_FAVORITE_SUCCESS("즐겨찾기 삭제 성공");
+    DELETE_FAVORITE_SUCCESS("즐겨찾기 삭제 성공"),
+    GET_FAVORITES_SUCCESS("즐겨찾기 정보 리스트 조회 성공");
 
     private final String message;
 
