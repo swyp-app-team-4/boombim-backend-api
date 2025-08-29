@@ -5,12 +5,15 @@ import static boombimapi.global.response.ResponseMessage.*;
 import boombimapi.domain.favorite.application.FavoriteService;
 import boombimapi.domain.favorite.dto.request.AddFavoriteRequest;
 import boombimapi.domain.favorite.dto.response.AddFavoriteResponse;
+import boombimapi.domain.favorite.dto.response.GetFavoriteResponse;
 import boombimapi.global.response.BaseResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +53,19 @@ public class FavoriteController {
                 HttpStatus.OK,
                 DELETE_FAVORITE_SUCCESS,
                 null
+            )
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<List<GetFavoriteResponse>>> getFavorites(
+        @AuthenticationPrincipal String memberId
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_FAVORITES_SUCCESS,
+                favoriteService.getFavoritesWithLatestCongestion(memberId)
             )
         );
     }
