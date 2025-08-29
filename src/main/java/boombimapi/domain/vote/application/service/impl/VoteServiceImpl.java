@@ -365,7 +365,7 @@ public class VoteServiceImpl implements VoteService {
 
             if (response.items() == null || response.items().isEmpty()) {
                 log.warn("🔍 이미지 검색 결과 없음: {}", posName);
-                return "https://gamehackspring.s3.ap-northeast-2.amazonaws.com/appicon.png";
+                return "https://gamehackspring.s3.ap-northeast-2.amazonaws.com/appicon.png96";
             }
 
             // 후보 중에서 "급식/식단/메뉴" 같은 거 제외하고 첫 번째 반환
