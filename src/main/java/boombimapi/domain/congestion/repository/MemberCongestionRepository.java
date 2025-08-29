@@ -1,7 +1,7 @@
 package boombimapi.domain.congestion.repository;
 
 import boombimapi.domain.congestion.entity.MemberCongestion;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,12 +9,12 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
 
     boolean existsByMemberPlaceIdAndExpiresAtAfter(
         Long memberPlaceId,
-        Instant now
+        LocalDateTime now
     );
 
     Optional<MemberCongestion> findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
         Long memberPlaceId,
-        Instant now
+        LocalDateTime now
     );
 
 }

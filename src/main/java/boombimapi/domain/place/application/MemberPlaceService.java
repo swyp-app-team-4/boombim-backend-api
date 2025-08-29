@@ -15,7 +15,7 @@ import boombimapi.global.geo.core.ClusterMarker;
 import boombimapi.global.geo.core.ClusterPoint;
 import boombimapi.global.geo.core.Clusterer;
 import boombimapi.global.geo.internal.GeoDistance;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +74,7 @@ public class MemberPlaceService {
             .findByLatitudeBetweenAndLongitudeBetween(minLatitude, maxLatitude, minLongitude, maxLongitude);
 
         // 3) 유효 혼잡도 존재 장소만 필터링
-        Instant now = Instant.now();
+        LocalDateTime now = LocalDateTime.now();
         List<ClusterPoint> clusterPoints = new ArrayList<>();
         Map<Long, MemberPlace> memberPlaceMap = new HashMap<>(allPlaces.size());
 
