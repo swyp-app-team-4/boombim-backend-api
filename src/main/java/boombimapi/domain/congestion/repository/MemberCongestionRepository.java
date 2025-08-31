@@ -3,7 +3,10 @@ package boombimapi.domain.congestion.repository;
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface MemberCongestionRepository extends JpaRepository<MemberCongestion, Long> {
 
@@ -16,5 +19,13 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
         Long memberPlaceId,
         LocalDateTime now
     );
+
+    @Query("""
+           SELECT COUNT(mc) 
+           FROM MemberCongestion mc
+           WHERE mc.memberPlace.id = :placeId
+             AND CAST(mc.createdAt AS DATE) = CURRENT_DATE
+           """)
+    long countTodayByPlace(@Param("placeId") Long placeId);
 
 }
