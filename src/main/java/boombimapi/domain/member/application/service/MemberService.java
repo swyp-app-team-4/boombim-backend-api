@@ -2,11 +2,8 @@ package boombimapi.domain.member.application.service;
 
 
 import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
-import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
-import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
+import boombimapi.domain.member.presentation.dto.member.res.*;
 
-import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
-import boombimapi.domain.member.presentation.dto.member.res.ProfileRes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,6 +13,9 @@ public interface MemberService {
 
     // 1번 구간
     GetMemberRes getMember(String userId);
+
+    // 2번 구간
+    List<GetFavoriteRes>  getFavorites(String userId);
 
     // 3번 구간
     List<MyPageVoteRes> getMyVoteAnswer(String userId);
