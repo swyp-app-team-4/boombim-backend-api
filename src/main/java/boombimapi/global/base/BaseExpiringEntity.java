@@ -5,6 +5,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
@@ -12,7 +13,7 @@ import lombok.Getter;
 public abstract class BaseExpiringEntity extends BaseEntity {
 
     @Column(name = "expires_at", nullable = false, columnDefinition = "timestamptz")
-    private Instant expiresAt;
+    private LocalDateTime expiresAt;
 
     protected Duration ttl() {
         return Duration.ofHours(1);
@@ -24,15 +25,15 @@ public abstract class BaseExpiringEntity extends BaseEntity {
             return;
         }
 
-        Instant baseTime = getCreatedAt();
+        LocalDateTime baseTime = getCreatedAt();
         if (baseTime == null) {
-            baseTime = Instant.now();
+            baseTime = LocalDateTime.now();
         }
         expiresAt = baseTime.plus(ttl());
     }
 
     protected void setExpiresAt(
-        Instant expiresAt
+        LocalDateTime expiresAt
     ) {
         this.expiresAt = expiresAt;
     }

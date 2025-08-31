@@ -46,7 +46,7 @@ public class Alarm {
 
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private AlarmStatus status;
 
     @Column(nullable = false)
