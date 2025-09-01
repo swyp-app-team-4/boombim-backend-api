@@ -36,6 +36,8 @@ public class OfficialPlace {
     @Column(name = "polygon_coordinates", nullable = false, columnDefinition = "jsonb")
     private String polygonCoordinates;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
 
     @Builder
     private OfficialPlace(
@@ -43,13 +45,15 @@ public class OfficialPlace {
         String poiCode,
         Double centroidLatitude,
         Double centroidLongitude,
-        String polygonCoordinates
+        String polygonCoordinates,
+        String imageUrl
     ) {
         this.name = name;
         this.poiCode = poiCode;
         this.centroidLatitude = centroidLatitude;
         this.centroidLongitude = centroidLongitude;
         this.polygonCoordinates = polygonCoordinates;
+        this.imageUrl = imageUrl;
     }
 
     public static OfficialPlace of(
@@ -57,7 +61,8 @@ public class OfficialPlace {
         String poiCode,
         Double centroidLatitude,
         Double centroidLongitude,
-        String polygonCoordinates
+        String polygonCoordinates,
+        String imageUrl
     ) {
         return OfficialPlace.builder()
             .name(name)
@@ -65,6 +70,7 @@ public class OfficialPlace {
             .centroidLatitude(centroidLatitude)
             .centroidLongitude(centroidLongitude)
             .polygonCoordinates(polygonCoordinates)
+            .imageUrl(imageUrl)
             .build();
     }
 
