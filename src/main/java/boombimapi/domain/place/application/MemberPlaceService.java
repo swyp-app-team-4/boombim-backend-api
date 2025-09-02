@@ -4,7 +4,7 @@ import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.congestion.repository.MemberCongestionRepository;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.dto.request.ViewportRequest;
-import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
+import boombimapi.domain.place.dto.response.member.ResolveMemberPlaceResponse;
 import boombimapi.domain.place.dto.response.node.ViewportClusterNodeResponse;
 import boombimapi.domain.place.dto.response.node.ViewportNodeResponse;
 import boombimapi.domain.place.dto.response.node.ViewportPlaceNodeResponse;
