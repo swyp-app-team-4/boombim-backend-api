@@ -86,12 +86,12 @@ public class Member {
     private boolean alarmFlag;
 
     // 첫 로그인일시에는 false 이후에는 계속 true
-    @Column(name= "name_flag", nullable = false)
+    @Column(name = "name_flag", nullable = false)
     private boolean nameFlag;
 
     @Builder
     public Member(String id, String email, String name, String profile,
-                SocialProvider socialProvider, Role role) {
+                  SocialProvider socialProvider, Role role) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -107,20 +107,27 @@ public class Member {
     }
 
     public void updateName(String name) {
-        this.name=name;
+        this.name = name;
     }
 
-    public void updateProfile(String profile){this.profile= profile;}
+    public void updateProfile(String profile) {
+        this.profile = profile;
+    }
 
     public void updateIsActivateNameFlag() {
-        this.nameFlag=true;
+        this.nameFlag = true;
     }
 
     public void updateIsActivateAlarmFlag() {
-        this.alarmFlag=true;
+        this.alarmFlag = true;
     }
+
     public void updateIsDeactivateAlarmFlag() {
-        this.alarmFlag=false;
+        this.alarmFlag = false;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @PrePersist
