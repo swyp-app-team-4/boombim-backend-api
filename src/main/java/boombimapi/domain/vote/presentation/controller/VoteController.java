@@ -6,6 +6,8 @@ import boombimapi.domain.vote.presentation.dto.req.VoteAnswerReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteDeleteReq;
 import boombimapi.domain.vote.presentation.dto.req.VoteRegisterReq;
 import boombimapi.domain.vote.presentation.dto.res.VoteListRes;
+import boombimapi.global.response.BaseOKResponse;
+import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,9 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import static boombimapi.global.response.ResponseMessage.*;
 
 @RestController
 @RequestMapping("/api/vote")
@@ -34,8 +39,13 @@ public class VoteController {
             @ApiResponse(responseCode = "409", description = "중복된 장소")
     })
     @PostMapping
-    public void registerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteRegisterReq req) {
+    public ResponseEntity<BaseOKResponse<Void>> registerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteRegisterReq req) {
         voteService.registerVote(userId, req);
+
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK,
+                        VOTE_SUCCESS));
     }
 
     @Operation(summary = "투표하기", description = "기존 투표에 투표합니다. 종료된 투표이거나 이미 투표한 경우 오류가 발생합니다.")
@@ -46,8 +56,13 @@ public class VoteController {
             @ApiResponse(responseCode = "409", description = "이미 투표함")
     })
     @PostMapping("/answer")
-    public void answerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteAnswerReq req) {
+    public ResponseEntity<BaseOKResponse<Void>> answerVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteAnswerReq req) {
         voteService.answerVote(userId, req);
+
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK,
+                        VOTE_SUCCESS));
     }
 
     @Operation(summary = "투표 종료", description = "본인이 생성한 투표를 종료합니다.")
@@ -57,8 +72,13 @@ public class VoteController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저 또는 투표")
     })
     @PatchMapping
-    public void endVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
+    public ResponseEntity<BaseOKResponse<Void>> endVote(@AuthenticationPrincipal String userId, @Valid @RequestBody VoteDeleteReq req) {
         voteService.endVote(userId, req);
+
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK,
+                        VOTE_SUCCESS));
     }
 
     @Operation(summary = "투표 목록 조회", description = "현재 위치 기준 반경 500m 이내 투표 목록과 내 질문 목록을 조회합니다.")
@@ -74,7 +94,6 @@ public class VoteController {
 
         return ResponseEntity.ok(voteService.listVote(userId, latitude, longitude));
     }
-
 
 
 }

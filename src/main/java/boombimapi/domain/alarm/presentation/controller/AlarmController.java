@@ -9,6 +9,7 @@ import boombimapi.domain.alarm.presentation.dto.req.UpdateAlarmStatusReq;
 import boombimapi.domain.alarm.presentation.dto.res.HistoryResponse;
 import boombimapi.domain.alarm.presentation.dto.res.RegisterFcmTokenResponse;
 import boombimapi.domain.alarm.presentation.dto.res.SendAlarmResponse;
+import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,12 +17,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static boombimapi.global.response.ResponseMessage.GET_ALARM_SUCCESS;
+import static boombimapi.global.response.ResponseMessage.VOTE_SUCCESS;
 
 @RestController
 @RequestMapping("/api/alarm")
@@ -85,12 +90,18 @@ public class AlarmController {
             @ApiResponse(responseCode = "404", description = "알림 및 유저 존재하지 않음"),
     })
     @PatchMapping
-    public void updateAlarmRead(
+    public ResponseEntity<BaseOKResponse<Void>> updateAlarmRead(
             @AuthenticationPrincipal String userId,
             @RequestBody UpdateAlarmStatusReq req
     ) {
         alarmService.updateAlarmRead(userId, req);
+
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK,
+                        GET_ALARM_SUCCESS));
     }
+
 
     @Operation(summary = "알림 설정 활성화", description = "알림을 활성화 및 비활성화를 합니다.")
     @ApiResponses(value = {
@@ -98,11 +109,14 @@ public class AlarmController {
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음"),
     })
     @PatchMapping("/status")
-    public void updateAlarmStatus(
+    public ResponseEntity<BaseOKResponse<Void>> updateAlarmStatus(
             @AuthenticationPrincipal String userId
     ) {
         alarmService.updateAlarmStatus(userId);
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK,
+                        GET_ALARM_SUCCESS));
     }
-
 
 }
