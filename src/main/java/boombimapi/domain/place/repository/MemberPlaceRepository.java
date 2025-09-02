@@ -3,6 +3,10 @@ package boombimapi.domain.place.repository;
 import boombimapi.domain.place.entity.MemberPlace;
 import java.util.List;
 import java.util.Optional;
+
+import boombimapi.domain.search.presentation.dto.PlaceNameProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberPlaceRepository extends JpaRepository<MemberPlace, Long> {
@@ -15,4 +19,13 @@ public interface MemberPlaceRepository extends JpaRepository<MemberPlace, Long> 
         double minLongitude,
         double maxLongitude
     );
+
+    // 연관 검색
+    List<PlaceNameProjection> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
+
+    // 검색 결과
+    List<MemberPlace> findEntitiesByNameContainingIgnoreCase(String keyword, Pageable pageable);
+
+
+
 }
