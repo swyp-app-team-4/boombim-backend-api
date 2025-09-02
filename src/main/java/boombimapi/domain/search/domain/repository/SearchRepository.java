@@ -1,4 +1,9 @@
 package boombimapi.domain.search.domain.repository;
 
-public class SearchRepository {
+import boombimapi.domain.search.domain.entity.Search;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface SearchRepository extends JpaRepository<Search, Long> {
 }
