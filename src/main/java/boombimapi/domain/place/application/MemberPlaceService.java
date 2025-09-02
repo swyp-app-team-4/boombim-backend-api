@@ -47,7 +47,8 @@ public class MemberPlaceService {
                     request.uuid(),
                     request.name(),
                     request.latitude(),
-                    request.longitude()
+                    request.longitude(),
+                    null
                 )
             ));
 
