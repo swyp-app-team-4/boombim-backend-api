@@ -35,6 +35,9 @@ public class MemberPlace extends BaseEntity {
     @Column(name = "name", length = 32, nullable = false)
     private String name;
 
+    @Column(name = "address", length = 32, nullable = false)
+    private String address;
+
     @Column(name = "latitude", nullable = false)
     private Double latitude;
 
@@ -48,12 +51,14 @@ public class MemberPlace extends BaseEntity {
     private MemberPlace(
         String uuid,
         String name,
+        String address,
         Double latitude,
         Double longitude,
         String imageUrl
     ) {
         this.uuid = uuid;
         this.name = name;
+        this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.imageUrl = imageUrl;
@@ -62,6 +67,7 @@ public class MemberPlace extends BaseEntity {
     public static MemberPlace of(
         String uuid,
         String name,
+        String address,
         Double latitude,
         Double longitude,
         String imageUrl
@@ -69,6 +75,7 @@ public class MemberPlace extends BaseEntity {
         return MemberPlace.builder()
             .uuid(uuid)
             .name(name)
+            .address(address)
             .latitude(latitude)
             .longitude(longitude)
             .imageUrl(imageUrl)
