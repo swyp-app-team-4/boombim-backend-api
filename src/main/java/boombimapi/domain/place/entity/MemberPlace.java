@@ -24,7 +24,7 @@ public class MemberPlace extends BaseEntity {
     private Long id;
 
     @OneToMany(mappedBy = "memberPlace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Vote> votes  = new ArrayList<>();
+    private List<Vote> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "memberPlace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberCongestion> memberCongestions;
@@ -41,30 +41,37 @@ public class MemberPlace extends BaseEntity {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     @Builder
     private MemberPlace(
         String uuid,
         String name,
         Double latitude,
-        Double longitude
+        Double longitude,
+        String imageUrl
     ) {
         this.uuid = uuid;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.imageUrl = imageUrl;
     }
 
     public static MemberPlace of(
         String uuid,
         String name,
         Double latitude,
-        Double longitude
+        Double longitude,
+        String imageUrl
     ) {
         return MemberPlace.builder()
             .uuid(uuid)
             .name(name)
             .latitude(latitude)
             .longitude(longitude)
+            .imageUrl(imageUrl)
             .build();
     }
 
