@@ -2,9 +2,12 @@ package boombimapi.domain.congestion.repository;
 
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import boombimapi.domain.place.entity.MemberPlace;
 import feign.Param;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,11 +24,22 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
     );
 
     @Query("""
-           SELECT COUNT(mc) 
+           SELECT COUNT(mc)\s
            FROM MemberCongestion mc
            WHERE mc.memberPlace.id = :placeId
              AND CAST(mc.createdAt AS DATE) = CURRENT_DATE
            """)
     long countTodayByPlace(@Param("placeId") Long placeId);
+
+
+    @Query("""
+    select mc
+    from MemberCongestion mc
+    join fetch mc.congestionLevel cl
+    where mc.memberPlace = :place
+    order by mc.createdAt desc
+    """)
+    List<MemberCongestion> findLatestByPlaceFetchLevel(@Param("place") MemberPlace place, Pageable pageable);
+
 
 }

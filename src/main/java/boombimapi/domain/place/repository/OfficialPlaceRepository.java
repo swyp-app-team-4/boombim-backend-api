@@ -2,6 +2,9 @@ package boombimapi.domain.place.repository;
 
 import boombimapi.domain.place.entity.OfficialPlace;
 import java.util.List;
+
+import boombimapi.domain.search.presentation.dto.PlaceNameProjection;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OfficialPlaceRepository extends JpaRepository<OfficialPlace, Long> {
@@ -14,4 +17,9 @@ public interface OfficialPlaceRepository extends JpaRepository<OfficialPlace, Lo
         double maxLongitude
     );
 
+    // 연관 검색
+    List<PlaceNameProjection> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
+
+    // 검색 결과
+    List<OfficialPlace> findEntitiesByNameContainingIgnoreCase(String keyword, Pageable pageable);
 }
