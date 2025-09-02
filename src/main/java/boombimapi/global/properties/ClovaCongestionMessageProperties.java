@@ -1,5 +1,11 @@
 package boombimapi.global.properties;
 
-public record ClovaCongestionMessageProperties() {
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "clova.congestion-message")
+public record ClovaCongestionMessageProperties(
+    String baseUrl,
+    String apiKey
+) {
 
 }
