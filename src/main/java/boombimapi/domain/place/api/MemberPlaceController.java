@@ -5,7 +5,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 import boombimapi.domain.place.application.MemberPlaceService;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.dto.request.ViewportRequest;
-import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
+import boombimapi.domain.place.dto.response.member.ResolveMemberPlaceResponse;
 import boombimapi.domain.place.dto.response.node.ViewportNodeResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;

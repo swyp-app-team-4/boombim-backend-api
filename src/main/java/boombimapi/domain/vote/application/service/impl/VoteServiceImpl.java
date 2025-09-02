@@ -8,7 +8,7 @@ import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.place.application.MemberPlaceService;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
-import boombimapi.domain.place.dto.response.ResolveMemberPlaceResponse;
+import boombimapi.domain.place.dto.response.member.ResolveMemberPlaceResponse;
 import boombimapi.domain.place.entity.MemberPlace;
 import boombimapi.domain.place.repository.MemberPlaceRepository;
 import boombimapi.domain.vote.application.service.VoteService;
