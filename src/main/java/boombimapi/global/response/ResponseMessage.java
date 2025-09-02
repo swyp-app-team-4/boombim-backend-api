@@ -15,6 +15,7 @@ public enum ResponseMessage {
     // member place
     GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS("뷰포트 내 사용자 장소 조회 성공"),
     RESOLVE_MEMBER_PLACE_SUCCESS("사용자 장소 ID 조회 성공"),
+    GET_MEMBER_PLACE_DETAIL_SUCCESS("사용자 장소 상세 조회 성공"),
 
     // member congestion
     CREATE_MEMBER_CONGESTION_SUCCESS("사용자 혼잡도 생성 성공"),

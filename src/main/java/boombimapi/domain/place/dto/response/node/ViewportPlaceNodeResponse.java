@@ -10,7 +10,8 @@ public record ViewportPlaceNodeResponse(
     Coordinate coordinate,
     Double distance,
     String congestionLevelName,
-    String congestionMessage
+    String congestionMessage,
+    boolean isFavorite
 ) implements ViewportNodeResponse {
 
     public static ViewportPlaceNodeResponse of(
@@ -19,7 +20,8 @@ public record ViewportPlaceNodeResponse(
         Coordinate coordinate,
         Double distance,
         String congestionLevelName,
-        String congestionMessage
+        String congestionMessage,
+        boolean isFavorite
     ) {
         return new ViewportPlaceNodeResponse(
             MarkerType.PLACE,
@@ -28,7 +30,8 @@ public record ViewportPlaceNodeResponse(
             coordinate,
             distance,
             congestionLevelName,
-            congestionMessage
+            congestionMessage,
+            isFavorite
         );
     }
 
