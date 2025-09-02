@@ -1,6 +1,9 @@
 package boombimapi.domain.member.application.service.impl;
 
 
+import boombimapi.domain.congestion.repository.MemberCongestionRepository;
+import boombimapi.domain.favorite.entity.Favorite;
+import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.member.application.service.MemberService;
 
 import boombimapi.domain.member.domain.entity.Member;
@@ -8,10 +11,7 @@ import boombimapi.domain.member.domain.entity.MemberLeave;
 import boombimapi.domain.member.domain.repository.MemberLeaveRepository;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
-import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
-import boombimapi.domain.member.presentation.dto.member.res.GetNicknameRes;
-import boombimapi.domain.member.presentation.dto.member.res.MyPageVoteRes;
-import boombimapi.domain.member.presentation.dto.member.res.ProfileRes;
+import boombimapi.domain.member.presentation.dto.member.res.*;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.MPVoteRes;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -47,6 +47,8 @@ public class MemberServiceImpl implements MemberService {
     private final VoteRepository voteRepository;
     private final S3Service s3Service;
     private final MemberLeaveRepository memberLeaveRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final MemberCongestionRepository memberCongestionRepository;
 
     @Override
     public GetMemberRes getMember(String userId) {
@@ -61,6 +63,31 @@ public class MemberServiceImpl implements MemberService {
         List<Vote> votes = voteRepository.findByMember(user);
 
         return GetMemberRes.of(user, (long) voteAnswers.size(), (long) (voteDus.size() + votes.size()));
+    }
+
+    @Override
+    public List<GetFavoriteRes> getFavorites(String userId) {
+        Member user = userRepository.findById(userId).orElse(null);
+        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        List<GetFavoriteRes> result = new ArrayList<>();
+
+
+        List<Favorite> byFavorites = favoriteRepository.findByMemberWithJoin(user);
+
+
+        for (Favorite byFavorite : byFavorites) {
+
+            long todyPeopleCnt = memberCongestionRepository.countTodayByPlace(byFavorite.getMemberPlace().getId());
+            GetFavoriteRes getFavoriteRes = GetFavoriteRes.of("",
+                    byFavorite.getMemberPlace().getName(),
+                    byFavorite.getMemberPlace().getId(),
+                    byFavorite.getMemberPlace().getMemberCongestions().get(0).getCongestionLevel().getName(),
+                    String.valueOf(todyPeopleCnt));
+            result.add(getFavoriteRes);
+        }
+
+        return result;
     }
 
     // 3번 api 투표

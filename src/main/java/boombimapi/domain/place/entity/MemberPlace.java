@@ -1,5 +1,6 @@
 package boombimapi.domain.place.entity;
 
+import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
 import boombimapi.global.base.BaseEntity;
@@ -24,6 +25,9 @@ public class MemberPlace extends BaseEntity {
 
     @OneToMany(mappedBy = "memberPlace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "memberPlace", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberCongestion> memberCongestions;
 
     @Column(name = "uuid", length = 32, nullable = false, unique = true)
     private String uuid;

@@ -4,15 +4,18 @@ public record ResolveMemberPlaceRequest(
         String uuid,
         String name,
         Double latitude,
-        Double longitude
+        Double longitude,
+
+        String imageUrl
 ) {
 
     public static ResolveMemberPlaceRequest of(
             String uuid,
             String name,
             Double latitude,
-            Double longitude
-    ) {
-        return new ResolveMemberPlaceRequest(uuid, name, latitude, longitude);
+            Double longitude,
+            String imageUrl
+            ) {
+        return new ResolveMemberPlaceRequest(uuid, name, latitude, longitude, imageUrl);
     }
 }

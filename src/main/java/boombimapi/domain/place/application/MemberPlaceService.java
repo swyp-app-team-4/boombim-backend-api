@@ -15,12 +15,14 @@ import boombimapi.global.geo.core.ClusterMarker;
 import boombimapi.global.geo.core.ClusterPoint;
 import boombimapi.global.geo.core.Clusterer;
 import boombimapi.global.geo.internal.GeoDistance;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,27 +38,28 @@ public class MemberPlaceService {
     private final Clusterer clusterer;
 
     public ResolveMemberPlaceResponse resolveMemberPlace(
-        ResolveMemberPlaceRequest request
+            ResolveMemberPlaceRequest request
     ) {
         log.info("[MemberPlaceService] resolveMemberPlace()");
 
+
         // TODO: 레이스 컨디션 처리 필요(동일 uuid 동시 생성 방지)
         MemberPlace memberPlace = memberPlaceRepository.findByUuid(request.uuid())
-            .orElseGet(() -> memberPlaceRepository.save(
-                MemberPlace.of(
-                    request.uuid(),
-                    request.name(),
-                    request.latitude(),
-                    request.longitude(),
-                    null
-                )
-            ));
+                .orElseGet(() -> memberPlaceRepository.save(
+                        MemberPlace.of(
+                                request.uuid(),
+                                request.name(),
+                                request.latitude(),
+                                request.longitude(),
+                                request.imageUrl()
+                        )
+                ));
 
         return ResolveMemberPlaceResponse.from(memberPlace);
     }
 
     public List<ViewportNodeResponse> getViewportNodes(
-        ViewportRequest request
+            ViewportRequest request
     ) {
 
         // 1) 뷰포트 경계 계산
@@ -72,7 +75,7 @@ public class MemberPlaceService {
 
         // 2) 뷰포트 내 장소 조회
         List<MemberPlace> allPlaces = memberPlaceRepository
-            .findByLatitudeBetweenAndLongitudeBetween(minLatitude, maxLatitude, minLongitude, maxLongitude);
+                .findByLatitudeBetweenAndLongitudeBetween(minLatitude, maxLatitude, minLongitude, maxLongitude);
 
         // 3) 유효 혼잡도 존재 장소만 필터링
         LocalDateTime now = LocalDateTime.now();
@@ -81,7 +84,7 @@ public class MemberPlaceService {
 
         for (MemberPlace memberPlace : allPlaces) {
             boolean exists = memberCongestionRepository
-                .existsByMemberPlaceIdAndExpiresAtAfter(memberPlace.getId(), now);
+                    .existsByMemberPlaceIdAndExpiresAtAfter(memberPlace.getId(), now);
             if (exists) {
                 clusterPoints.add(new ClusterPoint(memberPlace.getId(), memberPlace.getLatitude(), memberPlace.getLongitude()));
                 memberPlaceMap.put(memberPlace.getId(), memberPlace);
@@ -96,12 +99,12 @@ public class MemberPlaceService {
 
         // Clustering
         List<ClusterMarker> clusterMarkers = clusterer.cluster(
-            clusterPoints,
-            minLatitude,
-            maxLatitude,
-            minLongitude,
-            maxLongitude,
-            zoomLevel
+                clusterPoints,
+                minLatitude,
+                maxLatitude,
+                minLongitude,
+                maxLongitude,
+                zoomLevel
         );
 
         int minClusterSize = 2;
@@ -120,9 +123,9 @@ public class MemberPlaceService {
 
                 for (Long placeId : clusterMarker.memberPlaceIds()) {
                     Optional<MemberCongestion> optionalMemberCongestion =
-                        memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
-                            placeId, now
-                        );
+                            memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
+                                    placeId, now
+                            );
 
                     if (optionalMemberCongestion.isEmpty())
                         continue;
@@ -132,11 +135,11 @@ public class MemberPlaceService {
                 }
 
                 nodes.add(
-                    ViewportClusterNodeResponse.of(
-                        new Coordinate(clusterMarker.latitude(), clusterMarker.longitude()),
-                        clusterMarker.count(),
-                        levelCounts
-                    )
+                        ViewportClusterNodeResponse.of(
+                                new Coordinate(clusterMarker.latitude(), clusterMarker.longitude()),
+                                clusterMarker.count(),
+                                levelCounts
+                        )
                 );
 
                 continue;
@@ -149,9 +152,9 @@ public class MemberPlaceService {
                     continue;
 
                 Optional<MemberCongestion> optionalMemberCongestion =
-                    memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
-                        placeId, now
-                    );
+                        memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
+                                placeId, now
+                        );
 
                 if (optionalMemberCongestion.isEmpty())
                     continue;
@@ -159,21 +162,21 @@ public class MemberPlaceService {
                 MemberCongestion memberCongestion = optionalMemberCongestion.get();
 
                 double distanceMeters = GeoDistance.haversineMeters(
-                    memberLatitude,
-                    memberLongitude,
-                    memberPlace.getLatitude(),
-                    memberPlace.getLongitude()
+                        memberLatitude,
+                        memberLongitude,
+                        memberPlace.getLatitude(),
+                        memberPlace.getLongitude()
                 );
 
                 nodes.add(
-                    ViewportPlaceNodeResponse.of(
-                        memberPlace.getId(),
-                        memberPlace.getName(),
-                        new Coordinate(memberPlace.getLatitude(), memberPlace.getLongitude()),
-                        distanceMeters,
-                        memberCongestion.getCongestionLevel().getName(),
-                        memberCongestion.getCongestionMessage()
-                    )
+                        ViewportPlaceNodeResponse.of(
+                                memberPlace.getId(),
+                                memberPlace.getName(),
+                                new Coordinate(memberPlace.getLatitude(), memberPlace.getLongitude()),
+                                distanceMeters,
+                                memberCongestion.getCongestionLevel().getName(),
+                                memberCongestion.getCongestionMessage()
+                        )
                 );
             }
         }
