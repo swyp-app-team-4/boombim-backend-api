@@ -110,7 +110,15 @@ public class VoteServiceImpl implements VoteService {
         log.info(posImage);
 
         // 공식 장소 테이블 추가
-        ResolveMemberPlaceResponse resolveMemberPlaceResponse = memberPlaceService.resolveMemberPlace(ResolveMemberPlaceRequest.of(req.posId(), req.posName(), req.posLatitude(), req.posLongitude()));
+        ResolveMemberPlaceResponse resolveMemberPlaceResponse =
+                memberPlaceService
+                        .resolveMemberPlace(
+                                ResolveMemberPlaceRequest.of(
+                                        req.posId(),
+                                        req.posName(),
+                                        req.posLatitude(),
+                                        req.posLongitude(),
+                                        posImage));
         MemberPlace memberPlace = memberPlaceRepository.findById(resolveMemberPlaceResponse.memberPlaceId())
                 .orElseThrow(() -> new BoombimException(MEMBER_PLACE_NOT_FOUND));
 
