@@ -5,6 +5,7 @@ import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
+import boombimapi.domain.search.domain.entity.Search;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
@@ -54,8 +55,13 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteAnswer> voteAnswers = new ArrayList<>();
 
+    // 7) 혼잡도 멤버들
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberCongestion> memberCongestions = new ArrayList<>();
+
+    // 7) 혼잡도 멤버들
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Search> searchs = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;
