@@ -5,6 +5,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 import boombimapi.domain.place.application.MemberPlaceService;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.member.GetMemberPlaceDetailResponse;
 import boombimapi.domain.place.dto.response.member.ResolveMemberPlaceResponse;
 import boombimapi.domain.place.dto.response.node.ViewportNodeResponse;
 import boombimapi.global.response.BaseResponse;
@@ -12,13 +13,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,15 +59,45 @@ public class MemberPlaceController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse<List<ViewportNodeResponse>>> getMemberPlacesInViewport(
+        @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
     ) {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
-                memberPlaceService.getViewportNodes(request)
+                memberPlaceService.getViewportNodes(memberId, request)
             )
         );
+    }
+
+    @Operation(summary = "특정 사용자 장소 상세 조회", description = "특정 사용자 장소를 상세 조회하여 해당 장소에 작성된 혼잡도들을 확인합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "특정 사용자 장소 상세 조회 성공")
+    })
+    @GetMapping("/{memberPlaceId}")
+    public ResponseEntity<BaseResponse<GetMemberPlaceDetailResponse>> getMemberPlaceDetail(
+        @PathVariable Long memberPlaceId,
+        @RequestParam(required = false) @Min(1) @Max(100) Integer size,
+        @RequestParam(required = false) Long cursor,
+        @AuthenticationPrincipal String memberId
+    ) {
+
+        GetMemberPlaceDetailResponse memberPlaceDetailResponse = memberPlaceService.getMemberPlaceDetail(
+            memberId,
+            memberPlaceId,
+            size,
+            cursor
+        );
+
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_MEMBER_PLACE_DETAIL_SUCCESS,
+                memberPlaceDetailResponse
+            )
+        );
+
     }
 
 }
