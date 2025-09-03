@@ -1,5 +1,6 @@
 package boombimapi.domain.place.application;
 
+import static boombimapi.domain.place.entity.PlaceType.OFFICIAL_PLACE;
 import static boombimapi.global.infra.exception.error.ErrorCode.*;
 
 import boombimapi.domain.congestion.entity.CongestionLevel;
@@ -7,6 +8,7 @@ import boombimapi.domain.congestion.entity.OfficialCongestion;
 import boombimapi.domain.congestion.repository.OfficialCongestionDemographicsRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionForecastRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
+import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceDemographics;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceForecast;
@@ -35,8 +37,10 @@ public class OfficialPlaceService {
     private final OfficialCongestionForecastRepository forecastRepository;
     private final OfficialCongestionRepository officialCongestionRepository;
     private final OfficialCongestionDemographicsRepository demographicsRepository;
+    private final FavoriteRepository favoriteRepository;
 
     public List<ViewportResponse> getOfficialPlacesInViewport(
+        String memberId,
         ViewportRequest request
     ) {
 
@@ -90,6 +94,8 @@ public class OfficialPlaceService {
 
             Coordinate coordinate = Coordinate.of(centroidLatitude, centroidLongitude);
 
+            boolean isFavorite = isFavorite(memberId, officialPlace.getId());
+
             result.add(
                 ViewportResponse.of(
                     officialPlace.getId(),
@@ -98,7 +104,8 @@ public class OfficialPlaceService {
                     coordinate,
                     distanceMeters,
                     congestionLevel.getName(),
-                    congestionLevel.getMessage()
+                    congestionLevel.getMessage(),
+                    isFavorite
                 )
             );
         }
@@ -110,6 +117,7 @@ public class OfficialPlaceService {
     }
 
     public OfficialPlaceOverviewResponse getOverview(
+        String memberId,
         Long officialPlaceId
     ) {
 
@@ -136,6 +144,8 @@ public class OfficialPlaceService {
             .map(OfficialPlaceForecast::from)
             .toList();
 
+        boolean isFavorite = isFavorite(memberId, officialPlaceId);
+
         return OfficialPlaceOverviewResponse.of(
             officialPlace.getId(),
             officialPlace.getName(),
@@ -146,7 +156,8 @@ public class OfficialPlaceService {
             officialPlace.getCentroidLongitude(),
             officialPlace.getPolygonCoordinates(),
             demographics,
-            forecasts
+            forecasts,
+            isFavorite
         );
     }
 
@@ -157,6 +168,21 @@ public class OfficialPlaceService {
             + Math.cos(Math.toRadians(aLat)) * Math.cos(Math.toRadians(bLat))
             * Math.pow(Math.sin(dLng / 2), 2);
         return 2 * 6_371_000 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+    }
+
+    private boolean isFavorite(
+        String memberId,
+        Long placeId
+    ) {
+        if (memberId == null) {
+            return false;
+        }
+
+        return favoriteRepository.existsByMemberIdAndPlaceIdAndPlaceType(
+            memberId,
+            placeId,
+            OFFICIAL_PLACE
+        );
     }
 
 }
