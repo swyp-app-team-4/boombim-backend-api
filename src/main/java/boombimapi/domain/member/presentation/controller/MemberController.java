@@ -91,7 +91,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @DeleteMapping
+    @PostMapping
     public ResponseEntity<BaseOKResponse<Void>> memberDelete(@AuthenticationPrincipal String userId, @RequestBody MemberLeaveReq req) {
         memberService.memberDelete(userId, req);
         return ResponseEntity.ok(
