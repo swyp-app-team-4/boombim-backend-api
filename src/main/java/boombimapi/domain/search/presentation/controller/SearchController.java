@@ -65,11 +65,11 @@ public class SearchController {
             @ApiResponse(responseCode = "200", description = "검색 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "검색 ID 존재하지가 않음"),
     })
-    @DeleteMapping
+    @DeleteMapping("/{searchId}")
     public ResponseEntity<BaseOKResponse<Void>> deletePersonal(
             @AuthenticationPrincipal String userId,
-            @RequestBody DeletePersonalReq req) {
-        searchService.deletePersonal(req.searchId(), userId);
+            @PathVariable Long searchId) {
+        searchService.deletePersonal(searchId, userId);
         return ResponseEntity.ok(
                 BaseOKResponse.of(
                         HttpStatus.OK,
