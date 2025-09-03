@@ -99,7 +99,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<SearchRes> getSearch(String posName, String userId) {
-        if(!Objects.equals(posName, "")){
+        if (!Objects.equals(posName, "")) {
             saveSearchWord(posName, userId); // 공백은 저장 X
         }
 
@@ -115,6 +115,30 @@ public class SearchServiceImpl implements SearchService {
 
         return sortedCongestion(memberPlaceEntities, officialEntities);
 
+    }
+
+    @Override
+    public void deletePersonal(Long searchId, String userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        Search search = searchRepository.findById(searchId).orElse(null);
+        if (search == null) throw new BoombimException(ErrorCode.SEARCH_NOT_EXISTS);
+
+        if (Objects.equals(search.getMember().getId(), member.getId())) {
+            searchRepository.delete(search); // 이중 체크까지 해주자
+        } else {
+            throw new BoombimException(ErrorCode.SEARCH_NOT_EXISTS);
+        }
+
+    }
+
+    @Override
+    public void deleteAll(String userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
+        searchRepository.deleteByMember(member);
     }
 
 

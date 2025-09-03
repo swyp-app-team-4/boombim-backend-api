@@ -15,4 +15,7 @@ public interface SearchRepository extends JpaRepository<Search, Long> {
     List<Search> findByMember(Member member);
 
     Optional<Search> findBySearchWord(String posName);
+
+    // 특정 멤버가 가진 Search 전부 삭제
+    void deleteByMember(Member member);
 }

@@ -36,7 +36,10 @@ public enum ResponseMessage {
     LOGOUT_SUCCESS("로그아웃 성공"),
 
     // alarm
-    GET_ALARM_SUCCESS("알림 성공");
+    GET_ALARM_SUCCESS("알림 성공"),
+
+    // search
+    DELETE_SEARCH_SUCCESS("검색 삭제 성공");
 
 
     private final String message;

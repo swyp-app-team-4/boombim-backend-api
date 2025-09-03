@@ -80,7 +80,8 @@ public enum ErrorCode {
     CONGESTION_LEVEL_NOT_FOUND(-700, "해당 혼잡도 수준이 존재하지 않습니다.", 406),
 
     // favorite
-    FAVORITE_ALREADY_EXISTS(-800, "이미 즐겨찾기 한 사용자 장소입니다.", 409);
+    FAVORITE_ALREADY_EXISTS(-800, "이미 즐겨찾기 한 사용자 장소입니다.", 409),
+    SEARCH_NOT_EXISTS(-801, "해당 검색 ID가 없습니다.", 409);
 
     private final int code;
     private final String message;
