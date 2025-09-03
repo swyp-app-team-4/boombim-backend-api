@@ -4,15 +4,13 @@ import boombimapi.domain.search.application.SearchService;
 import boombimapi.domain.search.presentation.dto.res.SearchHistoryRes;
 import boombimapi.domain.search.presentation.dto.res.SearchRelatedRes;
 import boombimapi.domain.search.presentation.dto.res.SearchRes;
+import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,6 +41,18 @@ public class SearchController {
             @AuthenticationPrincipal String userId) {
 
         return ResponseEntity.ok(searchService.getSearch(posName, userId));
+    }
+
+    @Operation(description = "개인 삭제")
+    @DeleteMapping
+    public ResponseEntity<BaseOKResponse<Void>> deletePersonal(@RequestParam String posName) {
+        return null;
+    }
+
+    @Operation(description = "전체 삭제")
+    @DeleteMapping("/all")
+    public ResponseEntity<BaseOKResponse<Void>> deleteAll(@RequestParam String posName) {
+        return null;
     }
 
 }

@@ -55,6 +55,7 @@ public class SearchServiceImpl implements SearchService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
+
         return searchRepository.findByMember(member)
                 .stream()
                 .map(search -> SearchHistoryRes.of(search.getId(), search.getSearchWord()))
@@ -67,10 +68,10 @@ public class SearchServiceImpl implements SearchService {
         Pageable limit10 = PageRequest.of(0, 10);
 
         List<PlaceNameProjection> fromMember =
-                memberPlaceRepository.findByNameContainingIgnoreCase(posName, limit10);
+                memberPlaceRepository.searchByName(posName, limit10);
 
         List<PlaceNameProjection> fromOfficial =
-                officialPlaceRepository.findByNameContainingIgnoreCase(posName, limit10);
+                officialPlaceRepository.searchByName(posName, limit10);
 
         // 이름 기준으로 중복 제거 (대소문자 무시), 입력 키워드와의 "접두" 우선 정렬 → 그다음 사전식
         String keyLower = posName.toLowerCase(Locale.ROOT);
@@ -98,7 +99,10 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<SearchRes> getSearch(String posName, String userId) {
-        saveSearchWord(posName, userId);
+        if(!Objects.equals(posName, "")){
+            saveSearchWord(posName, userId); // 공백은 저장 X
+        }
+
 
         Pageable limit10 = PageRequest.of(0, 10);
 
@@ -118,8 +122,11 @@ public class SearchServiceImpl implements SearchService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        Search search = Search.builder().member(member).searchWord(posName).build();
-        searchRepository.save(search);
+        Search findSearch = searchRepository.findBySearchWord(posName).orElse(null);
+        if (findSearch == null) {
+            Search search = Search.builder().member(member).searchWord(posName).build();
+            searchRepository.save(search);
+        }
     }
 
     // 장소마다 혼잡도 조회해서 정보 넘겨줘야됨
@@ -129,26 +136,24 @@ public class SearchServiceImpl implements SearchService {
         for (MemberPlace memberPlace : memberPlaceEntities) {
 
             MemberCongestion latestMember =
-                    memberCongestionRepository
-                            .findLatestByPlaceFetchLevel(memberPlace, PageRequest.of(0, 1))
-                            .stream().findFirst().orElse(null);
+                    memberCongestionRepository.findTop1ByMemberPlaceIdOrderByCreatedAtDesc(memberPlace.getId()).orElse(null);
+
+            if (latestMember != null) {
 
 
-            result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), latestMember.getCreatedAt(),
-                    latestMember.getCongestionLevel().getName(), "주소", memberPlace.getImageUrl()));
-
+                result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), latestMember.getCreatedAt(),
+                        latestMember.getCongestionLevel().getName(), "주소", memberPlace.getImageUrl()));
+            }
         }
 
 
         for (OfficialPlace official : officialEntities) {
             OfficialCongestion latestOfficial =
-                    officialCongestionRepository
-                            .findLatestByPlaceFetchLevel(official, PageRequest.of(0, 1))
-                            .stream().findFirst().orElse(null);
-
-
-            result.add(SearchRes.of(official.getId(), official.getName(), latestOfficial.getObservedAt(),
-                    latestOfficial.getCongestionLevel().getName(), "주소", official.getImageUrl()));
+                    officialCongestionRepository.findTopByOfficialPlaceIdOrderByObservedAtDesc(official.getId()).orElse(null);
+            if (latestOfficial != null) {
+                result.add(SearchRes.of(official.getId(), official.getName(), latestOfficial.getObservedAt(),
+                        latestOfficial.getCongestionLevel().getName(), "주소", official.getImageUrl()));
+            }
         }
 
         result.sort(Comparator.comparing(SearchRes::timeAt).reversed());
