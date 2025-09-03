@@ -1,5 +1,6 @@
 package boombimapi.domain.place.application;
 
+import static boombimapi.domain.place.entity.PlaceType.*;
 import static boombimapi.global.infra.exception.error.ErrorCode.*;
 
 import boombimapi.domain.congestion.dto.response.MemberCongestionItemResponse;
@@ -268,15 +269,16 @@ public class MemberPlaceService {
 
     private boolean isFavorite(
         String memberId,
-        Long memberPlaceId
+        Long placeId
     ) {
         if (memberId == null) {
             return false;
         }
 
-        return favoriteRepository.existsByMemberIdAndMemberPlaceId(
+        return favoriteRepository.existsByMemberIdAndPlaceIdAndPlaceType(
             memberId,
-            memberPlaceId
+            placeId,
+            MEMBER_PLACE
         );
     }
 
