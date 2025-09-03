@@ -126,3 +126,27 @@ cloud:
     credentials:
       accessKey: ${S3_ACCESS_KEY}
       secretKey: ${S3_SECRET_KEY}
+
+# CLOVA Studio
+clova:
+  congestion-message:
+    base-url: ${GENERATE_CONGESTION_MESSAGE_BASE_URL}
+    api-key: ${GENERATE_CONGESTION_MESSAGE_API_KEY}
+  prompts:
+    auto-complete-congestion-message: ${GENERATE_CONGESTION_MESSAGE_PROMPT}
+  generation:
+    top-p: ${GENERATE_CONGESTION_MESSAGE_TOP_P}
+    top-k: ${GENERATE_CONGESTION_MESSAGE_TOP_K}
+    max-tokens: ${GENERATE_CONGESTION_MESSAGE_MAX_TOKENS}
+    temperature: ${GENERATE_CONGESTION_MESSAGE_TEMPERATURE}
+    repetition-penalty: ${GENERATE_CONGESTION_MESSAGE_REPETITION_PENALTY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+
