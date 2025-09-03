@@ -5,7 +5,6 @@ import boombimapi.global.config.converter.StringToSocialProviderConverter;
 import boombimapi.global.properties.ClovaCongestionMessageProperties;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -15,7 +14,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties(ClovaCongestionMessageProperties.class)
 public class WebConfig implements WebMvcConfigurer {
 
     private final ClovaCongestionMessageProperties congestionMessageProperties;
@@ -28,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(String.class, SocialProvider.class, stringToSocialProviderConverter);
     }
 
-    @Bean(name = "clovaCongestionMessageClient")
+    @Bean(name = "clovaCongestionMessageWebClient")
     public WebClient clovaCongestionMessageClient(
         WebClient.Builder builder
     ) {
