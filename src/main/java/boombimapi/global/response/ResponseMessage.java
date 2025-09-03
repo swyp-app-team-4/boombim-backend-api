@@ -19,6 +19,7 @@ public enum ResponseMessage {
 
     // member congestion
     CREATE_MEMBER_CONGESTION_SUCCESS("사용자 혼잡도 생성 성공"),
+    GENERATE_CONGESTION_MESSAGE_SUCCESS("사용자 혼잡도 메시지 생성 성공"),
 
     // favorite
     ADD_FAVORITE_SUCCESS("즐겨찾기 추가 성공"),

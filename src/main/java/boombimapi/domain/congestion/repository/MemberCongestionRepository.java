@@ -1,18 +1,15 @@
 package boombimapi.domain.congestion.repository;
 
 import boombimapi.domain.congestion.entity.MemberCongestion;
+import boombimapi.domain.place.entity.MemberPlace;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import boombimapi.domain.place.entity.MemberPlace;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface MemberCongestionRepository extends JpaRepository<MemberCongestion, Long> {
 
@@ -34,9 +31,7 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
            """)
     long countTodayByPlace(@Param("placeId") Long placeId);
 
-
     Optional<MemberCongestion> findTop1ByMemberPlaceIdOrderByCreatedAtDesc(Long placeId);
-
 
     Slice<MemberCongestion> findByMemberPlaceIdOrderByIdDesc(
         Long memberPlaceId,
@@ -49,4 +44,17 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
         Pageable pageable
     );
 
+    @Query("""
+        select mc
+        from MemberCongestion mc
+        join fetch mc.congestionLevel cl
+        where mc.memberPlace = :place
+        order by mc.createdAt desc
+        """)
+    List<MemberCongestion> findLatestByPlaceFetchLevel(
+        @Param("place") MemberPlace place,
+        Pageable pageable
+    );
+
+    Optional<MemberCongestion> findTop1ByMemberPlaceIdOrderByCreatedAtDesc(Long placeId);
 }
