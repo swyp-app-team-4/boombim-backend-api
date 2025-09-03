@@ -1,5 +1,10 @@
 package boombimapi.domain.clova.dto.request;
 
-public record ChatMessage() {
+import java.util.List;
+
+public record ChatMessage(
+    String role,
+    List<ChatContent> content
+) {
 
 }
