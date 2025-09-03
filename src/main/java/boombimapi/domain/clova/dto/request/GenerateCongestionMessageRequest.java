@@ -1,5 +1,12 @@
 package boombimapi.domain.clova.dto.request;
 
-public record GenerateCongestionMessageRequest() {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record GenerateCongestionMessageRequest(
+    String memberPlaceName,
+    String congestionLevelName,
+    String congestionMessage    // optional
+) {
 
 }
