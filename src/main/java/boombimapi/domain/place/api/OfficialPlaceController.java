@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,13 +37,14 @@ public class OfficialPlaceController {
     })
     @PostMapping
     public ResponseEntity<BaseResponse<List<ViewportResponse>>> getOfficialPlacesInViewport(
+        @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
     ) {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_OFFICIAL_PLACES_IN_VIEWPORT_SUCCESS,
-                officialPlaceService.getOfficialPlacesInViewport(request)
+                officialPlaceService.getOfficialPlacesInViewport(memberId, request)
             )
         );
     }
@@ -55,13 +57,14 @@ public class OfficialPlaceController {
     })
     @GetMapping("/{officialPlaceId}/overview")
     public ResponseEntity<BaseResponse<OfficialPlaceOverviewResponse>> getOfficialPlaceOverview(
+        @AuthenticationPrincipal String memberId,
         @PathVariable Long officialPlaceId
     ) {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_OFFICIAL_PLACE_OVERVIEW_SUCCESS,
-                officialPlaceService.getOverview(officialPlaceId)
+                officialPlaceService.getOverview(memberId, officialPlaceId)
             )
         );
     }
