@@ -73,7 +73,7 @@ public class VoteServiceImpl implements VoteService {
         if (user == null)
             throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
-        //위도 경도 100m 맞는지 true면 있음 false면 없음
+        //위도 경도 100m 맞는지 true면 있음 false면 없음 ==> 이제부터 300m로 통일
         boolean result = isWithin300Meters(
             req.posLatitude(), req.posLongitude(),
             req.userLatitude(), req.userLongitude()
