@@ -56,5 +56,4 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
         Pageable pageable
     );
 
-    Optional<MemberCongestion> findTop1ByMemberPlaceIdOrderByCreatedAtDesc(Long placeId);
 }
