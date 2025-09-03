@@ -17,4 +17,10 @@ public interface SearchService {
 
     // 검색 결과 조회 및 검색 내역 저장
     List<SearchRes> getSearch(String posName, String userId);
+
+    // 개인 삭제
+    void deletePersonal(Long searchId, String userId);
+
+    // 전체 삭제
+    void deleteAll(String userId);
 }
