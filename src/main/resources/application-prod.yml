@@ -140,3 +140,13 @@ clova:
     max-tokens: ${GENERATE_CONGESTION_MESSAGE_MAX_TOKENS}
     temperature: ${GENERATE_CONGESTION_MESSAGE_TEMPERATURE}
     repetition-penalty: ${GENERATE_CONGESTION_MESSAGE_REPETITION_PENALTY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+
