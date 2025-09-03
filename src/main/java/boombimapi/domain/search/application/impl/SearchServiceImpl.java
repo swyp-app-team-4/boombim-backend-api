@@ -166,7 +166,7 @@ public class SearchServiceImpl implements SearchService {
 
 
                 result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), latestMember.getCreatedAt(),
-                        latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl()));
+                        latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl(), "사용자"));
             }
         }
 
@@ -176,7 +176,7 @@ public class SearchServiceImpl implements SearchService {
                     officialCongestionRepository.findTopByOfficialPlaceIdOrderByObservedAtDesc(official.getId()).orElse(null);
             if (latestOfficial != null) {
                 result.add(SearchRes.of(official.getId(), official.getName(), latestOfficial.getObservedAt(),
-                        latestOfficial.getCongestionLevel().getName(), "", official.getImageUrl()));
+                        latestOfficial.getCongestionLevel().getName(), "", official.getImageUrl(), "공식"));
             }
         }
 
