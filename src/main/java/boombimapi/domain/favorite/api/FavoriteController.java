@@ -7,6 +7,10 @@ import boombimapi.domain.favorite.dto.request.AddFavoriteRequest;
 import boombimapi.domain.favorite.dto.response.AddFavoriteResponse;
 import boombimapi.domain.favorite.dto.response.GetFavoriteResponse;
 import boombimapi.global.response.BaseResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,10 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/favorite")
+@Tag(name = "Favorite", description = "사용자 즐겨찾기 관련 API")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
+    @Operation(summary = "즐겨찾기 추가", description = "해당 장소를 즐겨찾기에 추가합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "즐겨찾기 추가 성공")
+    })
     @PostMapping
     public ResponseEntity<BaseResponse<AddFavoriteResponse>> addFavorite(
         @AuthenticationPrincipal String memberId,
@@ -41,6 +50,10 @@ public class FavoriteController {
         );
     }
 
+    @Operation(summary = "즐겨찾기 삭제", description = "해당 장소를 즐겨찾기에서 삭제합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "즐겨찾기 삭제 성공")
+    })
     @DeleteMapping
     public ResponseEntity<BaseResponse<Void>> deleteFavorite(
         @AuthenticationPrincipal String memberId,
@@ -57,6 +70,10 @@ public class FavoriteController {
         );
     }
 
+    @Operation(summary = "즐겨찾기 조회", description = "사용자가 즐겨찾기한 장소들의 최신 혼잡도를 조회합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "사용자 즐겨찾기 최신 혼잡도 조회 성공")
+    })
     @GetMapping
     public ResponseEntity<BaseResponse<List<GetFavoriteResponse>>> getFavorites(
         @AuthenticationPrincipal String memberId
