@@ -10,8 +10,10 @@ import boombimapi.global.properties.ClovaGenerationProperties;
 import boombimapi.global.properties.ClovaPromptProperties;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ClovaService {
@@ -29,6 +31,8 @@ public class ClovaService {
         String congestionMessage = request.congestionMessage();
 
         String systemPrompt = promptProperties.autoCompleteCongestionMessage();
+
+        log.info("[ClovaService] systemPrompt: \n{}", systemPrompt);
 
         String userContent = buildUserContent(
             memberPlaceName,
