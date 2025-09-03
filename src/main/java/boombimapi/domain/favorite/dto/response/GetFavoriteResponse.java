@@ -1,10 +1,12 @@
 package boombimapi.domain.favorite.dto.response;
 
+import boombimapi.domain.place.entity.PlaceType;
 import java.time.LocalDateTime;
 
 public record GetFavoriteResponse(
     Long favoriteId,
-    Long memberPlaceId,
+    Long placeId,
+    PlaceType placeType,
     Double latitude,
     Double longitude,
     String memberPlaceName,
@@ -15,7 +17,8 @@ public record GetFavoriteResponse(
 
     public static GetFavoriteResponse of(
         Long favoriteId,
-        Long memberPlaceId,
+        Long placeId,
+        PlaceType placeType,
         Double latitude,
         Double longitude,
         String memberPlaceName,
@@ -25,7 +28,8 @@ public record GetFavoriteResponse(
     ) {
         return new GetFavoriteResponse(
             favoriteId,
-            memberPlaceId,
+            placeId,
+            placeType,
             latitude,
             longitude,
             memberPlaceName,
