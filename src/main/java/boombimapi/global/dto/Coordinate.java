@@ -5,4 +5,11 @@ public record Coordinate(
     double longitude
 ) {
 
+    public static Coordinate of(
+        double latitude,
+        double longitude
+    ) {
+        return new Coordinate(latitude, longitude);
+    }
+
 }
