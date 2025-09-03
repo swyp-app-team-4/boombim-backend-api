@@ -6,6 +6,7 @@ import boombimapi.domain.favorite.application.FavoriteService;
 import boombimapi.domain.favorite.dto.request.AddFavoriteRequest;
 import boombimapi.domain.favorite.dto.response.AddFavoriteResponse;
 import boombimapi.domain.favorite.dto.response.GetFavoriteResponse;
+import boombimapi.domain.place.entity.PlaceType;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,9 +58,10 @@ public class FavoriteController {
     @DeleteMapping
     public ResponseEntity<BaseResponse<Void>> deleteFavorite(
         @AuthenticationPrincipal String memberId,
-        @RequestParam Long memberPlaceId
+        @RequestParam Long placeId,
+        @RequestParam PlaceType placeType
     ) {
-        favoriteService.deleteFavorite(memberId, memberPlaceId);
+        favoriteService.deleteFavorite(memberId, placeId, placeType);
 
         return ResponseEntity.ok(
             BaseResponse.of(
