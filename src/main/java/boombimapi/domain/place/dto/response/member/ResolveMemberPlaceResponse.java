@@ -1,4 +1,4 @@
-package boombimapi.domain.place.dto.response;
+package boombimapi.domain.place.dto.response.member;
 
 import boombimapi.domain.place.entity.MemberPlace;
 

@@ -8,6 +8,9 @@ import java.util.Optional;
 import boombimapi.domain.place.entity.MemberPlace;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,7 +27,7 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
     );
 
     @Query("""
-           SELECT COUNT(mc)\s
+           SELECT COUNT(mc)
            FROM MemberCongestion mc
            WHERE mc.memberPlace.id = :placeId
              AND CAST(mc.createdAt AS DATE) = CURRENT_DATE
@@ -34,5 +37,16 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
 
     Optional<MemberCongestion> findTop1ByMemberPlaceIdOrderByCreatedAtDesc(Long placeId);
 
+
+    Slice<MemberCongestion> findByMemberPlaceIdOrderByIdDesc(
+        Long memberPlaceId,
+        Pageable pageable
+    );
+
+    Slice<MemberCongestion> findByMemberPlaceIdAndIdLessThanOrderByIdDesc(
+        Long memberPlaceId,
+        Long cursor,
+        Pageable pageable
+    );
 
 }

@@ -88,13 +88,19 @@ public class OfficialPlaceService {
                 centroidLongitude
             );
 
-            result.add(new ViewportResponse(
-                officialPlace.getId(),
-                officialPlace.getName(),
-                new Coordinate(centroidLatitude, centroidLongitude),
-                distanceMeters,
-                congestionLevel.getName(),
-                congestionLevel.getMessage()));
+            Coordinate coordinate = Coordinate.of(centroidLatitude, centroidLongitude);
+
+            result.add(
+                ViewportResponse.of(
+                    officialPlace.getId(),
+                    officialPlace.getName(),
+                    officialPlace.getImageUrl(),
+                    coordinate,
+                    distanceMeters,
+                    congestionLevel.getName(),
+                    congestionLevel.getMessage()
+                )
+            );
         }
 
         // TODO: 정렬을 DB 단에서 해줄지, 아니면 지금처럼 소스 코드 단에서 해줄지 고민
@@ -130,10 +136,11 @@ public class OfficialPlaceService {
             .map(OfficialPlaceForecast::from)
             .toList();
 
-        return new OfficialPlaceOverviewResponse(
+        return OfficialPlaceOverviewResponse.of(
             officialPlace.getId(),
             officialPlace.getName(),
             officialPlace.getPoiCode(),
+            officialPlace.getImageUrl(),
             latestOfficialCongestion.getObservedAt(),
             officialPlace.getCentroidLatitude(),
             officialPlace.getCentroidLongitude(),
