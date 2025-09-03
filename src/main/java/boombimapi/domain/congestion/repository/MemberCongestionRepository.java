@@ -54,5 +54,7 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
         """)
     List<MemberCongestion> findLatestByPlaceFetchLevel(@Param("place") MemberPlace place, Pageable pageable);
 
+    Optional<MemberCongestion> findTop1ByMemberPlaceIdOrderByCreatedAtDesc(Long placeId);
+
 
 }

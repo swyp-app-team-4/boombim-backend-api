@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import boombimapi.domain.place.entity.OfficialPlace;
-import feign.Param;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,13 +19,7 @@ public interface OfficialCongestionRepository extends JpaRepository<OfficialCong
     );
 
 
-    @Query("""
-        select oc
-        from OfficialCongestion oc
-        join fetch oc.congestionLevel cl
-        where oc.officialPlace = :place
-        order by oc.observedAt desc
-        """)
-    List<OfficialCongestion> findLatestByPlaceFetchLevel(@Param("place") OfficialPlace place, Pageable pageable);
+
+
 
 }

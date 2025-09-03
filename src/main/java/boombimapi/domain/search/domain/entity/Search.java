@@ -11,7 +11,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @NoArgsConstructor
 @DynamicUpdate
-
 public class Search {
 
     @Id
