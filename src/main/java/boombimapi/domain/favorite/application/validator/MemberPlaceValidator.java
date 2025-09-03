@@ -1,6 +1,6 @@
 package boombimapi.domain.favorite.application.validator;
 
-import boombimapi.domain.favorite.entity.FavoriteType;
+import boombimapi.domain.place.entity.PlaceType;
 import boombimapi.domain.place.repository.MemberPlaceRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
@@ -14,8 +14,8 @@ public class MemberPlaceValidator implements PlaceValidator {
     private final MemberPlaceRepository memberPlaceRepository;
 
     @Override
-    public FavoriteType supports() {
-        return FavoriteType.MEMBER_PLACE;
+    public PlaceType supports() {
+        return PlaceType.MEMBER_PLACE;
     }
 
     @Override

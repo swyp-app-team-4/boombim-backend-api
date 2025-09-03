@@ -1,10 +1,10 @@
 package boombimapi.domain.favorite.application.validator;
 
-import boombimapi.domain.favorite.entity.FavoriteType;
+import boombimapi.domain.place.entity.PlaceType;
 
 public interface PlaceValidator {
 
-    FavoriteType supports();
+    PlaceType supports();
 
     void validate(
         Long placeId
