@@ -27,12 +27,12 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
         String memberId
     );
 
-    @Query("SELECT f FROM Favorite f " +
-        "JOIN FETCH f.memberPlace mp " +
-        "JOIN FETCH mp.memberCongestions mc " +
-        "JOIN FETCH mc.congestionLevel cl " +
-        "WHERE f.member = :member")
-    List<Favorite> findByMemberWithJoin(@Param("member") Member member);
+//    @Query("SELECT f FROM Favorite f " +
+//        "JOIN FETCH f.memberPlace mp " +
+//        "JOIN FETCH mp.memberCongestions mc " +
+//        "JOIN FETCH mc.congestionLevel cl " +
+//        "WHERE f.member = :member")
+//    List<Favorite> findByMemberWithJoin(@Param("member") Member member);
 
 
 }
