@@ -1,5 +1,10 @@
 package boombimapi.domain.clova.dto.response;
 
-public record ClovaResult() {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ClovaResult(
+    ClovaMessage message
+) {
 
 }
