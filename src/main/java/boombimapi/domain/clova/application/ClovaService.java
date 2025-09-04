@@ -32,8 +32,6 @@ public class ClovaService {
 
         String systemPrompt = promptProperties.autoCompleteCongestionMessage();
 
-        log.info("[ClovaService] systemPrompt: \n{}", systemPrompt);
-
         String userContent = buildUserContent(
             memberPlaceName,
             congestionLevelName,

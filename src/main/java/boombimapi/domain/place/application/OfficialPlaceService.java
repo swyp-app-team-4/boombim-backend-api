@@ -10,12 +10,14 @@ import boombimapi.domain.congestion.repository.OfficialCongestionForecastReposit
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
 import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceDemographics;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceForecast;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
+import boombimapi.domain.place.repository.projection.NearbyOfficialPlaceProjection;
 import boombimapi.global.dto.Coordinate;
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.util.ArrayList;
@@ -159,6 +161,24 @@ public class OfficialPlaceService {
             forecasts,
             isFavorite
         );
+    }
+
+    public List<NearbyOfficialPlaceResponse> getNearbyNonCrowdedOfficialPlace(
+        double latitude,
+        double longitude
+    ) {
+        int limit = 10;
+
+        List<NearbyOfficialPlaceProjection> rows = officialPlaceRepository
+            .findNearbyNonCrowdedHaversine(latitude, longitude, limit);
+
+        ArrayList<NearbyOfficialPlaceResponse> result = new ArrayList<>(rows.size());
+
+        for (NearbyOfficialPlaceProjection row : rows) {
+            result.add(NearbyOfficialPlaceResponse.from(row));
+        }
+
+        return result;
     }
 
     private double haversine(double aLat, double aLng, double bLat, double bLng) {
