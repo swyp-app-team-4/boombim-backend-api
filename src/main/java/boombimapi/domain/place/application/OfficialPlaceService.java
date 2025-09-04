@@ -163,14 +163,14 @@ public class OfficialPlaceService {
         );
     }
 
-    public List<NearbyOfficialPlaceResponse> getNearbyNonCrowdedOfficialPlace(
+    public List<NearbyOfficialPlaceResponse> getNearbyNonCongestedOfficialPlace(
         double latitude,
         double longitude
     ) {
         int limit = 10;
 
         List<NearbyOfficialPlaceProjection> rows = officialPlaceRepository
-            .findNearbyNonCrowdedHaversine(latitude, longitude, limit);
+            .findNearbyNonCongestedHaversine(latitude, longitude, limit);
 
         ArrayList<NearbyOfficialPlaceResponse> result = new ArrayList<>(rows.size());
 

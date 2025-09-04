@@ -79,7 +79,7 @@ public class OfficialPlaceController {
         @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
     })
     @GetMapping("/nearby-non-congested")
-    public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCrowdedOfficialPlace(
+    public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlace(
         @RequestParam double latitude,
         @RequestParam double longitude
     ) {
@@ -87,7 +87,7 @@ public class OfficialPlaceController {
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES,
-                officialPlaceService.getNearbyNonCrowdedOfficialPlace(latitude, longitude)
+                officialPlaceService.getNearbyNonCongestedOfficialPlace(latitude, longitude)
             )
         );
     }
