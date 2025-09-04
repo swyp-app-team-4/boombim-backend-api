@@ -1,7 +1,8 @@
 package boombimapi.global.config;
 
-import boombimapi.domain.oauth2.infra.filter.BoombimJWTFilter;
+import boombimapi.global.infra.filter.BoombimJWTFilter;
 import boombimapi.global.infra.exception.auth.BoombimAuthExceptionFilter;
+import boombimapi.global.infra.filter.CustomSecurityLogger;
 import boombimapi.global.jwt.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -82,8 +83,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                         ))
+
+                .addFilterBefore(new CustomSecurityLogger(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
                 .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

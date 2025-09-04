@@ -1,4 +1,4 @@
-package boombimapi.domain.oauth2.infra.filter;
+package boombimapi.global.infra.filter;
 
 import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
