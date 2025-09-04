@@ -183,7 +183,7 @@ public class SearchServiceImpl implements SearchService {
                         latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
             }else{
                 result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), memberPlace.getCreatedAt(),
-                        null, memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
+                        "여유", memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
             }
         }
 
