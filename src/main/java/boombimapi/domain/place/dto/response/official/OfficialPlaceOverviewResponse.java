@@ -1,11 +1,13 @@
 package boombimapi.domain.place.dto.response.official;
 
+import boombimapi.domain.place.entity.PlaceType;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public record OfficialPlaceOverviewResponse(
     Long officialPlaceId,
     String officialPlaceName,
+    PlaceType placeType,
     String poiCode,
     String imageUrl,
     LocalDateTime observedAt,
@@ -13,7 +15,8 @@ public record OfficialPlaceOverviewResponse(
     Double centroidLongitude,
     String polygonCoordinates,
     List<OfficialPlaceDemographics> demographics,
-    List<OfficialPlaceForecast> forecasts
+    List<OfficialPlaceForecast> forecasts,
+    boolean isFavorite
 ) {
 
     public static OfficialPlaceOverviewResponse of(
@@ -26,11 +29,13 @@ public record OfficialPlaceOverviewResponse(
         Double centroidLongitude,
         String polygonCoordinates,
         List<OfficialPlaceDemographics> demographics,
-        List<OfficialPlaceForecast> forecasts
+        List<OfficialPlaceForecast> forecasts,
+        boolean isFavorite
     ) {
         return new OfficialPlaceOverviewResponse(
             officialPlaceId,
             officialPlaceName,
+            PlaceType.OFFICIAL_PLACE,
             poiCode,
             imageUrl,
             observedAt,
@@ -38,7 +43,8 @@ public record OfficialPlaceOverviewResponse(
             centroidLongitude,
             polygonCoordinates,
             demographics,
-            forecasts
+            forecasts,
+            isFavorite
         );
     }
 

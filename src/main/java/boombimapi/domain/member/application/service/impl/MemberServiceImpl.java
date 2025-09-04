@@ -53,7 +53,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public GetMemberRes getMember(String userId) {
         Member user = userRepository.findById(userId).orElse(null);
-        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (user == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         // 투표수
         List<VoteAnswer> voteAnswers = voteAnswerRepository.findByMember(user);
@@ -65,36 +66,36 @@ public class MemberServiceImpl implements MemberService {
         return GetMemberRes.of(user, (long) voteAnswers.size(), (long) (voteDus.size() + votes.size()));
     }
 
-    @Override
-    public List<GetFavoriteRes> getFavorites(String userId) {
-        Member user = userRepository.findById(userId).orElse(null);
-        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-
-        List<GetFavoriteRes> result = new ArrayList<>();
-
-
-        List<Favorite> byFavorites = favoriteRepository.findByMemberWithJoin(user);
-
-
-        for (Favorite byFavorite : byFavorites) {
-
-            long todyPeopleCnt = memberCongestionRepository.countTodayByPlace(byFavorite.getMemberPlace().getId());
-            GetFavoriteRes getFavoriteRes = GetFavoriteRes.of("",
-                    byFavorite.getMemberPlace().getName(),
-                    byFavorite.getMemberPlace().getId(),
-                    byFavorite.getMemberPlace().getMemberCongestions().get(0).getCongestionLevel().getName(),
-                    String.valueOf(todyPeopleCnt));
-            result.add(getFavoriteRes);
-        }
-
-        return result;
-    }
+//    @Override
+//    public List<GetFavoriteRes> getFavorites(String userId) {
+//        Member user = userRepository.findById(userId).orElse(null);
+//        if (user == null)
+//            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+//
+//        List<GetFavoriteRes> result = new ArrayList<>();
+//
+//        List<Favorite> byFavorites = favoriteRepository.findByMemberWithJoin(user);
+//
+//        for (Favorite byFavorite : byFavorites) {
+//
+//            long todyPeopleCnt = memberCongestionRepository.countTodayByPlace(byFavorite.getMemberPlace().getId());
+//            GetFavoriteRes getFavoriteRes = GetFavoriteRes.of("",
+//                byFavorite.getMemberPlace().getName(),
+//                byFavorite.getMemberPlace().getId(),
+//                byFavorite.getMemberPlace().getMemberCongestions().get(0).getCongestionLevel().getName(),
+//                String.valueOf(todyPeopleCnt));
+//            result.add(getFavoriteRes);
+//        }
+//
+//        return result;
+//    }
 
     // 3번 api 투표
     @Override
     public List<MyPageVoteRes> getMyVoteAnswer(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         // 1. 하위 데이터 먼저 수집
         List<MPVoteRes> bottomResult = new ArrayList<>();
@@ -120,7 +121,7 @@ public class MemberServiceImpl implements MemberService {
             List<String> profile = profileTopThree(vote);
 
             bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
-                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+                vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
         if (bottomResult.isEmpty()) {
@@ -135,7 +136,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<MyPageVoteRes> getMyVoteQuestion(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         // 1. 하위 데이터 수집
         List<MPVoteRes> bottomResult = new ArrayList<>();
@@ -160,7 +162,7 @@ public class MemberServiceImpl implements MemberService {
             List<String> profile = profileTopThree(vote);
 
             bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
-                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+                vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
 
         }
 
@@ -184,9 +186,8 @@ public class MemberServiceImpl implements MemberService {
             List<String> profile = profileTopThree(vote);
 
             bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
-                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+                vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
-
 
         if (bottomResult.isEmpty()) {
             return List.of();
@@ -201,7 +202,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void updateNickname(String userId, String name) {
         Member member = userRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         member.updateName(name);
     }
@@ -209,7 +211,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public GetNicknameRes getNameFlag(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         return GetNicknameRes.of(member.isNameFlag());
     }
@@ -217,7 +220,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void memberDelete(String userId, MemberLeaveReq req) {
         Member member = userRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         memberLeaveRepository.save(MemberLeave.builder().leaveReason(req.leaveReason()).build());
 
@@ -227,8 +231,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException {
         Member member = userRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         String profile = s3Service.storeUserProFile(multipartFile, userId);
         member.updateProfile(profile);
@@ -245,13 +249,13 @@ public class MemberServiceImpl implements MemberService {
 
         // 타입별 카운팅
         Map<VoteAnswerType, Long> countMap = voteAnswers.stream()
-                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+            .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
 
         // 최대 투표 수 찾기
         long maxCount = countMap.values().stream()
-                .mapToLong(Long::longValue)
-                .max()
-                .orElse(0L);
+            .mapToLong(Long::longValue)
+            .max()
+            .orElse(0L);
 
         if (maxCount == 0L) {
             return Collections.emptyList();
@@ -259,9 +263,9 @@ public class MemberServiceImpl implements MemberService {
 
         // 최대값과 같은 타입들만 추출
         return countMap.entrySet().stream()
-                .filter(e -> e.getValue().equals(maxCount))
-                .map(Map.Entry::getKey)
-                .toList();
+            .filter(e -> e.getValue().equals(maxCount))
+            .map(Map.Entry::getKey)
+            .toList();
     }
 
 
@@ -274,12 +278,12 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Map<VoteAnswerType, Long> countMap = voteAnswers.stream()
-                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+            .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
 
         return countMap.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(e -> Map.entry(e.getKey().name(), e.getValue()))
-                .orElse(Map.entry("없음", 0L));
+            .max(Map.Entry.comparingByValue())
+            .map(e -> Map.entry(e.getKey().name(), e.getValue()))
+            .orElse(Map.entry("없음", 0L));
     }
 
 
@@ -287,20 +291,20 @@ public class MemberServiceImpl implements MemberService {
     private List<MyPageVoteRes> dayMapping(List<MPVoteRes> bottomResult) {
         // 2) 날짜(일 단위)로 그룹핑
         Map<LocalDate, List<MPVoteRes>> grouped = bottomResult.stream()
-                .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
+            .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
 
         // 3) 날짜 내림차순(최근일자 먼저),
         //    같은 날짜 내에서는 시간 내림차순으로 정렬해서 MyPageVoteRes 구성
         List<MyPageVoteRes> result = grouped.entrySet().stream()
-                .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
-                .map(e -> {
-                    List<MPVoteRes> items = e.getValue().stream()
-                            .sorted(Comparator.comparing(MPVoteRes::day).reversed())
-                            .toList();
-                    LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
-                    return MyPageVoteRes.of(headerDay, items);
-                })
-                .toList();
+            .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
+            .map(e -> {
+                List<MPVoteRes> items = e.getValue().stream()
+                    .sorted(Comparator.comparing(MPVoteRes::day).reversed())
+                    .toList();
+                LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
+                return MyPageVoteRes.of(headerDay, items);
+            })
+            .toList();
         return result;
     }
 
@@ -308,7 +312,7 @@ public class MemberServiceImpl implements MemberService {
     public List<Long> voteAnswerCnt(Vote vote) {
         List<VoteAnswer> voteAnswer = voteAnswerRepository.findByVote(vote);
         Map<VoteAnswerType, Long> counts = voteAnswer.stream()
-                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+            .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
 
         long relaxedCount = counts.getOrDefault(VoteAnswerType.RELAXED, 0L);
         long commonlyCount = counts.getOrDefault(VoteAnswerType.COMMONLY, 0L);
@@ -326,10 +330,10 @@ public class MemberServiceImpl implements MemberService {
     // 상위 3건 유저 프로필 이미지 링크
     public List<String> profileTopThree(Vote vote) {
         return vote.getVoteAnswers().stream()
-                .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
-                .filter(Objects::nonNull)                               // null 값 제거 (안전)
-                .limit(3)                                               // 최대 3개만
-                .toList();
+            .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
+            .filter(Objects::nonNull)                               // null 값 제거 (안전)
+            .limit(3)                                               // 최대 3개만
+            .toList();
     }
 
 

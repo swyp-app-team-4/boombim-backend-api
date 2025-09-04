@@ -1,6 +1,7 @@
 package boombimapi.domain.favorite.repository;
 
 import boombimapi.domain.favorite.entity.Favorite;
+import boombimapi.domain.place.entity.PlaceType;
 import java.util.List;
 
 import boombimapi.domain.member.domain.entity.Member;
@@ -10,27 +11,28 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
-    boolean existsByMemberIdAndMemberPlaceId(
+    boolean existsByMemberIdAndPlaceIdAndPlaceType(
         String memberId,
-        Long memberPlaceId
+        Long placeId,
+        PlaceType placeType
     );
 
-    void deleteByMemberIdAndMemberPlaceId(
+    void deleteByMemberIdAndPlaceIdAndPlaceType(
         String memberId,
-        Long memberPlaceId
+        Long placeId,
+        PlaceType placeType
     );
 
     List<Favorite> findAllByMemberId(
         String memberId
     );
 
-
-    @Query("SELECT f FROM Favorite f " +
-            "JOIN FETCH f.memberPlace mp " +
-            "JOIN FETCH mp.memberCongestions mc " +
-            "JOIN FETCH mc.congestionLevel cl " +
-            "WHERE f.member = :member")
-    List<Favorite> findByMemberWithJoin(@Param("member") Member member);
+//    @Query("SELECT f FROM Favorite f " +
+//        "JOIN FETCH f.memberPlace mp " +
+//        "JOIN FETCH mp.memberCongestions mc " +
+//        "JOIN FETCH mc.congestionLevel cl " +
+//        "WHERE f.member = :member")
+//    List<Favorite> findByMemberWithJoin(@Param("member") Member member);
 
 
 }

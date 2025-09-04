@@ -1,7 +1,10 @@
 package boombimapi.domain.favorite.dto.request;
 
+import boombimapi.domain.place.entity.PlaceType;
+
 public record AddFavoriteRequest(
-    Long memberPlaceId
+    PlaceType placeType,
+    Long placeId
 ) {
 
 }

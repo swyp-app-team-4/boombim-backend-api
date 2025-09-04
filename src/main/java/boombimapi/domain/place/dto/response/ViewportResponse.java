@@ -1,15 +1,18 @@
 package boombimapi.domain.place.dto.response;
 
+import boombimapi.domain.place.entity.PlaceType;
 import boombimapi.global.dto.Coordinate;
 
 public record ViewportResponse(
     Long officialPlaceId,
     String officialPlaceName,
+    PlaceType placeType,
     String imageUrl,
     Coordinate coordinate,
     double distance,
     String congestionLevelName,
-    String congestionMessage
+    String congestionMessage,
+    boolean isFavorite
 ) {
 
     public static ViewportResponse of(
@@ -19,16 +22,19 @@ public record ViewportResponse(
         Coordinate coordinate,
         double distance,
         String congestionLevelName,
-        String congestionMessage
+        String congestionMessage,
+        boolean isFavorite
     ) {
         return new ViewportResponse(
             officialPlaceId,
             officialPlaceName,
+            PlaceType.OFFICIAL_PLACE,
             imageUrl,
             coordinate,
             distance,
             congestionLevelName,
-            congestionMessage
+            congestionMessage,
+            isFavorite
         );
     }
 

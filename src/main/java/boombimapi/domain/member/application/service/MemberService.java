@@ -15,7 +15,7 @@ public interface MemberService {
     GetMemberRes getMember(String userId);
 
     // 2번 구간
-    List<GetFavoriteRes>  getFavorites(String userId);
+//    List<GetFavoriteRes>  getFavorites(String userId);
 
     // 3번 구간
     List<MyPageVoteRes> getMyVoteAnswer(String userId);

@@ -5,7 +5,8 @@ import static boombimapi.global.response.ResponseMessage.*;
 import boombimapi.domain.favorite.application.FavoriteService;
 import boombimapi.domain.favorite.dto.request.AddFavoriteRequest;
 import boombimapi.domain.favorite.dto.response.AddFavoriteResponse;
-import boombimapi.domain.favorite.dto.response.GetFavoriteResponse;
+import boombimapi.domain.favorite.dto.response.FavoriteResponse;
+import boombimapi.domain.place.entity.PlaceType;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,9 +58,10 @@ public class FavoriteController {
     @DeleteMapping
     public ResponseEntity<BaseResponse<Void>> deleteFavorite(
         @AuthenticationPrincipal String memberId,
-        @RequestParam Long memberPlaceId
+        @RequestParam Long placeId,
+        @RequestParam PlaceType placeType
     ) {
-        favoriteService.deleteFavorite(memberId, memberPlaceId);
+        favoriteService.deleteFavorite(memberId, placeId, placeType);
 
         return ResponseEntity.ok(
             BaseResponse.of(
@@ -70,19 +72,19 @@ public class FavoriteController {
         );
     }
 
-    @Operation(summary = "즐겨찾기 조회", description = "사용자가 즐겨찾기한 장소들의 최신 혼잡도를 조회합니다.")
+    @Operation(summary = "즐겨찾기 조회", description = "사용자가 즐겨찾기한 장소들을 조회합니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "사용자 즐겨찾기 최신 혼잡도 조회 성공")
+        @ApiResponse(responseCode = "200", description = "사용자 즐겨찾기 조회 성공")
     })
     @GetMapping
-    public ResponseEntity<BaseResponse<List<GetFavoriteResponse>>> getFavorites(
+    public ResponseEntity<BaseResponse<List<FavoriteResponse>>> getFavorites(
         @AuthenticationPrincipal String memberId
     ) {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_FAVORITES_SUCCESS,
-                favoriteService.getFavoritesWithLatestCongestion(memberId)
+                favoriteService.getMemberFavorites(memberId)
             )
         );
     }
