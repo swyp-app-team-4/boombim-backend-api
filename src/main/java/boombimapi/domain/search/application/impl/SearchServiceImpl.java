@@ -164,6 +164,7 @@ public class SearchServiceImpl implements SearchService {
 
         List<SearchRes> result = new ArrayList<>();
 
+        log.info(String.valueOf(memberPlaceEntities.size()));
 
         for (MemberPlace memberPlace : memberPlaceEntities) {
 
@@ -180,6 +181,9 @@ public class SearchServiceImpl implements SearchService {
             if (latestMember != null) {
                 result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), latestMember.getCreatedAt(),
                         latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
+            }else{
+                result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), memberPlace.getCreatedAt(),
+                        null, memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
             }
         }
 
@@ -196,13 +200,10 @@ public class SearchServiceImpl implements SearchService {
             OfficialCongestion latestOfficial =
                     officialCongestionRepository.findTopByOfficialPlaceIdOrderByObservedAtDesc(official.getId()).orElse(null);
 
-            // 혼잡도 정보 때문에 즉 붐빔 키워드랑 최신 반영 날짜 때문에 하지만 사용자가 올린거랑 다르게 null 도 존재함 애초에 공식 장소라
+            // 혼잡도 정보 때문에 즉 붐빔 키워드랑 최신 반영 날짜 때문에
             if (latestOfficial != null) {
                 result.add(SearchRes.of(official.getId(), official.getName(), latestOfficial.getObservedAt(),
                         latestOfficial.getCongestionLevel().getName(), null, official.getImageUrl(), PlaceType.OFFICIAL_PLACE, favoriteFlag));
-            } else {
-                result.add(SearchRes.of(official.getId(), official.getName(), null,
-                        null, null, official.getImageUrl(), PlaceType.OFFICIAL_PLACE, favoriteFlag));
             }
         }
 
