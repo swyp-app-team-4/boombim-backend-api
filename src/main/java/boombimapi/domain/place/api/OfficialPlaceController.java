@@ -4,6 +4,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.OfficialPlaceService;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.global.response.BaseResponse;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -65,6 +67,27 @@ public class OfficialPlaceController {
                 HttpStatus.OK,
                 GET_OFFICIAL_PLACE_OVERVIEW_SUCCESS,
                 officialPlaceService.getOverview(memberId, officialPlaceId)
+            )
+        );
+    }
+
+    @Operation(
+        summary = "인근 공식 장소 TOP 10 (여유/보통)",
+        description = "사용자 위치 기준으로 혼잡도 수준이 '여유' 또는 '보통'인 공식 장소 10개를 거리순으로 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
+    })
+    @GetMapping("/nearby-non-crowded")
+    public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCrowdedOfficialPlace(
+        @RequestParam double latitude,
+        @RequestParam double longitude
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES,
+                officialPlaceService.getNearbyNonCrowdedOfficialPlace(latitude, longitude)
             )
         );
     }
