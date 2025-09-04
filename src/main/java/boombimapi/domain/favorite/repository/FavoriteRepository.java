@@ -1,8 +1,10 @@
 package boombimapi.domain.favorite.repository;
 
 import boombimapi.domain.favorite.entity.Favorite;
+import boombimapi.domain.place.entity.MemberPlace;
 import boombimapi.domain.place.entity.PlaceType;
 import java.util.List;
+import java.util.Optional;
 
 import boombimapi.domain.member.domain.entity.Member;
 import feign.Param;
@@ -25,6 +27,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     List<Favorite> findAllByMemberId(
         String memberId
+    );
+
+    // 즐겨 찾기 여부
+    Optional<Favorite> findByMemberAndPlaceIdAndPlaceType(
+            Member member,
+            Long placeId,
+            PlaceType placeType
     );
 
 //    @Query("SELECT f FROM Favorite f " +

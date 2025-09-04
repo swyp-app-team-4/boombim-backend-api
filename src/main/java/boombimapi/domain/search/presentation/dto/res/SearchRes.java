@@ -2,6 +2,7 @@ package boombimapi.domain.search.presentation.dto.res;
 
 import java.time.LocalDateTime;
 
+import boombimapi.domain.place.entity.PlaceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "검색 결과 응답 모델")
@@ -25,13 +26,15 @@ public record SearchRes(
         @Schema(description = "이미지 URL // 원래 공식만 주는게 맞는데 나중을 사용자도 올린거 다 주겠음", example = "https://example.com/image.jpg")
         String imageUrl,
 
-        @Schema(description = "장소 유형", example = "공식 or 사용자가 올린거")
-        String placeType
+        @Schema(description = "장소 유형", example = "OFFICIAL_PLACE / MEMBER_PLACE")
+        PlaceType placeType,
+        @Schema(description = "즐겨찾기 여부 true면 한거 false면 안한거", example = "true or false")
+        boolean favoriteFlag
 
 ) {
     @Schema(description = "SearchRes 객체 생성을 위한 팩토리 메서드")
     public static SearchRes of(Long id, String posName, LocalDateTime timeAt,
-                               String answerType, String address, String imageUrl, String placeType) {
+                               String answerType, String address, String imageUrl, PlaceType placeType, boolean favoriteFlag) {
         return new SearchRes(
                 id,
                 posName,
@@ -39,7 +42,8 @@ public record SearchRes(
                 answerType,
                 address,
                 imageUrl,
-                placeType
+                placeType,
+                favoriteFlag
         );
     }
 }

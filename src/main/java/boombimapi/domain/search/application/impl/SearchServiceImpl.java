@@ -4,10 +4,13 @@ import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.congestion.entity.OfficialCongestion;
 import boombimapi.domain.congestion.repository.MemberCongestionRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
+import boombimapi.domain.favorite.entity.Favorite;
+import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.place.entity.MemberPlace;
 import boombimapi.domain.place.entity.OfficialPlace;
+import boombimapi.domain.place.entity.PlaceType;
 import boombimapi.domain.place.repository.MemberPlaceRepository;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
 import boombimapi.domain.search.application.SearchService;
@@ -49,6 +52,7 @@ public class SearchServiceImpl implements SearchService {
     // 혼잡도
     private final OfficialCongestionRepository officialCongestionRepository;
     private final MemberCongestionRepository memberCongestionRepository;
+    private final FavoriteRepository favoriteRepository;
 
     @Override
     public List<SearchHistoryRes> getSearchHistory(String userId) {
@@ -99,8 +103,11 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<SearchRes> getSearch(String posName, String userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+
         if (!Objects.equals(posName, "")) {
-            saveSearchWord(posName, userId); // 공백은 저장 X
+            saveSearchWord(posName, member); // 공백은 저장 X
         }
 
 
@@ -113,7 +120,7 @@ public class SearchServiceImpl implements SearchService {
                 officialPlaceRepository.findEntitiesByNameContainingIgnoreCase(posName, limit10);
 
 
-        return sortedCongestion(memberPlaceEntities, officialEntities);
+        return sortedCongestion(memberPlaceEntities, officialEntities, member);
 
     }
 
@@ -142,9 +149,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
 
-    private void saveSearchWord(String posName, String userId) {
-        Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
+    private void saveSearchWord(String posName, Member member) {
 
         Search findSearch = searchRepository.findBySearchWord(posName).orElse(null);
         if (findSearch == null) {
@@ -154,29 +159,50 @@ public class SearchServiceImpl implements SearchService {
     }
 
     // 장소마다 혼잡도 조회해서 정보 넘겨줘야됨
-    private List<SearchRes> sortedCongestion(List<MemberPlace> memberPlaceEntities, List<OfficialPlace> officialEntities) {
+    private List<SearchRes> sortedCongestion(List<MemberPlace> memberPlaceEntities, List<OfficialPlace> officialEntities, Member member) {
+        // 서버에 있는 장소들이 매개변수로 넘어옴
+
         List<SearchRes> result = new ArrayList<>();
+
 
         for (MemberPlace memberPlace : memberPlaceEntities) {
 
+            boolean favoriteFlag = false;
+
+            // 해당 장소 즐겨찾기 여부
+            Favorite favorite = favoriteRepository.findByMemberAndPlaceIdAndPlaceType(member, memberPlace.getId(), PlaceType.MEMBER_PLACE).orElse(null);
+            if (favorite != null) favoriteFlag = true;
+
+            // 혼잡도 정보 때문에 즉 붐빔 키워드랑 최신 반영 날짜 때문에
             MemberCongestion latestMember =
                     memberCongestionRepository.findTop1ByMemberPlaceIdOrderByCreatedAtDesc(memberPlace.getId()).orElse(null);
 
             if (latestMember != null) {
-
-
                 result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), latestMember.getCreatedAt(),
-                        latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl(), "사용자"));
+                        latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
             }
         }
 
 
         for (OfficialPlace official : officialEntities) {
+
+
+            boolean favoriteFlag = false;
+
+            // 해당 장소 즐겨찾기 여부
+            Favorite favorite = favoriteRepository.findByMemberAndPlaceIdAndPlaceType(member, official.getId(), PlaceType.OFFICIAL_PLACE).orElse(null);
+            if (favorite != null) favoriteFlag = true;
+
             OfficialCongestion latestOfficial =
                     officialCongestionRepository.findTopByOfficialPlaceIdOrderByObservedAtDesc(official.getId()).orElse(null);
+
+            // 혼잡도 정보 때문에 즉 붐빔 키워드랑 최신 반영 날짜 때문에 하지만 사용자가 올린거랑 다르게 null 도 존재함 애초에 공식 장소라
             if (latestOfficial != null) {
                 result.add(SearchRes.of(official.getId(), official.getName(), latestOfficial.getObservedAt(),
-                        latestOfficial.getCongestionLevel().getName(), "", official.getImageUrl(), "공식"));
+                        latestOfficial.getCongestionLevel().getName(), null, official.getImageUrl(), PlaceType.OFFICIAL_PLACE, favoriteFlag));
+            } else {
+                result.add(SearchRes.of(official.getId(), official.getName(), null,
+                        null, null, official.getImageUrl(), PlaceType.OFFICIAL_PLACE, favoriteFlag));
             }
         }
 
