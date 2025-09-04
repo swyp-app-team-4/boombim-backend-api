@@ -32,6 +32,11 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/actuator/prometheus")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String method = request.getMethod();
 
         // 소셜 로그인 요청에 대한 중복 로그인 체크
