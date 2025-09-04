@@ -78,7 +78,7 @@ public class OfficialPlaceController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
     })
-    @GetMapping("/nearby-non-crowded")
+    @GetMapping("/nearby-non-congested")
     public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCrowdedOfficialPlace(
         @RequestParam double latitude,
         @RequestParam double longitude
