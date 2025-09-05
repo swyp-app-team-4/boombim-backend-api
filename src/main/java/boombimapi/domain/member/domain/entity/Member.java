@@ -4,6 +4,7 @@ import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.congestion.entity.MemberCongestion;
+import boombimapi.domain.favorite.entity.Favorite;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.search.domain.entity.Search;
 import boombimapi.domain.vote.domain.entity.Vote;
@@ -62,6 +63,10 @@ public class Member {
     // 7) 혼잡도 멤버들
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Search> searchs = new ArrayList<>();
+
+    // 8) 즐겨찾기
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorite> favorites = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;
