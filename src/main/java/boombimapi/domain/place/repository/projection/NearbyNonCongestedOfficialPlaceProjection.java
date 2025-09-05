@@ -2,7 +2,7 @@ package boombimapi.domain.place.repository.projection;
 
 import java.time.LocalDateTime;
 
-public interface NearbyOfficialPlaceProjection {
+public interface NearbyNonCongestedOfficialPlaceProjection {
 
     Long getId();
 

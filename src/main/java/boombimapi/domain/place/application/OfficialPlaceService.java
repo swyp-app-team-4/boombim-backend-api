@@ -12,14 +12,14 @@ import boombimapi.domain.congestion.repository.OfficialPlaceCongestionRankProjec
 import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.official.CongestedOfficialPlaceResponse;
-import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
+import boombimapi.domain.place.dto.response.official.NearbyNonCongestedOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceDemographics;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceForecast;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
-import boombimapi.domain.place.repository.projection.NearbyOfficialPlaceProjection;
+import boombimapi.domain.place.repository.projection.NearbyNonCongestedOfficialPlaceProjection;
 import boombimapi.global.dto.Coordinate;
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.util.ArrayList;
@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -168,19 +167,19 @@ public class OfficialPlaceService {
         );
     }
 
-    public List<NearbyOfficialPlaceResponse> getNearbyNonCongestedOfficialPlace(
+    public List<NearbyNonCongestedOfficialPlaceResponse> getNearbyNonCongestedOfficialPlace(
         double latitude,
         double longitude
     ) {
         int limit = 10;
 
-        List<NearbyOfficialPlaceProjection> rows = officialPlaceRepository
-            .findNearbyNonCongestedHaversine(latitude, longitude, limit);
+        List<NearbyNonCongestedOfficialPlaceProjection> rows = officialPlaceRepository
+            .findNearbyNonCongestedOfficialPlace(latitude, longitude, limit);
 
-        ArrayList<NearbyOfficialPlaceResponse> result = new ArrayList<>(rows.size());
+        ArrayList<NearbyNonCongestedOfficialPlaceResponse> result = new ArrayList<>(rows.size());
 
-        for (NearbyOfficialPlaceProjection row : rows) {
-            result.add(NearbyOfficialPlaceResponse.from(row));
+        for (NearbyNonCongestedOfficialPlaceProjection row : rows) {
+            result.add(NearbyNonCongestedOfficialPlaceResponse.from(row));
         }
 
         return result;

@@ -1,7 +1,7 @@
 package boombimapi.domain.place.repository;
 
 import boombimapi.domain.place.entity.OfficialPlace;
-import boombimapi.domain.place.repository.projection.NearbyOfficialPlaceProjection;
+import boombimapi.domain.place.repository.projection.NearbyNonCongestedOfficialPlaceProjection;
 import java.util.List;
 
 import boombimapi.domain.search.presentation.dto.PlaceNameProjection;
@@ -55,13 +55,14 @@ public interface OfficialPlaceRepository extends JpaRepository<OfficialPlace, Lo
                  POWER(SIN(RADIANS(p.centroid_longitude - :longitude) / 2), 2)
                ))                    AS distanceMeters,
                f.levelName           AS congestionLevelName,
-                f.observed_at AS observedAt
+               f.observed_at         AS observedAt,
+               p.legal_dong          AS legalDong
         FROM official_places p
         JOIN filtered f ON f.official_place_id = p.id
         ORDER BY distanceMeters ASC, f.observed_at DESC, p.id ASC
         LIMIT :limit
         """, nativeQuery = true)
-    List<NearbyOfficialPlaceProjection> findNearbyNonCongestedHaversine(
+    List<NearbyNonCongestedOfficialPlaceProjection> findNearbyNonCongestedOfficialPlace(
         @Param("latitude") double latitude,
         @Param("longitude") double longitude,
         @Param("limit") int limit

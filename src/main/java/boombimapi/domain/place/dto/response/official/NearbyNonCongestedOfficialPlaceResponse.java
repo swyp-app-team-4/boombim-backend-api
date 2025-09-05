@@ -1,9 +1,9 @@
 package boombimapi.domain.place.dto.response.official;
 
-import boombimapi.domain.place.repository.projection.NearbyOfficialPlaceProjection;
+import boombimapi.domain.place.repository.projection.NearbyNonCongestedOfficialPlaceProjection;
 import java.time.LocalDateTime;
 
-public record NearbyOfficialPlaceResponse(
+public record NearbyNonCongestedOfficialPlaceResponse(
     Long officialPlaceId,
     String officialPlaceName,
     String legalDong,
@@ -13,10 +13,10 @@ public record NearbyOfficialPlaceResponse(
     double distanceMeters
 ) {
 
-    public static NearbyOfficialPlaceResponse from(
-        NearbyOfficialPlaceProjection row
+    public static NearbyNonCongestedOfficialPlaceResponse from(
+        NearbyNonCongestedOfficialPlaceProjection row
     ) {
-        return new NearbyOfficialPlaceResponse(
+        return new NearbyNonCongestedOfficialPlaceResponse(
             row.getId(),
             row.getName(),
             row.getLegalDong(),

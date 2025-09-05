@@ -5,7 +5,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 import boombimapi.domain.place.application.OfficialPlaceService;
 import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.official.CongestedOfficialPlaceResponse;
-import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
+import boombimapi.domain.place.dto.response.official.NearbyNonCongestedOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.global.response.BaseResponse;
@@ -73,14 +73,14 @@ public class OfficialPlaceController {
     }
 
     @Operation(
-        summary = "인근 공식 장소 TOP 10 (여유/보통)",
+        summary = "인근 한산한 공식 장소 TOP 10",
         description = "사용자 위치 기준으로 혼잡도 수준이 '여유' 또는 '보통'인 공식 장소 10개를 거리순으로 반환합니다."
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
     })
     @GetMapping("/nearby-non-congested")
-    public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlace(
+    public ResponseEntity<BaseResponse<List<NearbyNonCongestedOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlace(
         @RequestParam double latitude,
         @RequestParam double longitude
     ) {
