@@ -93,6 +93,13 @@ public class OfficialPlaceController {
         );
     }
 
+    @Operation(
+        summary = "붐비는 공식 장소 TOP 5",
+        description = "실시간 공식 장소들 중 가장 붐비는 장소 5개를 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "실시간 붐비는 장소 상위 5개 조회 성공")
+    })
     @GetMapping("/top-congested")
     public ResponseEntity<BaseResponse<List<CongestedOfficialPlaceResponse>>> getCongestedOfficialPlace() {
         return ResponseEntity.ok(
