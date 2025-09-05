@@ -42,6 +42,9 @@ public class OfficialCongestion {
     @Column(name = "population_max")
     private Long populationMax;
 
+    @Column(name = "density_per_m2")
+    private Double densityPerM2;
+
     @Column(name = "observed_at", nullable = false)
     private LocalDateTime observedAt;
 
@@ -51,12 +54,14 @@ public class OfficialCongestion {
         CongestionLevel congestionLevel,
         Long populationMin,
         Long populationMax,
+        Double densityPerM2,
         LocalDateTime observedAt
     ) {
         this.officialPlace = officialPlace;
         this.congestionLevel = congestionLevel;
         this.populationMin = populationMin;
         this.populationMax = populationMax;
+        this.densityPerM2 = densityPerM2;
         this.observedAt = observedAt;
     }
 
@@ -65,6 +70,7 @@ public class OfficialCongestion {
         CongestionLevel congestionLevel,
         Long populationMin,
         Long populationMax,
+        Double densityPerM2,
         LocalDateTime observedAt
     ) {
         return OfficialCongestion.builder()
@@ -72,6 +78,7 @@ public class OfficialCongestion {
             .congestionLevel(congestionLevel)
             .populationMin(populationMin)
             .populationMax(populationMax)
+            .densityPerM2(densityPerM2)
             .observedAt(observedAt)
             .build();
     }
