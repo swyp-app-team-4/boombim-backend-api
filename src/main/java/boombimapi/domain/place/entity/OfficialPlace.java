@@ -27,6 +27,12 @@ public class OfficialPlace {
     @Column(name = "poi_code", length = 20, nullable = false, unique = true)
     private String poiCode;
 
+    @Column(name = "legalDong", nullable = false)
+    private String legalDong;
+
+    @Column(name = "area_m2", nullable = false)
+    private Double areaM2;
+
     @Column(name = "centroid_latitude", nullable = false)
     private Double centroidLatitude;    // 중심 위도
 
@@ -43,6 +49,8 @@ public class OfficialPlace {
     private OfficialPlace(
         String name,
         String poiCode,
+        String legalDong,
+        Double areaM2,
         Double centroidLatitude,
         Double centroidLongitude,
         String polygonCoordinates,
@@ -50,6 +58,8 @@ public class OfficialPlace {
     ) {
         this.name = name;
         this.poiCode = poiCode;
+        this.legalDong = legalDong;
+        this.areaM2 = areaM2;
         this.centroidLatitude = centroidLatitude;
         this.centroidLongitude = centroidLongitude;
         this.polygonCoordinates = polygonCoordinates;
@@ -59,6 +69,8 @@ public class OfficialPlace {
     public static OfficialPlace of(
         String name,
         String poiCode,
+        String legalDong,
+        Double areaM2,
         Double centroidLatitude,
         Double centroidLongitude,
         String polygonCoordinates,
@@ -67,6 +79,8 @@ public class OfficialPlace {
         return OfficialPlace.builder()
             .name(name)
             .poiCode(poiCode)
+            .legalDong(legalDong)
+            .areaM2(areaM2)
             .centroidLatitude(centroidLatitude)
             .centroidLongitude(centroidLongitude)
             .polygonCoordinates(polygonCoordinates)
