@@ -107,9 +107,9 @@ public class VoteServiceImpl implements VoteService {
             throw new BoombimException(ErrorCode.DUPLICATE_POS_ID);
         }
 
-        String posImage = getPosImage(req.posName());
+        // String posImage = getPosImage(req.posName());
 
-        log.info(posImage);
+        String posImage = "https://gamehackspring.s3.ap-northeast-2.amazonaws.com/appicon.png";
 
         // 공식 장소 테이블 추가
         ResolveMemberPlaceResponse resolveMemberPlaceResponse =
