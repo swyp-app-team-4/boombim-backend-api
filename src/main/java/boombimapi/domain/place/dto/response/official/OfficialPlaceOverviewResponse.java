@@ -7,6 +7,7 @@ import java.util.List;
 public record OfficialPlaceOverviewResponse(
     Long officialPlaceId,
     String officialPlaceName,
+    String legalDong,
     PlaceType placeType,
     String poiCode,
     String imageUrl,
@@ -22,6 +23,7 @@ public record OfficialPlaceOverviewResponse(
     public static OfficialPlaceOverviewResponse of(
         Long officialPlaceId,
         String officialPlaceName,
+        String legalDong,
         String poiCode,
         String imageUrl,
         LocalDateTime observedAt,
@@ -35,6 +37,7 @@ public record OfficialPlaceOverviewResponse(
         return new OfficialPlaceOverviewResponse(
             officialPlaceId,
             officialPlaceName,
+            legalDong,
             PlaceType.OFFICIAL_PLACE,
             poiCode,
             imageUrl,
