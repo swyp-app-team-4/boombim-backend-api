@@ -4,6 +4,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.OfficialPlaceService;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.official.CongestedOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
@@ -86,8 +87,19 @@ public class OfficialPlaceController {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
-                GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES,
+                GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES_SUCCESS,
                 officialPlaceService.getNearbyNonCongestedOfficialPlace(latitude, longitude)
+            )
+        );
+    }
+
+    @GetMapping("/top-congested")
+    public ResponseEntity<BaseResponse<List<CongestedOfficialPlaceResponse>>> getCongestedOfficialPlace() {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_CONGESTED_OFFICIAL_PLACES_SUCCESS,
+                officialPlaceService.getCongestedOfficialPlace()
             )
         );
     }
