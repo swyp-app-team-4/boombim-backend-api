@@ -54,7 +54,8 @@ public interface OfficialPlaceRepository extends JpaRepository<OfficialPlace, Lo
                  COS(RADIANS(:latitude)) * COS(RADIANS(p.centroid_latitude)) *
                  POWER(SIN(RADIANS(p.centroid_longitude - :longitude) / 2), 2)
                ))                    AS distanceMeters,
-               f.levelName           AS congestionLevelName
+               f.levelName           AS congestionLevelName,
+                f.observed_at AS observedAt
         FROM official_places p
         JOIN filtered f ON f.official_place_id = p.id
         ORDER BY distanceMeters ASC, f.observed_at DESC, p.id ASC
