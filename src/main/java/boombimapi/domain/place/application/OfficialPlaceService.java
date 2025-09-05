@@ -8,8 +8,10 @@ import boombimapi.domain.congestion.entity.OfficialCongestion;
 import boombimapi.domain.congestion.repository.OfficialCongestionDemographicsRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionForecastRepository;
 import boombimapi.domain.congestion.repository.OfficialCongestionRepository;
+import boombimapi.domain.congestion.repository.OfficialPlaceCongestionRankProjection;
 import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.official.CongestedOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceDemographics;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceForecast;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,6 +105,7 @@ public class OfficialPlaceService {
                 ViewportResponse.of(
                     officialPlace.getId(),
                     officialPlace.getName(),
+                    officialPlace.getLegalDong(),
                     officialPlace.getImageUrl(),
                     coordinate,
                     distanceMeters,
@@ -151,6 +155,7 @@ public class OfficialPlaceService {
         return OfficialPlaceOverviewResponse.of(
             officialPlace.getId(),
             officialPlace.getName(),
+            officialPlace.getLegalDong(),
             officialPlace.getPoiCode(),
             officialPlace.getImageUrl(),
             latestOfficialCongestion.getObservedAt(),
@@ -163,19 +168,34 @@ public class OfficialPlaceService {
         );
     }
 
-    public List<NearbyOfficialPlaceResponse> getNearbyNonCrowdedOfficialPlace(
+    public List<NearbyOfficialPlaceResponse> getNearbyNonCongestedOfficialPlace(
         double latitude,
         double longitude
     ) {
         int limit = 10;
 
         List<NearbyOfficialPlaceProjection> rows = officialPlaceRepository
-            .findNearbyNonCrowdedHaversine(latitude, longitude, limit);
+            .findNearbyNonCongestedHaversine(latitude, longitude, limit);
 
         ArrayList<NearbyOfficialPlaceResponse> result = new ArrayList<>(rows.size());
 
         for (NearbyOfficialPlaceProjection row : rows) {
             result.add(NearbyOfficialPlaceResponse.from(row));
+        }
+
+        return result;
+    }
+
+    public List<CongestedOfficialPlaceResponse> getCongestedOfficialPlace() {
+        int limit = 5;
+
+        List<OfficialPlaceCongestionRankProjection> rows = officialCongestionRepository
+            .findTopCongestedOfficialPlace(limit);
+
+        List<CongestedOfficialPlaceResponse> result = new ArrayList<>(rows.size());
+
+        for (OfficialPlaceCongestionRankProjection row : rows) {
+            result.add(CongestedOfficialPlaceResponse.from(row));
         }
 
         return result;

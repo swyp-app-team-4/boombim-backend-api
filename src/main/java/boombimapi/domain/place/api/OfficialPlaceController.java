@@ -4,6 +4,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 
 import boombimapi.domain.place.application.OfficialPlaceService;
 import boombimapi.domain.place.dto.request.ViewportRequest;
+import boombimapi.domain.place.dto.response.official.CongestedOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.NearbyOfficialPlaceResponse;
 import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewResponse;
 import boombimapi.domain.place.dto.response.ViewportResponse;
@@ -78,16 +79,34 @@ public class OfficialPlaceController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
     })
-    @GetMapping("/nearby-non-crowded")
-    public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCrowdedOfficialPlace(
+    @GetMapping("/nearby-non-congested")
+    public ResponseEntity<BaseResponse<List<NearbyOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlace(
         @RequestParam double latitude,
         @RequestParam double longitude
     ) {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,
-                GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES,
-                officialPlaceService.getNearbyNonCrowdedOfficialPlace(latitude, longitude)
+                GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES_SUCCESS,
+                officialPlaceService.getNearbyNonCongestedOfficialPlace(latitude, longitude)
+            )
+        );
+    }
+
+    @Operation(
+        summary = "붐비는 공식 장소 TOP 5",
+        description = "실시간 공식 장소들 중 가장 붐비는 장소 5개를 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "실시간 붐비는 장소 상위 5개 조회 성공")
+    })
+    @GetMapping("/top-congested")
+    public ResponseEntity<BaseResponse<List<CongestedOfficialPlaceResponse>>> getCongestedOfficialPlace() {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_CONGESTED_OFFICIAL_PLACES_SUCCESS,
+                officialPlaceService.getCongestedOfficialPlace()
             )
         );
     }

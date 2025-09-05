@@ -6,6 +6,7 @@ import boombimapi.global.dto.Coordinate;
 public record ViewportResponse(
     Long officialPlaceId,
     String officialPlaceName,
+    String legalDong,
     PlaceType placeType,
     String imageUrl,
     Coordinate coordinate,
@@ -18,6 +19,7 @@ public record ViewportResponse(
     public static ViewportResponse of(
         Long officialPlaceId,
         String officialPlaceName,
+        String legalDong,
         String imageUrl,
         Coordinate coordinate,
         double distance,
@@ -28,6 +30,7 @@ public record ViewportResponse(
         return new ViewportResponse(
             officialPlaceId,
             officialPlaceName,
+            legalDong,
             PlaceType.OFFICIAL_PLACE,
             imageUrl,
             coordinate,
