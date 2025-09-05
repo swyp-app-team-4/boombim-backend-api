@@ -148,23 +148,21 @@ public class VoteServiceImpl implements VoteService {
     @Override
     public void answerVote(String userId, VoteAnswerReq req) {
         Member user = userRepository.findById(userId).orElse(null);
-        if (user == null)
-            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (user == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         Vote vote = voteRepository.findById(req.voteId()).orElse(null);
-        if (vote == null)
-            throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
+        if (vote == null) throw new BoombimException(ErrorCode.VOTE_NOT_EXIST);
 
         // 투표 종료됐는데 투표할려고 할때
-        if (!vote.isVoteActivate())
-            throw new BoombimException(ErrorCode.VOTE_ALREADY_CLOSED);
+        if (!vote.isVoteActivate()) throw new BoombimException(ErrorCode.VOTE_ALREADY_CLOSED);
+
+        // 본인 투표 막기 즉 본인이 올린거 투표 못하게 해야됨
+        if(vote.getMember().getId().equals(user.getId())) throw new BoombimException(ErrorCode.SELF_VOTE_NOT_ALLOWED);
 
         // 같은 투표 중복자 막기
         VoteAnswer voteAnswer = voteAnswerRepository.findByMemberAndVote(user, vote).orElse(null);
-        if (voteAnswer != null)
-            throw new BoombimException(ErrorCode.DUPLICATE_VOTE_USER);
+        if (voteAnswer != null) throw new BoombimException(ErrorCode.DUPLICATE_VOTE_USER);
 
-        log.info(String.valueOf(req.voteAnswerType()));
         // 투표 완료
         voteAnswerRepository.save(VoteAnswer.builder()
                 .member(user)

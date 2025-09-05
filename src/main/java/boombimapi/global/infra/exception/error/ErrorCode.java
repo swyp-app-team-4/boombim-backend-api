@@ -72,6 +72,8 @@ public enum ErrorCode {
     DUPLICATE_VOTE_USER(-504, "이미 투표했습니다.", 409),
     NO_PERMISSION_TO_CLOSE_VOTE(-505, "투표 종료 권한이 없습니다.", 403),
     VOTE_ALREADY_CLOSED(-506, "종료된 투표입니다.", 400),
+    SELF_VOTE_NOT_ALLOWED(-507, "본인이 생성한 투표에는 참여할 수 없습니다.", 409),
+
 
     // member place & member congestion
     MEMBER_PLACE_NOT_FOUND(-600, "해당 장소가 등록되지 않았습니다.", 406),
