@@ -15,11 +15,13 @@ services:
 
   redis:
     image: redis
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - ./redis-data:/data
 
   prometheus:
     image: prom/prometheus
