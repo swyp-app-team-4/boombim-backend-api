@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ResponseMessage {
 
-    // official
+    // official place
     GET_OFFICIAL_PLACES_IN_VIEWPORT_SUCCESS("뷰포트 내 공식 장소 조회 성공"),
     GET_LATEST_OFFICIAL_CONGESTION_SUCCESS("최신 공식 혼잡도 조회 성공"),
     GET_OFFICIAL_PLACE_OVERVIEW_SUCCESS("공식 장소 개요 조회 성공"),
-    GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES("인근 여유 공식 장소 조회 성공"),
+    GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES_SUCCESS("인근 여유 공식 장소 조회 성공"),
+    GET_CONGESTED_OFFICIAL_PLACES_SUCCESS("실시간 붐비는 장소 상위 5개 조회 성공"),
 
     // member place
     GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS("뷰포트 내 사용자 장소 조회 성공"),
