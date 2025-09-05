@@ -174,7 +174,7 @@ public class OfficialPlaceService {
         int limit = 10;
 
         List<NearbyNonCongestedOfficialPlaceProjection> rows = officialPlaceRepository
-            .findNearbyNonCongestedHaversine(latitude, longitude, limit);
+            .findNearbyNonCongestedOfficialPlace(latitude, longitude, limit);
 
         ArrayList<NearbyNonCongestedOfficialPlaceResponse> result = new ArrayList<>(rows.size());
 

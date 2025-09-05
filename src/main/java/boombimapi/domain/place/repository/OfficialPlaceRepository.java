@@ -61,7 +61,7 @@ public interface OfficialPlaceRepository extends JpaRepository<OfficialPlace, Lo
         ORDER BY distanceMeters ASC, f.observed_at DESC, p.id ASC
         LIMIT :limit
         """, nativeQuery = true)
-    List<NearbyNonCongestedOfficialPlaceProjection> findNearbyNonCongestedHaversine(
+    List<NearbyNonCongestedOfficialPlaceProjection> findNearbyNonCongestedOfficialPlace(
         @Param("latitude") double latitude,
         @Param("longitude") double longitude,
         @Param("limit") int limit
