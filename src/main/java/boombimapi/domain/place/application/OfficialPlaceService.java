@@ -19,7 +19,7 @@ import boombimapi.domain.place.dto.response.official.OfficialPlaceOverviewRespon
 import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
-import boombimapi.domain.place.repository.projection.NearbyOfficialPlaceProjection;
+import boombimapi.domain.place.repository.projection.NearbyNonCongestedOfficialPlaceProjection;
 import boombimapi.global.dto.Coordinate;
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.util.ArrayList;
@@ -173,12 +173,12 @@ public class OfficialPlaceService {
     ) {
         int limit = 10;
 
-        List<NearbyOfficialPlaceProjection> rows = officialPlaceRepository
+        List<NearbyNonCongestedOfficialPlaceProjection> rows = officialPlaceRepository
             .findNearbyNonCongestedHaversine(latitude, longitude, limit);
 
         ArrayList<NearbyNonCongestedOfficialPlaceResponse> result = new ArrayList<>(rows.size());
 
-        for (NearbyOfficialPlaceProjection row : rows) {
+        for (NearbyNonCongestedOfficialPlaceProjection row : rows) {
             result.add(NearbyNonCongestedOfficialPlaceResponse.from(row));
         }
 

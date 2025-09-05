@@ -1,6 +1,6 @@
 package boombimapi.domain.place.dto.response.official;
 
-import boombimapi.domain.place.repository.projection.NearbyOfficialPlaceProjection;
+import boombimapi.domain.place.repository.projection.NearbyNonCongestedOfficialPlaceProjection;
 import java.time.LocalDateTime;
 
 public record NearbyNonCongestedOfficialPlaceResponse(
@@ -14,7 +14,7 @@ public record NearbyNonCongestedOfficialPlaceResponse(
 ) {
 
     public static NearbyNonCongestedOfficialPlaceResponse from(
-        NearbyOfficialPlaceProjection row
+        NearbyNonCongestedOfficialPlaceProjection row
     ) {
         return new NearbyNonCongestedOfficialPlaceResponse(
             row.getId(),
