@@ -73,7 +73,7 @@ public class OfficialPlaceController {
     }
 
     @Operation(
-        summary = "인근 공식 장소 TOP 10 (여유/보통)",
+        summary = "인근 한산한 공식 장소 TOP 10",
         description = "사용자 위치 기준으로 혼잡도 수준이 '여유' 또는 '보통'인 공식 장소 10개를 거리순으로 반환합니다."
     )
     @ApiResponses({
