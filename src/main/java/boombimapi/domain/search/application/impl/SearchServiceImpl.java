@@ -181,9 +181,6 @@ public class SearchServiceImpl implements SearchService {
             if (latestMember != null) {
                 result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), latestMember.getCreatedAt(),
                         latestMember.getCongestionLevel().getName(), memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
-            }else{
-                result.add(SearchRes.of(memberPlace.getId(), memberPlace.getName(), memberPlace.getCreatedAt(),
-                        "여유", memberPlace.getAddress(), memberPlace.getImageUrl(), PlaceType.MEMBER_PLACE, favoriteFlag));
             }
         }
 

@@ -45,7 +45,7 @@ public class AdminController {
     }
 
 
-    @PostMapping("/join")
+    //@PostMapping("/join")
     public void adminJoin(@Valid @RequestBody AdminLoginReq req) {
         Member admin = Member.builder()
                 .id(UUID.randomUUID().toString())
