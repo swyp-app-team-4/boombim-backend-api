@@ -28,10 +28,9 @@ services:
     container_name: prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus-data:/prometheus   # ← 영속 데이터 경로
     ports:
       - "9090:9090"
-    depends_on:
-      - app
 
   grafana:
     image: grafana/grafana
@@ -41,5 +40,5 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-    depends_on:
-      - prometheus
+    volumes:
+      - ./grafana-data:/var/lib/grafana   # ← 영속 데이터 경로
