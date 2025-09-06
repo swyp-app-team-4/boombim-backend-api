@@ -43,7 +43,7 @@ public class SecurityConfig {
             "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
             "/api/oauth2/logout",
             "/api/healthcheck", "/api/admin/**",
-            "/actuator/prometheus"
+            "/actuator/prometheus", "/metrics"
     );
 
     @Bean
@@ -75,7 +75,7 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/favicon.ico", "/api/region").permitAll()
                         .requestMatchers("/api/reissue").permitAll()
-                        .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/actuator/prometheus","/metrics").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

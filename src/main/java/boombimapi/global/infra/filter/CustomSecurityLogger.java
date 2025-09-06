@@ -21,9 +21,11 @@ public class CustomSecurityLogger extends OncePerRequestFilter {
         String uri = request.getRequestURI();
 
         // prometheus 요청은 제외
-        if (!uri.startsWith("/actuator/prometheus")) {
+// prometheus 요청과 metrics 요청은 제외
+        if (!uri.startsWith("/actuator/prometheus") && !uri.startsWith("/metrics")) {
             log.info("Security Request: {} {}", request.getMethod(), uri);
         }
+
 
         filterChain.doFilter(request, response);
     }
