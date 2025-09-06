@@ -2,7 +2,11 @@ global:
   scrape_interval: 5s  # 5초마다 수집
 
 scrape_configs:
-  - job_name: 'spring-app'
-    metrics_path: '/actuator/prometheus'
+  - job_name: 'boombim-api'
     static_configs:
-      - targets: ['app:8080']   # docker-compose 서비스명:포트
+      - targets: ['app:8080']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'boombim-api'   # ← 고정 인스턴스 이름
+
