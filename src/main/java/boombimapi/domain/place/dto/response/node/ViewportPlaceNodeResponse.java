@@ -3,6 +3,7 @@ package boombimapi.domain.place.dto.response.node;
 import boombimapi.domain.place.dto.type.MarkerType;
 import boombimapi.domain.place.entity.PlaceType;
 import boombimapi.global.dto.Coordinate;
+import java.time.LocalDateTime;
 
 public record ViewportPlaceNodeResponse(
     MarkerType type,
@@ -13,6 +14,7 @@ public record ViewportPlaceNodeResponse(
     Double distance,
     String congestionLevelName,
     String congestionMessage,
+    LocalDateTime createdAt,
     boolean isFavorite
 ) implements ViewportNodeResponse {
 
@@ -23,6 +25,7 @@ public record ViewportPlaceNodeResponse(
         Double distance,
         String congestionLevelName,
         String congestionMessage,
+        LocalDateTime createdAt,
         boolean isFavorite
     ) {
         return new ViewportPlaceNodeResponse(
@@ -34,6 +37,7 @@ public record ViewportPlaceNodeResponse(
             distance,
             congestionLevelName,
             congestionMessage,
+            createdAt,
             isFavorite
         );
     }

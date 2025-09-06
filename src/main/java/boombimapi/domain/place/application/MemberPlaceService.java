@@ -7,6 +7,8 @@ import boombimapi.domain.congestion.dto.response.MemberCongestionItemResponse;
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.congestion.repository.MemberCongestionRepository;
 import boombimapi.domain.favorite.repository.FavoriteRepository;
+import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.place.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.dto.request.ViewportRequest;
 import boombimapi.domain.place.dto.response.member.GetMemberPlaceDetailResponse;
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberPlaceService {
 
+    private final MemberRepository memberRepository;
     private final MemberPlaceRepository memberPlaceRepository;
     private final MemberCongestionRepository memberCongestionRepository;
 
@@ -52,7 +55,6 @@ public class MemberPlaceService {
     public ResolveMemberPlaceResponse resolveMemberPlace(
         ResolveMemberPlaceRequest request
     ) {
-        log.info("[MemberPlaceService] resolveMemberPlace()");
 
         // TODO: 레이스 컨디션 처리 필요(동일 uuid 동시 생성 방지)
         MemberPlace memberPlace = memberPlaceRepository.findByUuid(request.uuid())
@@ -88,8 +90,21 @@ public class MemberPlaceService {
             pageable
         );
 
-        List<MemberCongestionItemResponse> memberCongestionItems = slice.getContent().stream()
-            .map(MemberCongestionItemResponse::of)
+        // TODO: N+1 발생 가능성 높음
+        List<MemberCongestionItemResponse> memberCongestionItems = slice.getContent()
+            .stream()
+            .map(memberCongestion -> {
+                Member member = memberCongestion.getMember();
+
+                return MemberCongestionItemResponse.of(
+                    memberCongestion.getId(),
+                    member.getProfile(),
+                    member.getName(),
+                    memberCongestion.getCongestionLevel().getName(),
+                    memberCongestion.getCongestionMessage(),
+                    memberCongestion.getCreatedAt()
+                );
+            })
             .toList();
 
         Long nextCursor = computeNextCursor(memberCongestionItems);
@@ -236,6 +251,7 @@ public class MemberPlaceService {
                         distanceMeters,
                         memberCongestion.getCongestionLevel().getName(),
                         memberCongestion.getCongestionMessage(),
+                        memberCongestion.getCreatedAt(),
                         isFavorite
                     )
                 );
