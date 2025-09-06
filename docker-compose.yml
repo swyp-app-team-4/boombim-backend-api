@@ -26,19 +26,21 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    user: "65534:65534"   # nobody 유저 (Prometheus 기본 실행 계정)
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus-data:/prometheus   # ← 영속 데이터 경로
+      - ./prometheus-data:/prometheus
     ports:
       - "9090:9090"
 
   grafana:
     image: grafana/grafana
     container_name: grafana
-    ports:
-      - "3000:3000"
+    user: "472:472"       # grafana 기본 실행 계정
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - ./grafana-data:/var/lib/grafana   # ← 영속 데이터 경로
+      - ./grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
