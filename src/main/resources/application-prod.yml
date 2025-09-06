@@ -145,8 +145,18 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health, info, metrics, prometheus  # 👈 metrics 추가
   endpoint:
     prometheus:
       enabled: true
+
+  metrics:
+    tags:
+      application: boombim-api   # 👈 공통 라벨 추가 (Grafana 호환)
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true        # 👈 status 라벨 포함된 http_server_requests 메트릭 활성화
+
 
