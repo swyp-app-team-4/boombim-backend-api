@@ -109,7 +109,7 @@ public class VoteServiceImpl implements VoteService {
 
         // String posImage = getPosImage(req.posName());
 
-        String posImage = "https://gamehackspring.s3.ap-northeast-2.amazonaws.com/appicon.png";
+        String posImage = null;
 
         // 공식 장소 테이블 추가
         ResolveMemberPlaceResponse resolveMemberPlaceResponse =

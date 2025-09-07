@@ -15,15 +15,18 @@ services:
 
   redis:
     image: redis
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - ./redis-data:/data
 
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    user: "65534:65534"   # nobody 유저 (Prometheus 기본 실행 계정)
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus-data:/prometheus
@@ -33,6 +36,7 @@ services:
   grafana:
     image: grafana/grafana
     container_name: grafana
+    user: "472:472"       # grafana 기본 실행 계정
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -40,4 +44,3 @@ services:
       - ./grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"
-
