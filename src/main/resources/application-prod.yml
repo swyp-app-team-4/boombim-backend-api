@@ -145,8 +145,21 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health, info, metrics, prometheus  # actuator에서 노출할 엔드포인트
   endpoint:
     prometheus:
-      enabled: true
+      enabled: true  # /actuator/prometheus 활성화
+
+  metrics:
+    enable:
+      all: true       # 👈 Tomcat 포함 모든 메트릭 노출
+    tags:
+      application: boombim-api   # 👈 공통 라벨 추가 (Grafana 호환성 위해)
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true        # 👈 HTTP 요청에 status 라벨 붙이기
+
+
 
