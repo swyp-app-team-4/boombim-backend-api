@@ -1,6 +1,7 @@
 package boombimapi.domain.member.application.service.impl;
 
 
+import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.congestion.repository.MemberCongestionRepository;
 import boombimapi.domain.favorite.entity.Favorite;
 import boombimapi.domain.favorite.repository.FavoriteRepository;
@@ -47,8 +48,7 @@ public class MemberServiceImpl implements MemberService {
     private final VoteRepository voteRepository;
     private final S3Service s3Service;
     private final MemberLeaveRepository memberLeaveRepository;
-    private final FavoriteRepository favoriteRepository;
-    private final MemberCongestionRepository memberCongestionRepository;
+    private final FcmService fcmService;
 
     @Override
     public GetMemberRes getMember(String userId) {
@@ -223,6 +223,7 @@ public class MemberServiceImpl implements MemberService {
         if (member == null)
             throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
+        fcmService.deleteFcmToken(userId);
         memberLeaveRepository.save(MemberLeave.builder().leaveReason(req.leaveReason()).build());
 
         userRepository.delete(member);
