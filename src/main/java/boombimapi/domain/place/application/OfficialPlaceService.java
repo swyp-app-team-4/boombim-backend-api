@@ -157,6 +157,8 @@ public class OfficialPlaceService {
             officialPlace.getLegalDong(),
             officialPlace.getPoiCode(),
             officialPlace.getImageUrl(),
+            latestOfficialCongestion.getCongestionLevel().getName(),
+            latestOfficialCongestion.getCongestionLevel().getMessage(),
             latestOfficialCongestion.getObservedAt(),
             officialPlace.getCentroidLatitude(),
             officialPlace.getCentroidLongitude(),
