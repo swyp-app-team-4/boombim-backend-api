@@ -89,6 +89,8 @@ public class Member {
     @Column(name = "role", nullable = false)
     private Role role;
 
+    private Long point;
+
     // 관리자 비번 null이어도됨
     private String password;
 
@@ -102,7 +104,7 @@ public class Member {
 
     @Builder
     public Member(String id, String email, String name, String profile,
-                  SocialProvider socialProvider, Role role) {
+                  SocialProvider socialProvider, Role role,Long point) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -111,6 +113,7 @@ public class Member {
         this.role = role;
         this.alarmFlag = true;
         this.nameFlag = false;
+        this.point= 0L;
     }
 
     public void updateEmail(String email) {

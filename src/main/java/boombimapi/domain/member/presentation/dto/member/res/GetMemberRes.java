@@ -23,16 +23,20 @@ public record GetMemberRes(
         Long voteCnt,
 
         @Schema(description = "작성한 답변 수", example = "34")
-        Long questionCnt
+        Long questionCnt,
+
+        @Schema(description = "포인트 점수", example = "4")
+        Long point
 ) {
-    public static GetMemberRes of(Member user, Long voteCnt, Long questionCnt) {
+    public static GetMemberRes of(Member user, Long voteCnt, Long questionCnt,Long point) {
         return new GetMemberRes(
                 user.getName(),
                 user.getProfile(),
                 user.getEmail(),
                 user.getSocialProvider(),
                 voteCnt,
-                questionCnt
+                questionCnt,
+                point
         );
     }
 }
