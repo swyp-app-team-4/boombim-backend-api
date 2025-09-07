@@ -129,7 +129,7 @@ public class VoteServiceImpl implements VoteService {
                 .member(user)
                 .memberPlace(memberPlace)
                 .posId(req.posId())
-                .posImage(posImage)
+                .posImage("https://gamehackspring.s3.ap-northeast-2.amazonaws.com/appicon.png")
                 .posName(req.posName())
                 .latitude(req.posLatitude())
                 .longitude(req.posLongitude()).build();
