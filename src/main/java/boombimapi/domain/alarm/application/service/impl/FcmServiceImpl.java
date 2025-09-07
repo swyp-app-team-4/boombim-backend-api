@@ -13,6 +13,7 @@ import boombimapi.domain.alarm.presentation.dto.req.AlarmSendDto;
 import boombimapi.domain.alarm.presentation.dto.req.AlarmSendResDto;
 
 import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import com.google.firebase.messaging.*;
@@ -33,6 +34,7 @@ public class FcmServiceImpl implements FcmService {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
     private final AlarmRecipientRepository alarmRecipientRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * FCM 토큰 등록
@@ -271,6 +273,14 @@ public class FcmServiceImpl implements FcmService {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(30);
         fcmTokenRepository.deleteInactiveTokensOlderThan(cutoffDate);
         log.info("30일 이상 된 비활성 토큰 정리 완료");
+    }
+
+    @Override
+    public void deleteFcmToken(String userId) {
+        Member member = memberRepository.findById(userId).orElse(null);
+        if(member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        fcmTokenRepository.deleteAllByMember(member);
     }
 
 }

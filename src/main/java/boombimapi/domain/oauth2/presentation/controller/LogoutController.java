@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import static boombimapi.global.response.ResponseMessage.LOGOUT_SUCCESS;
@@ -22,8 +23,9 @@ public class LogoutController {
 
     @Operation(summary = "로그아웃", description = "사용자를 로그아웃하고 토큰을 무효화합니다.")
     @PostMapping("/api/oauth2/logout")
-    public ResponseEntity<BaseOKResponse<Void>> logout(@RequestBody LogoutRequest request) {
-        logoutService.logout(request.refreshToken());
+    public ResponseEntity<BaseOKResponse<Void>> logout(@AuthenticationPrincipal String userId,
+                                                       @RequestBody LogoutRequest request) {
+        logoutService.logout(userId,request.refreshToken());
 
         return ResponseEntity.ok(
                 BaseOKResponse.of(

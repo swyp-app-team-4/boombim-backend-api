@@ -26,5 +26,7 @@ public interface FcmService {
     // 오래된 비활성 토큰 정리
     void cleanupOldTokens();
 
+    void deleteFcmToken(String userId);
+
 
 }
