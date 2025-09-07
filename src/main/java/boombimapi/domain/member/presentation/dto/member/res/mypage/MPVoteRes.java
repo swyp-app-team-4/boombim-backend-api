@@ -23,6 +23,8 @@ public record MPVoteRes(
         )
         List<String> profile,
 
+        @Schema(description = "투표 중복자 수 (궁금해하는 사람 수)", example = "3")
+        Long voteDuplicationCnt,
         @Schema(description = "투표 생성 시간", example = "2025-07-15T09:30:00")
         LocalDateTime day,
 
@@ -54,6 +56,7 @@ public record MPVoteRes(
     public static MPVoteRes of(
             Long voteId,
             List<String> profile,
+            Long voteDuplicationCnt,
             LocalDateTime day,
             String posName,
             List<VoteAnswerType> popularRes,
@@ -67,6 +70,7 @@ public record MPVoteRes(
         return new MPVoteRes(
                 voteId,
                 profile,
+                voteDuplicationCnt,
                 day,
                 posName,
                 popularRes,

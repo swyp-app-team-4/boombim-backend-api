@@ -120,8 +120,8 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
-                vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
         if (bottomResult.isEmpty()) {
@@ -161,8 +161,8 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
-                vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
 
         }
 
@@ -185,8 +185,8 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
-                vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size(),vote.getCreatedAt(), posName, voteAnswerTypes,
+                    vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
         if (bottomResult.isEmpty()) {
@@ -249,13 +249,13 @@ public class MemberServiceImpl implements MemberService {
 
         // 타입별 카운팅
         Map<VoteAnswerType, Long> countMap = voteAnswers.stream()
-            .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
 
         // 최대 투표 수 찾기
         long maxCount = countMap.values().stream()
-            .mapToLong(Long::longValue)
-            .max()
-            .orElse(0L);
+                .mapToLong(Long::longValue)
+                .max()
+                .orElse(0L);
 
         if (maxCount == 0L) {
             return Collections.emptyList();
@@ -263,9 +263,9 @@ public class MemberServiceImpl implements MemberService {
 
         // 최대값과 같은 타입들만 추출
         return countMap.entrySet().stream()
-            .filter(e -> e.getValue().equals(maxCount))
-            .map(Map.Entry::getKey)
-            .toList();
+                .filter(e -> e.getValue().equals(maxCount))
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
 
@@ -278,12 +278,12 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Map<VoteAnswerType, Long> countMap = voteAnswers.stream()
-            .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
 
         return countMap.entrySet().stream()
-            .max(Map.Entry.comparingByValue())
-            .map(e -> Map.entry(e.getKey().name(), e.getValue()))
-            .orElse(Map.entry("없음", 0L));
+                .max(Map.Entry.comparingByValue())
+                .map(e -> Map.entry(e.getKey().name(), e.getValue()))
+                .orElse(Map.entry("없음", 0L));
     }
 
 
@@ -291,20 +291,20 @@ public class MemberServiceImpl implements MemberService {
     private List<MyPageVoteRes> dayMapping(List<MPVoteRes> bottomResult) {
         // 2) 날짜(일 단위)로 그룹핑
         Map<LocalDate, List<MPVoteRes>> grouped = bottomResult.stream()
-            .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
+                .collect(Collectors.groupingBy(r -> r.day().toLocalDate()));
 
         // 3) 날짜 내림차순(최근일자 먼저),
         //    같은 날짜 내에서는 시간 내림차순으로 정렬해서 MyPageVoteRes 구성
         List<MyPageVoteRes> result = grouped.entrySet().stream()
-            .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
-            .map(e -> {
-                List<MPVoteRes> items = e.getValue().stream()
-                    .sorted(Comparator.comparing(MPVoteRes::day).reversed())
-                    .toList();
-                LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
-                return MyPageVoteRes.of(headerDay, items);
-            })
-            .toList();
+                .sorted(Map.Entry.<LocalDate, List<MPVoteRes>>comparingByKey(Comparator.reverseOrder()))
+                .map(e -> {
+                    List<MPVoteRes> items = e.getValue().stream()
+                            .sorted(Comparator.comparing(MPVoteRes::day).reversed())
+                            .toList();
+                    LocalDateTime headerDay = e.getKey().atStartOfDay(); // 날짜 헤더(00:00)로 표시
+                    return MyPageVoteRes.of(headerDay, items);
+                })
+                .toList();
         return result;
     }
 
@@ -312,7 +312,7 @@ public class MemberServiceImpl implements MemberService {
     public List<Long> voteAnswerCnt(Vote vote) {
         List<VoteAnswer> voteAnswer = voteAnswerRepository.findByVote(vote);
         Map<VoteAnswerType, Long> counts = voteAnswer.stream()
-            .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
+                .collect(Collectors.groupingBy(VoteAnswer::getAnswerType, Collectors.counting()));
 
         long relaxedCount = counts.getOrDefault(VoteAnswerType.RELAXED, 0L);
         long commonlyCount = counts.getOrDefault(VoteAnswerType.COMMONLY, 0L);
@@ -329,11 +329,11 @@ public class MemberServiceImpl implements MemberService {
 
     // 상위 3건 유저 프로필 이미지 링크
     public List<String> profileTopThree(Vote vote) {
-        return vote.getVoteAnswers().stream()
-            .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
-            .filter(Objects::nonNull)                               // null 값 제거 (안전)
-            .limit(3)                                               // 최대 3개만
-            .toList();
+        return vote.getVoteDuplications().stream()
+                .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
+                .filter(Objects::nonNull)                               // null 값 제거 (안전)
+                .limit(3)                                               // 최대 3개만
+                .toList();
     }
 
 
