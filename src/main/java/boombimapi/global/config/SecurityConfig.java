@@ -41,7 +41,6 @@ public class SecurityConfig {
             "/api/region",
             "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
             "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
-            "/api/oauth2/logout",
             "/api/healthcheck", "/api/admin/**",
             "/actuator/**"
     );
@@ -71,7 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/healthcheck").permitAll()
                         .requestMatchers("/api/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
                         .requestMatchers("/api/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
-                        .requestMatchers("/api/oauth2/logout", "/api/admin/**").permitAll()
+                        .requestMatchers( "/api/admin/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/favicon.ico", "/api/region").permitAll()
                         .requestMatchers("/api/reissue").permitAll()
