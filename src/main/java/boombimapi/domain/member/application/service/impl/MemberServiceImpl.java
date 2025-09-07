@@ -120,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, vote.getCreatedAt(), posName, voteAnswerTypes,
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), posName, voteAnswerTypes,
                     vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
