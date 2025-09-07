@@ -159,6 +159,14 @@ public class VoteServiceImpl implements VoteService {
         // 본인 투표 막기 즉 본인이 올린거 투표 못하게 해야됨
         if(vote.getMember().getId().equals(user.getId())) throw new BoombimException(ErrorCode.SELF_VOTE_NOT_ALLOWED);
 
+        // voteDuplication 도 막기 이것보 본인이 합류한거니깐 막아야됨
+        List<VoteDuplication> voteDuplications = vote.getVoteDuplications();
+        for (VoteDuplication voteDuplication : voteDuplications) {
+            if(voteDuplication.getVote().getId().equals(vote.getId())){
+                throw new BoombimException(ErrorCode.SELF_VOTE_NOT_ALLOWED);
+            }
+        }
+
         // 같은 투표 중복자 막기
         VoteAnswer voteAnswer = voteAnswerRepository.findByMemberAndVote(user, vote).orElse(null);
         if (voteAnswer != null) throw new BoombimException(ErrorCode.DUPLICATE_VOTE_USER);
@@ -362,7 +370,7 @@ public class VoteServiceImpl implements VoteService {
 
     // 상위 3건 유저 프로필 이미지 링크
     public List<String> profileTopThree(Vote vote) {
-        return vote.getVoteAnswers().stream()
+        return vote.getVoteDuplications().stream()
                 .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
                 .filter(Objects::nonNull)                               // null 값 제거 (안전)
                 .limit(3)                                               // 최대 3개만

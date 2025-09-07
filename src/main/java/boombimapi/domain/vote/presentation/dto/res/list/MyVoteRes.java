@@ -11,7 +11,12 @@ public record MyVoteRes(
 
         @Schema(description = "투표 ID", example = "1")
         Long voteId,
-        @Schema(description = "사용자 별 프로필 사진", example = "http://k.kakaocdn.net/dn/bN0Hg2/btsIUhLSYs8/vrWzldpNSnycWKkRtYyIgk/img_640x640.jpg")
+        @Schema(
+                description = "사용자 별 프로필 사진 리스트",
+                example = "[\"http://k.kakaocdn.net/dn/bN0Hg2/btsIUhLSYs8/vrWzldpNSnycWKkRtYyIgk/img_640x640.jpg\", " +
+                        "\"https://example.com/images/profile2.jpg\", " +
+                        "\"https://example.com/images/profile3.png\"]"
+        )
         List<String> profile,
 
         @Schema(description = "투표 중복자 수 (궁금해하는 사람 수)", example = "3")
