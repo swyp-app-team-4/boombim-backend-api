@@ -362,7 +362,7 @@ public class VoteServiceImpl implements VoteService {
 
     // 상위 3건 유저 프로필 이미지 링크
     public List<String> profileTopThree(Vote vote) {
-        return vote.getVoteAnswers().stream()
+        return vote.getVoteDuplications().stream()
                 .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
                 .filter(Objects::nonNull)                               // null 값 제거 (안전)
                 .limit(3)                                               // 최대 3개만
