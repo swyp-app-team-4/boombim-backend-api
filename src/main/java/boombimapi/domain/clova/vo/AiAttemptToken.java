@@ -1,6 +1,6 @@
 package boombimapi.domain.clova.vo;
 
-public record AiAttemptId(
+public record AiAttemptToken(
     String value
 ) {
 

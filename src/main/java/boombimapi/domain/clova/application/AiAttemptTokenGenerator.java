@@ -1,6 +1,6 @@
 package boombimapi.domain.clova.application;
 
-import boombimapi.domain.clova.vo.AiAttemptId;
+import boombimapi.domain.clova.vo.AiAttemptToken;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Base64.Encoder;
@@ -15,12 +15,12 @@ public class AiAttemptTokenGenerator {
     private final SecureRandom random = new SecureRandom();
     private final Encoder base64 = Base64.getUrlEncoder().withoutPadding();
 
-    public AiAttemptId generateAiAttemptId() {
+    public AiAttemptToken generateAiAttemptToken() {
 
         byte[] buffer = new byte[BYTES];
         random.nextBytes(buffer);
 
-        return new AiAttemptId(PREFIX + base64.encodeToString(buffer));
+        return new AiAttemptToken(PREFIX + base64.encodeToString(buffer));
     }
 
 }

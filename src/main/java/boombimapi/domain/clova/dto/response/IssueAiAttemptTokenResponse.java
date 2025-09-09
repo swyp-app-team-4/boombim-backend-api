@@ -1,16 +1,16 @@
 package boombimapi.domain.clova.dto.response;
 
-import boombimapi.domain.clova.vo.AiAttemptId;
+import boombimapi.domain.clova.vo.AiAttemptToken;
 
 public record IssueAiAttemptTokenResponse(
-    String aiAttemptId
+    String aiAttemptToken
 ) {
 
     public static IssueAiAttemptTokenResponse from(
-        AiAttemptId aiAttemptId
+        AiAttemptToken aiAttemptToken
     ) {
         return new IssueAiAttemptTokenResponse(
-            aiAttemptId.value()
+            aiAttemptToken.value()
         );
     }
 

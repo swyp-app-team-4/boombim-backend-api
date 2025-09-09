@@ -2,7 +2,7 @@ package boombimapi.domain.clova.infrastructure.repository;
 
 import static boombimapi.global.constant.AiAttemptTokenRedisConstant.*;
 
-import boombimapi.domain.clova.vo.AiAttemptId;
+import boombimapi.domain.clova.vo.AiAttemptToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,13 +16,13 @@ public class AiAttemptTokenRepository {
 
     private final StringRedisTemplate redisTemplate;
 
-    public void saveAiAttemptId(
-        AiAttemptId aiAttemptId,
+    public void saveAiAttemptToken(
+        AiAttemptToken aiAttemptToken,
         String memberId,
         Long memberPlaceId
     ) {
         redisTemplate.opsForHash().putAll(
-            KEY_PREFIX_AI_ATTEMPT_META + aiAttemptId.value(),
+            KEY_PREFIX_AI_ATTEMPT_META + aiAttemptToken.value(),
             Map.of(
                 FIELD_MEMBER_ID, memberId,
                 FIELD_MEMBER_PLACE_ID, String.valueOf(memberPlaceId),
@@ -33,17 +33,17 @@ public class AiAttemptTokenRepository {
 
     public void setActiveAiAttemptPointer(
         String memberId,
-        AiAttemptId aiAttemptId
+        AiAttemptToken aiAttemptToken
     ) {
         redisTemplate.opsForValue()
-            .set(KEY_PREFIX_ACTIVE_POINTER + memberId, aiAttemptId.value());
+            .set(KEY_PREFIX_ACTIVE_POINTER + memberId, aiAttemptToken.value());
     }
 
     public Optional<Map<Object, Object>> getAiAttemptMeta(
-        AiAttemptId aiAttemptId
+        AiAttemptToken aiAttemptToken
     ) {
         Map<Object, Object> map = redisTemplate.opsForHash()
-            .entries(KEY_PREFIX_AI_ATTEMPT_META + aiAttemptId.value());
+            .entries(KEY_PREFIX_AI_ATTEMPT_META + aiAttemptToken.value());
 
         if (map.isEmpty()) {
             return Optional.empty();
@@ -52,29 +52,29 @@ public class AiAttemptTokenRepository {
         return Optional.of(map);
     }
 
-    public Optional<AiAttemptId> getActiveAiAttemptPointer(
+    public Optional<AiAttemptToken> getActiveAiAttemptPointer(
         String memberId
     ) {
         String value = redisTemplate.opsForValue()
             .get(KEY_PREFIX_ACTIVE_POINTER + memberId);
 
-        return Optional.of(new AiAttemptId(value));
+        return Optional.of(new AiAttemptToken(value));
     }
 
     public boolean acquireOnce(
-        AiAttemptId aiAttemptId
+        AiAttemptToken aiAttemptToken
     ) {
         Boolean ok = redisTemplate.opsForValue()
-            .setIfAbsent(KEY_PREFIX_USED_FLAG + aiAttemptId.value(), "1");
+            .setIfAbsent(KEY_PREFIX_USED_FLAG + aiAttemptToken.value(), "1");
 
         return Boolean.TRUE.equals(ok);
     }
 
     public void deleteAllKeysForAttempt(
-        AiAttemptId aiAttemptId
+        AiAttemptToken aiAttemptToken
     ) {
-        redisTemplate.delete(KEY_PREFIX_USED_FLAG + aiAttemptId.value());
-        redisTemplate.delete(KEY_PREFIX_AI_ATTEMPT_META + aiAttemptId.value());
+        redisTemplate.delete(KEY_PREFIX_USED_FLAG + aiAttemptToken.value());
+        redisTemplate.delete(KEY_PREFIX_AI_ATTEMPT_META + aiAttemptToken.value());
     }
 
 }
