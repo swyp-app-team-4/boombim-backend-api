@@ -1,5 +1,26 @@
 package boombimapi.domain.clova.application;
 
+import boombimapi.domain.clova.vo.AiAttemptId;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Base64.Encoder;
+import org.springframework.stereotype.Component;
+
+@Component
 public class AiAttemptIdGenerator {
+
+    private static final int BYTES = 16;
+    private static final String PREFIX = "attempt_";
+
+    private final SecureRandom random = new SecureRandom();
+    private final Encoder base64 = Base64.getUrlEncoder().withoutPadding();
+
+    public AiAttemptId generateAiAttemptId() {
+
+        byte[] buffer = new byte[BYTES];
+        random.nextBytes(buffer);
+
+        return new AiAttemptId(PREFIX + base64.encodeToString(buffer));
+    }
 
 }
