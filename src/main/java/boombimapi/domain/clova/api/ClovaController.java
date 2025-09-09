@@ -47,6 +47,16 @@ public class ClovaController {
         );
     }
 
+    @Operation(summary = "AI 생성 토큰 발급", description = "사용자 혼잡도 생성 시 1회만 가능하도록 제한하는 토큰을 생성합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "AI 생성 토큰 발급 성공"),
+        @ApiResponse(responseCode = "406", description = "AI 생성 토큰이 존재하지 않습니다."),
+        @ApiResponse(responseCode = "403", description = "AI 생성 토큰 소유자와 요청 사용자가 일치하지 않습니다."),
+        @ApiResponse(responseCode = "422", description = "AI 생성 토큰의 장소와 요청 값이 다릅니다."),
+        @ApiResponse(responseCode = "406", description = "활성 AI 생성 토큰이 없습니다."),
+        @ApiResponse(responseCode = "409", description = "AI 생성 토큰이 이미 사용되었습니다."),
+        @ApiResponse(responseCode = "424", description = "AI 생성 토큰이 이미 교체되었습니다.")
+    })
     @PostMapping("/issue-ai-attempt-token")
     public ResponseEntity<BaseResponse<IssueAiAttemptTokenResponse>> issueAiAttemptToken(
         @AuthenticationPrincipal String memberId,
