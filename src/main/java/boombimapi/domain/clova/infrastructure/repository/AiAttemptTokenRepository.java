@@ -1,6 +1,6 @@
 package boombimapi.domain.clova.infrastructure.repository;
 
-import static boombimapi.global.constant.AiAttemptRedisConstant.*;
+import static boombimapi.global.constant.AiAttemptTokenRedisConstant.*;
 
 import boombimapi.domain.clova.vo.AiAttemptId;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class AiAttemptIdRepository {
+public class AiAttemptTokenRepository {
 
     private final StringRedisTemplate redisTemplate;
 
