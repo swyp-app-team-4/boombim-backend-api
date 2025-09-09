@@ -1,5 +1,7 @@
 package boombimapi.domain.clova.vo;
 
-public record AiAttemptId() {
+public record AiAttemptId(
+    String value
+) {
 
 }
