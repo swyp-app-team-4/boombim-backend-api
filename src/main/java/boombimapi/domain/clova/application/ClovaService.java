@@ -1,14 +1,22 @@
 package boombimapi.domain.clova.application;
 
+import static boombimapi.global.infra.exception.error.ErrorCode.*;
+
 import boombimapi.domain.clova.dto.request.ClovaChatRequest;
 import boombimapi.domain.clova.dto.request.GenerateCongestionMessageRequest;
+import boombimapi.domain.clova.dto.request.IssueAiAttemptTokenRequest;
 import boombimapi.domain.clova.dto.response.ClovaResponse;
 import boombimapi.domain.clova.dto.response.GenerateCongestionMessageResponse;
+import boombimapi.domain.clova.dto.response.IssueAiAttemptTokenResponse;
 import boombimapi.domain.clova.infrastructure.ClovaCongestionMessageClient;
 import boombimapi.domain.clova.infrastructure.parser.ClovaParser;
+import boombimapi.domain.clova.infrastructure.repository.AiAttemptTokenRepository;
+import boombimapi.domain.clova.vo.AiAttemptToken;
+import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.properties.ClovaGenerationProperties;
 import boombimapi.global.properties.ClovaPromptProperties;
 import java.time.Duration;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,9 +31,27 @@ public class ClovaService {
     private final ClovaGenerationProperties clovaGenerationProperties;
     private final ClovaCongestionMessageClient clovaCongestionMessageClient;
 
+    private final AiAttemptTokenGenerator aiAttemptTokenGenerator;
+    private final AiAttemptTokenRepository aiAttemptTokenRepository;
+
+    public IssueAiAttemptTokenResponse issueAiAttemptToken(
+        String memberId,
+        IssueAiAttemptTokenRequest request
+    ) {
+        AiAttemptToken aiAttemptToken = aiAttemptTokenGenerator.generateAiAttemptToken();
+        aiAttemptTokenRepository.saveAiAttemptToken(aiAttemptToken, memberId, request.memberPlaceId());
+        aiAttemptTokenRepository.setActiveAiAttemptPointer(memberId, aiAttemptToken);
+
+        return IssueAiAttemptTokenResponse.from(aiAttemptToken);
+    }
+
+
     public GenerateCongestionMessageResponse generateCongestionMessage(
+        String memberId,
         GenerateCongestionMessageRequest request
     ) {
+        validateAiAttemptToken(memberId, request);
+
         String memberPlaceName = request.memberPlaceName();
         String congestionLevelName = request.congestionLevelName();
         String congestionMessage = request.congestionMessage();
@@ -63,6 +89,42 @@ public class ClovaService {
 
     }
 
+    private void validateAiAttemptToken(
+        String memberId,
+        GenerateCongestionMessageRequest request
+    ) {
+        AiAttemptToken providedAiAttemptToken = new AiAttemptToken(request.aiAttemptToken());
+
+        Map<Object, Object> aiAttemptMeta = aiAttemptTokenRepository.getAiAttemptMeta(providedAiAttemptToken)
+            .orElseThrow(() -> new BoombimException(AI_ATTEMPT_TOKEN_NOT_FOUND));
+
+        log.info("aiAttemptMeta: {}", aiAttemptMeta);
+
+        if (!aiAttemptMeta.get("memberId").equals(memberId)) {
+            throw new BoombimException(AI_ATTEMPT_TOKEN_MEMBER_MISMATCH);
+        }
+
+        log.info("aiAttemptMeta memberPlaceId: {}", aiAttemptMeta.get("memberPlaceId"));
+        log.info("request.memberPlaceId: {}", request.memberPlaceId());
+
+        if (!aiAttemptMeta.get("memberPlaceId").equals(request.memberPlaceId().toString())) {
+            throw new BoombimException(AI_ATTEMPT_TOKEN_PLACE_MISMATCH);
+        }
+
+        AiAttemptToken activeAiAttemptToken = aiAttemptTokenRepository.getActiveAiAttemptPointer(memberId)
+            .orElseThrow(() -> new BoombimException(AI_ATTEMPT_TOKEN_NO_ACTIVE_POINTER));
+
+        if (!activeAiAttemptToken.value().equals(providedAiAttemptToken.value())) {
+            throw new BoombimException(AI_ATTEMPT_TOKEN_SUPERSEDED);
+        }
+
+        boolean first = aiAttemptTokenRepository.acquireOnce(providedAiAttemptToken);
+
+        if (!first) {
+            throw new BoombimException(AI_ATTEMPT_TOKEN_ALREADY_USED);
+        }
+    }
+
     private String buildUserContent(
         String memberPlaceName,
         String congestionLevelName,
@@ -90,4 +152,5 @@ public class ClovaService {
             default -> "%s은(는) 보통 수준의 혼잡도입니다.".formatted(memberPlaceName);
         };
     }
+
 }

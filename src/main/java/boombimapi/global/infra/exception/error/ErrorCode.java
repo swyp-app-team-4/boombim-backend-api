@@ -83,7 +83,15 @@ public enum ErrorCode {
 
     // favorite
     FAVORITE_ALREADY_EXISTS(-800, "이미 즐겨찾기 한 사용자 장소입니다.", 409),
-    SEARCH_NOT_EXISTS(-801, "해당 검색 ID가 없습니다.", 409);
+    SEARCH_NOT_EXISTS(-801, "해당 검색 ID가 없습니다.", 409),
+
+    // clova
+    AI_ATTEMPT_TOKEN_NOT_FOUND(-900, "AI 생성 토큰이 존재하지 않습니다.", 406),
+    AI_ATTEMPT_TOKEN_MEMBER_MISMATCH(-901, "AI 생성 토큰 소유자가 요청 사용자와 일치하지 않습니다.", 403),
+    AI_ATTEMPT_TOKEN_PLACE_MISMATCH(-902, "AI 생성 토큰의 장소와 요청 값이 다릅니다.", 422),
+    AI_ATTEMPT_TOKEN_NO_ACTIVE_POINTER(-903, "활성 AI 생성 토큰이 없습니다.", 406),
+    AI_ATTEMPT_TOKEN_ALREADY_USED(-904, "AI 생성 토큰이 이미 사용되었습니다.", 409),
+    AI_ATTEMPT_TOKEN_SUPERSEDED(-905, "AI 생성 토큰이 이미 교체되었습니다.", 424);
 
     private final int code;
     private final String message;
