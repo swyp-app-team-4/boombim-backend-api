@@ -7,7 +7,7 @@ import java.util.Base64.Encoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AiAttemptIdGenerator {
+public class AiAttemptTokenGenerator {
 
     private static final int BYTES = 16;
     private static final String PREFIX = "attempt_";
