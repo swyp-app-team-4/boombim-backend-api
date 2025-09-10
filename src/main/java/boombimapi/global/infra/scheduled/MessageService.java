@@ -33,13 +33,12 @@ public class MessageService {
 
 
     public String dailyCommunityTitle() {
-        return "💬 오늘의 소통방에 참여해보세요!";
+        return "\uD83D\uDC40 붐빔 정도를 알고 싶어하는 사람이 있어요";
     }
 
     public String dailyCommunityMessage() {
         StringBuilder sb = new StringBuilder();
-        sb.append("🙌 서로의 의견을 나누고 소통해요!\n");
-        sb.append("👉 지금 바로 참여해서 여러분의 생각을 공유해보세요!");
+        sb.append("지금 있는 곳의 혼잡도를 공유해보세요!");
         return sb.toString();
     }
 
