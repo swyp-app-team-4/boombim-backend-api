@@ -1,0 +1,162 @@
+spring:
+  application:
+    name: boombim-prod
+
+  config:
+    import:
+      - file:env/prod.env[.properties]
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: root        # 기본 스키마
+        jdbc:
+          batch_size: 1000          # 배치 insert/update 사이즈
+        order_inserts: true         # insert 정렬
+        order_updates: true         # update 정렬
+        batch_versioned_data: true
+
+
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 30MB
+      max-file-size: 30MB
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+
+  task:
+    scheduling:
+      enabled: true
+    execution:
+      pool:
+        core-size: 2
+        max-size: 10
+        queue-capacity: 100
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    cache:
+      channel:
+        size: 50
+      connection:
+        mode: channel
+    requested-heartbeat: 30
+    connection-timeout: 5000
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: ERROR
+
+# 보류
+oauth2:
+  front-url: ${OAUTH2_FRONT_URL}
+
+  # Kakao 설정
+  kakao:
+    base-url: ${KAKAO_OAUTH2_BASE_URL}
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+    front-redirect-uri: ${KAKAO_FRONT_REDIRECT_URI}
+
+  # Naver 설정
+  naver:
+    base-url: ${NAVER_OAUTH2_BASE_URL}
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
+    redirect-uri: ${NAVER_REDIRECT_URI}
+
+  # Apple 설정
+  apple:
+    client-id: ${APPLE_CLIENT_ID}
+    team-id: ${APPLE_TEAM_ID}
+    key-id: ${APPLE_KEY_ID}
+    private-key: ${APPLE_PRIVATE_KEY}
+    redirect-uri: ${APPLE_REDIRECT_URI}
+    profile: ${APPLE_PROFILE}
+
+
+# Firebase FCM 설정
+firebase:
+  service-account-key: ${FIREBASE_SERVICE_ACCOUNT_KEY}
+
+admin:
+  id: ${ADMIN_ID}
+
+cluster:
+  zoom-ref: 20
+  base-cell-pixel: 64
+  merge-factor: 1.05
+  tile-size: 256.0
+
+# S3
+cloud:
+  aws:
+    stack:
+      auto: false
+    s3:
+      bucket: ${S3_BUCKET}
+    region:
+      static: ${S3_REGION}
+    credentials:
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+
+# CLOVA Studio
+clova:
+  congestion-message:
+    base-url: ${GENERATE_CONGESTION_MESSAGE_BASE_URL}
+    api-key: ${GENERATE_CONGESTION_MESSAGE_API_KEY}
+  prompts:
+    auto-complete-congestion-message: ${GENERATE_CONGESTION_MESSAGE_PROMPT}
+  generation:
+    top-p: ${GENERATE_CONGESTION_MESSAGE_TOP_P}
+    top-k: ${GENERATE_CONGESTION_MESSAGE_TOP_K}
+    max-tokens: ${GENERATE_CONGESTION_MESSAGE_MAX_TOKENS}
+    temperature: ${GENERATE_CONGESTION_MESSAGE_TEMPERATURE}
+    repetition-penalty: ${GENERATE_CONGESTION_MESSAGE_REPETITION_PENALTY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus  # 👈 metrics 추가
+  endpoint:
+    prometheus:
+      enabled: true
+
+  metrics:
+    tags:
+      application: boombim-api   # 👈 공통 라벨 추가 (Grafana 호환)
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true        # 👈 status 라벨 포함된 http_server_requests 메트릭 활성화
+
+

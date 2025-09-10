@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'boombim-api'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['app:8080']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: application
+        replacement: 'boombim-api'

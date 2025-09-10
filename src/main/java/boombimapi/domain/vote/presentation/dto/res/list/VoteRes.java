@@ -1,0 +1,51 @@
+package boombimapi.domain.vote.presentation.dto.res.list;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Schema(description = "전체 투표 목록 응답 DTO(500M)")
+public record VoteRes(
+
+        @Schema(description = "투표 ID", example = "1")
+        Long voteId,
+        @Schema(description = "사용자 별 프로필 사진", example = "http://k.kakaocdn.net/dn/bN0Hg2/btsIUhLSYs8/vrWzldpNSnycWKkRtYyIgk/img_640x640.jpg")
+        List<String> profile,
+        @Schema(description = "투표 중복자 수 (궁금해하는 사람 수)", example = "3")
+        Long voteDuplicationCnt,
+
+        @Schema(description = "투표 생성일시", example = "2025-08-13T14:30:00")
+        LocalDateTime createdAt,
+
+        @Schema(description = "장소 이름", example = "서울역")
+        String posName,
+
+        @Schema(description = "장소 사진", example = "http://imgnews.naver.net/image/5817/2024/02/08/0000024151_001_20240208111202892.jpg")
+        String posImage,
+
+        @Schema(description = "여유 투표 수", example = "5")
+        Long relaxedCnt,
+
+        @Schema(description = "보통 투표 수", example = "8")
+        Long commonly,
+
+        @Schema(description = "약간 붐빔 투표 수", example = "4")
+        Long slightlyBusyCnt,
+
+        @Schema(description = "붐빔 투표 수", example = "2")
+        Long crowedCnt,
+
+        @Schema(description = "전체 타입 (예: '투표하기, 내 질문')", example = "투표하기")
+        String allType,
+
+        @Schema(description = "투표했으면 true, 안했으면 false", example = "true")
+        boolean voteFlag
+) {
+    public static VoteRes of(Long voteId, List<String> profile, Long voteDuplicationCnt, LocalDateTime createdAt,
+                             String posName, String posImage, Long relaxedCnt, Long commonly, Long slightlyBusyCnt,
+                             Long crowedCnt, String allType, boolean voteFlag) {
+        return new VoteRes(voteId, profile, voteDuplicationCnt, createdAt, posName, posImage, relaxedCnt,
+                commonly, slightlyBusyCnt, crowedCnt, allType, voteFlag);
+    }
+}
