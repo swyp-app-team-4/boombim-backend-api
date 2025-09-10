@@ -83,7 +83,6 @@ public class SecurityConfig {
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                         ))
 
-                .addFilterBefore(new CustomSecurityLogger(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
                 .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
 
