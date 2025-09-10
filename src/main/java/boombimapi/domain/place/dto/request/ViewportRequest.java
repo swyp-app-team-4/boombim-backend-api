@@ -1,6 +1,6 @@
 package boombimapi.domain.place.dto.request;
 
-import boombimapi.global.dto.Coordinate;
+import boombimapi.global.vo.Coordinate;
 
 public record ViewportRequest(
     Coordinate topLeft,

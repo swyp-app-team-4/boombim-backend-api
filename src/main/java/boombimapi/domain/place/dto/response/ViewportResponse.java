@@ -1,7 +1,7 @@
 package boombimapi.domain.place.dto.response;
 
 import boombimapi.domain.place.entity.PlaceType;
-import boombimapi.global.dto.Coordinate;
+import boombimapi.global.vo.Coordinate;
 
 public record ViewportResponse(
     Long officialPlaceId,
