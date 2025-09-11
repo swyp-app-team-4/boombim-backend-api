@@ -13,6 +13,7 @@ import boombimapi.domain.clova.infrastructure.parser.ClovaParser;
 import boombimapi.domain.clova.infrastructure.repository.AiAttemptTokenRepository;
 import boombimapi.domain.clova.vo.AiAttemptToken;
 import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.RateLimitedException;
 import boombimapi.global.infra.ratelimit.AiAttemptTokenBucketLimiter;
 import boombimapi.global.properties.AiAttemptTokenBucketProperties;
 import boombimapi.global.properties.ClovaGenerationProperties;
@@ -64,7 +65,7 @@ public class ClovaService {
 
         if (!aiAttemptRateLimitDecision.allowed()) {
             long retryAfterSeconds = aiAttemptRateLimitDecision.retryAfterSeconds();
-            throw new BoombimException(AI_ATTEMPT_RATE_LIMITED);
+            throw new RateLimitedException(AI_ATTEMPT_RATE_LIMITED, retryAfterSeconds);
         }
 
         validateAiAttemptToken(memberId, request);
