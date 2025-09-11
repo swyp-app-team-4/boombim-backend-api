@@ -141,6 +141,14 @@ clova:
     temperature: ${GENERATE_CONGESTION_MESSAGE_TEMPERATURE}
     repetition-penalty: ${GENERATE_CONGESTION_MESSAGE_REPETITION_PENALTY}
 
+rate-limit:
+  ai:
+    token-bucket:
+      capacity: 3
+      refill-per-second: 0.0016666667
+      idle-ttl-seconds: 7200
+      default-cost: 1
+
 management:
   endpoints:
     web:
