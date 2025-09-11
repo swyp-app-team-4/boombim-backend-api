@@ -1,5 +1,7 @@
-package boombimapi.global.infra.exception.error;
+package boombimapi.global.infra.exception.error.response;
 
+import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import java.time.LocalDateTime;
 
 
