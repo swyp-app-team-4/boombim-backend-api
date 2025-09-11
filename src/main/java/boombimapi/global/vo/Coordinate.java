@@ -1,4 +1,4 @@
-package boombimapi.global.dto;
+package boombimapi.global.vo;
 
 public record Coordinate(
     double latitude,

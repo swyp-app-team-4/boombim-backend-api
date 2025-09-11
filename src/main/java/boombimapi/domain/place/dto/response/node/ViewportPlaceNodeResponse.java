@@ -2,7 +2,7 @@ package boombimapi.domain.place.dto.response.node;
 
 import boombimapi.domain.place.dto.type.MarkerType;
 import boombimapi.domain.place.entity.PlaceType;
-import boombimapi.global.dto.Coordinate;
+import boombimapi.global.vo.Coordinate;
 import java.time.LocalDateTime;
 
 public record ViewportPlaceNodeResponse(

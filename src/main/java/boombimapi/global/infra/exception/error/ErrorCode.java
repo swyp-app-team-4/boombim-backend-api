@@ -91,7 +91,8 @@ public enum ErrorCode {
     AI_ATTEMPT_TOKEN_PLACE_MISMATCH(-902, "AI 생성 토큰의 장소와 요청 값이 다릅니다.", 422),
     AI_ATTEMPT_TOKEN_NO_ACTIVE_POINTER(-903, "활성 AI 생성 토큰이 없습니다.", 406),
     AI_ATTEMPT_TOKEN_ALREADY_USED(-904, "AI 생성 토큰이 이미 사용되었습니다.", 409),
-    AI_ATTEMPT_TOKEN_SUPERSEDED(-905, "AI 생성 토큰이 이미 교체되었습니다.", 424);
+    AI_ATTEMPT_TOKEN_SUPERSEDED(-905, "AI 생성 토큰이 이미 교체되었습니다.", 424),
+    AI_ATTEMPT_RATE_LIMITED(-906, "AI 생성 요청이 너무 빠릅니다.", 429);
 
     private final int code;
     private final String message;

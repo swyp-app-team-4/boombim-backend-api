@@ -3,7 +3,7 @@ package boombimapi.global.infra.exception.auth;
 
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
-import boombimapi.global.infra.exception.error.ErrorResponse;
+import boombimapi.global.infra.exception.error.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

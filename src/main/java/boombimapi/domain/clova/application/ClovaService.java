@@ -13,8 +13,12 @@ import boombimapi.domain.clova.infrastructure.parser.ClovaParser;
 import boombimapi.domain.clova.infrastructure.repository.AiAttemptTokenRepository;
 import boombimapi.domain.clova.vo.AiAttemptToken;
 import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.RateLimitedException;
+import boombimapi.global.infra.ratelimit.AiAttemptTokenBucketLimiter;
+import boombimapi.global.properties.AiAttemptTokenBucketProperties;
 import boombimapi.global.properties.ClovaGenerationProperties;
 import boombimapi.global.properties.ClovaPromptProperties;
+import boombimapi.global.vo.AiAttemptRateLimitDecision;
 import java.time.Duration;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +31,12 @@ import org.springframework.stereotype.Service;
 public class ClovaService {
 
     private final ClovaParser parser;
+
     private final ClovaPromptProperties promptProperties;
     private final ClovaGenerationProperties clovaGenerationProperties;
+    private final AiAttemptTokenBucketProperties aiAttemptTokenBucketProperties;
+
+    private final AiAttemptTokenBucketLimiter aiAttemptTokenBucketLimiter;
     private final ClovaCongestionMessageClient clovaCongestionMessageClient;
 
     private final AiAttemptTokenGenerator aiAttemptTokenGenerator;
@@ -45,12 +53,14 @@ public class ClovaService {
         return IssueAiAttemptTokenResponse.from(aiAttemptToken);
     }
 
-
     public GenerateCongestionMessageResponse generateCongestionMessage(
         String memberId,
         GenerateCongestionMessageRequest request
     ) {
+
         validateAiAttemptToken(memberId, request);
+
+        enforceAiRateLimit(memberId);
 
         String memberPlaceName = request.memberPlaceName();
         String congestionLevelName = request.congestionLevelName();
@@ -122,6 +132,22 @@ public class ClovaService {
 
         if (!first) {
             throw new BoombimException(AI_ATTEMPT_TOKEN_ALREADY_USED);
+        }
+    }
+
+    private void enforceAiRateLimit(
+        String memberId
+    ) {
+        AiAttemptRateLimitDecision aiAttemptRateLimitDecision = aiAttemptTokenBucketLimiter.checkAndConsume(
+            memberId,
+            aiAttemptTokenBucketProperties.defaultCost()
+        );
+
+        if (!aiAttemptRateLimitDecision.allowed()) {
+            throw new RateLimitedException(
+                AI_ATTEMPT_RATE_LIMITED,
+                aiAttemptRateLimitDecision.retryAfterSeconds()
+            );
         }
     }
 

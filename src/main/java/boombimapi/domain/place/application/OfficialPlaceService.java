@@ -20,7 +20,7 @@ import boombimapi.domain.place.dto.response.ViewportResponse;
 import boombimapi.domain.place.entity.OfficialPlace;
 import boombimapi.domain.place.repository.OfficialPlaceRepository;
 import boombimapi.domain.place.repository.projection.NearbyNonCongestedOfficialPlaceProjection;
-import boombimapi.global.dto.Coordinate;
+import boombimapi.global.vo.Coordinate;
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.util.ArrayList;
 import java.util.Comparator;

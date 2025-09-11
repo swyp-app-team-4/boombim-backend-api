@@ -19,7 +19,7 @@ import boombimapi.domain.place.dto.response.node.ViewportNodeResponse;
 import boombimapi.domain.place.dto.response.node.ViewportPlaceNodeResponse;
 import boombimapi.domain.place.entity.MemberPlace;
 import boombimapi.domain.place.repository.MemberPlaceRepository;
-import boombimapi.global.dto.Coordinate;
+import boombimapi.global.vo.Coordinate;
 import boombimapi.global.geo.core.ClusterMarker;
 import boombimapi.global.geo.core.ClusterPoint;
 import boombimapi.global.geo.core.Clusterer;
