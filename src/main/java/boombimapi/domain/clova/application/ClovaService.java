@@ -58,17 +58,9 @@ public class ClovaService {
         GenerateCongestionMessageRequest request
     ) {
 
-        AiAttemptRateLimitDecision aiAttemptRateLimitDecision = aiAttemptTokenBucketLimiter.checkAndConsume(
-            memberId,
-            aiAttemptTokenBucketProperties.defaultCost()
-        );
-
-        if (!aiAttemptRateLimitDecision.allowed()) {
-            long retryAfterSeconds = aiAttemptRateLimitDecision.retryAfterSeconds();
-            throw new RateLimitedException(AI_ATTEMPT_RATE_LIMITED, retryAfterSeconds);
-        }
-
         validateAiAttemptToken(memberId, request);
+
+        enforceAiRateLimit(memberId);
 
         String memberPlaceName = request.memberPlaceName();
         String congestionLevelName = request.congestionLevelName();
@@ -140,6 +132,22 @@ public class ClovaService {
 
         if (!first) {
             throw new BoombimException(AI_ATTEMPT_TOKEN_ALREADY_USED);
+        }
+    }
+
+    private void enforceAiRateLimit(
+        String memberId
+    ) {
+        AiAttemptRateLimitDecision aiAttemptRateLimitDecision = aiAttemptTokenBucketLimiter.checkAndConsume(
+            memberId,
+            aiAttemptTokenBucketProperties.defaultCost()
+        );
+
+        if (!aiAttemptRateLimitDecision.allowed()) {
+            throw new RateLimitedException(
+                AI_ATTEMPT_RATE_LIMITED,
+                aiAttemptRateLimitDecision.retryAfterSeconds()
+            );
         }
     }
 
