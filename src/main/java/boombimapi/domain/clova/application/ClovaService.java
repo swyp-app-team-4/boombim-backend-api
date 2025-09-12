@@ -58,9 +58,9 @@ public class ClovaService {
         GenerateCongestionMessageRequest request
     ) {
 
-        validateAiAttemptToken(memberId, request);
-
-        enforceAiRateLimit(memberId);
+//        validateAiAttemptToken(memberId, request);
+//
+//        enforceAiRateLimit(memberId);
 
         String memberPlaceName = request.memberPlaceName();
         String congestionLevelName = request.congestionLevelName();
