@@ -135,6 +135,8 @@ public class MemberPlaceService {
         ViewportRequest request
     ) {
 
+        log.info("[MemberPlaceService] getViewportNodes() zoomLevel: {}", request.zoomLevel());
+
         // 1) 뷰포트 경계 계산
         double lat1 = request.topLeft().latitude();
         double lng1 = request.topLeft().longitude();
