@@ -48,9 +48,9 @@ public class OfficialPlaceService {
         ViewportRequest request
     ) {
 
-        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() topLeft: {}", request.topLeft());
-        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() bottomRight: {}", request.bottomRight());
-        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() zoomLevel: {}", request.zoomLevel());
+//        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() topLeft: {}", request.topLeft());
+//        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() bottomRight: {}", request.bottomRight());
+//        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() zoomLevel: {}", request.zoomLevel());
 
         // TODO: 직선 거리 계산 부분 리팩터링 필요
         // 1. 뷰포트 범위 계산
