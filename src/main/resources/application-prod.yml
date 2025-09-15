@@ -10,10 +10,19 @@ spring:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5 # 유지할 유휴 커넥션 수
+      connection-timeout: 2000 # 풀에서 커넥션을 가져오기까지 기다리는 최대 시간 (2초)
+      validation-timeout: 1000 # 풀에서 커넥션을 꺼낼 때 수행하는 검증에 허용할 최대 시간 (1초)
+      idle-timeout: 600000 # 유휴 커넥션 정리까지의 시간 (minimum-idle보다 클 경우에만 적용)
+      max-lifetime: 1700000 # 커넥션 최대 수명
   jpa:
     hibernate:
       ddl-auto: none
     properties:
+      javax.persistence.query.timeout: 2000
+      hibernate.query.timeout: 2000
       hibernate:
         default_schema: root        # 기본 스키마
         jdbc:
