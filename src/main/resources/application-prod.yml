@@ -21,7 +21,7 @@ spring:
     hibernate:
       ddl-auto: none
     properties:
-      javax.persistence.query.timeout: 2000
+      jakarta.persistence.query.timeout: 2000
       hibernate.query.timeout: 2000
       hibernate:
         default_schema: root        # 기본 스키마
