@@ -1,6 +1,6 @@
 package boombimapi.domain.favorite.application.validator;
 
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 
 public interface PlaceValidator {
 

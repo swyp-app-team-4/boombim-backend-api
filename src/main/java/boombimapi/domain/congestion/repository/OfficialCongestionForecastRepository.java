@@ -1,7 +1,7 @@
 package boombimapi.domain.congestion.repository;
 
 import boombimapi.domain.congestion.entity.OfficialCongestionForecast;
-import boombimapi.domain.place.entity.OfficialPlace;
+import boombimapi.domain.place.command.entity.OfficialPlace;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package boombimapi.domain.favorite.dto.response;
 
-import boombimapi.domain.place.entity.OfficialPlace;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.command.entity.OfficialPlace;
+import boombimapi.domain.place.shared.type.PlaceType;
 import java.time.LocalDateTime;
 
 public record OfficialPlaceFavoriteResponse(

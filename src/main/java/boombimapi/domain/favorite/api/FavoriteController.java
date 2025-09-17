@@ -6,7 +6,7 @@ import boombimapi.domain.favorite.application.FavoriteService;
 import boombimapi.domain.favorite.dto.request.AddFavoriteRequest;
 import boombimapi.domain.favorite.dto.response.AddFavoriteResponse;
 import boombimapi.domain.favorite.dto.response.FavoriteResponse;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
