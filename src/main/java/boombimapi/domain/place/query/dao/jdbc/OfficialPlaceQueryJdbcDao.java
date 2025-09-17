@@ -1,6 +1,9 @@
 package boombimapi.domain.place.query.dao.jdbc;
 
+import static boombimapi.domain.place.query.dao.mapper.OfficialPlaceRowMapper.*;
+
 import boombimapi.domain.place.query.dao.OfficialPlaceQueryDao;
+import boombimapi.domain.place.query.dao.param.OfficialPlaceViewportParam;
 import boombimapi.domain.place.query.dao.row.OfficialPlaceViewportRow;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +19,7 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
 
     @Override
     public List<OfficialPlaceViewportRow> findInViewport(
-        String memberId,
-        double minLatitude,
-        double maxLatitude,
-        double minLongitude,
-        double maxLongitude
+        OfficialPlaceViewportParam param
     ) {
         String sql = """
             SELECT
@@ -32,7 +31,6 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
                 op.centroid_longitude,
                 cl.name    AS congestion_level_name,
                 cl.message AS congestion_message,
-                -- memberId가 없으면 false, 있으면 존재여부로 판정
                 CASE 
                   WHEN :memberId IS NULL THEN FALSE
                   WHEN f.place_id IS NOT NULL THEN TRUE
@@ -46,34 +44,27 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
                ORDER BY oc.observed_at DESC
                LIMIT 1
             ) oc ON TRUE
-            LEFT JOIN congestion_level cl ON cl.id = oc.congestion_level_id
+            LEFT JOIN congestion_levels cl ON cl.id = oc.congestion_level_id
             LEFT JOIN favorites f
               ON f.member_id = :memberId
              AND f.place_id  = op.id
              AND f.place_type = 'OFFICIAL_PLACE'
-             AND (f.is_deleted = FALSE OR f.is_deleted IS NULL)
             WHERE op.centroid_latitude  BETWEEN :minLat AND :maxLat
               AND op.centroid_longitude BETWEEN :minLng AND :maxLng
             """;
 
         Map<String, Object> params = Map.of(
-            "memberId", memberId,
-            "minLat", minLatitude,
-            "maxLat", maxLatitude,
-            "minLng", minLongitude,
-            "maxLng", maxLongitude
+            "memberId", param.memberId(),
+            "minLat", param.minLatitude(),
+            "maxLat", param.maxLatitude(),
+            "minLng", param.minLongitude(),
+            "maxLng", param.maxLongitude()
         );
 
-        return jdbcTemplate.query(sql, params, (rs, i) -> new OfficialPlaceViewportRow(
-            rs.getLong("id"),
-            rs.getString("name"),
-            rs.getString("legal_dong"),
-            rs.getString("image_url"),
-            rs.getDouble("centroid_latitude"),
-            rs.getDouble("centroid_longitude"),
-            rs.getString("congestion_level_name"),
-            rs.getString("congestion_message"),
-            rs.getBoolean("is_favorite")
-        ));
+        return jdbcTemplate.query(
+            sql,
+            params,
+            OFFICIAL_PLACE_VIEWPORT
+        );
     }
 }
