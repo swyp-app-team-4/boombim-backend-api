@@ -1,6 +1,6 @@
 package boombimapi.domain.favorite.dto.response;
 
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 import java.time.LocalDateTime;
 
 public sealed interface FavoriteResponse

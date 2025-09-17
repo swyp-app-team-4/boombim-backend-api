@@ -1,8 +1,7 @@
 package boombimapi.domain.favorite.dto.response;
 
-import boombimapi.domain.congestion.entity.MemberCongestion;
-import boombimapi.domain.place.entity.MemberPlace;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.command.entity.MemberPlace;
+import boombimapi.domain.place.shared.type.PlaceType;
 import java.time.LocalDateTime;
 
 public record MemberPlaceFavoriteResponse(

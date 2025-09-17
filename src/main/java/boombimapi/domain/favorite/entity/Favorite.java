@@ -1,7 +1,7 @@
 package boombimapi.domain.favorite.entity;
 
 import boombimapi.domain.member.domain.entity.Member;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 import boombimapi.global.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

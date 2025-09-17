@@ -1,15 +1,12 @@
 package boombimapi.domain.favorite.repository;
 
 import boombimapi.domain.favorite.entity.Favorite;
-import boombimapi.domain.place.entity.MemberPlace;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 import java.util.List;
 import java.util.Optional;
 
 import boombimapi.domain.member.domain.entity.Member;
-import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 

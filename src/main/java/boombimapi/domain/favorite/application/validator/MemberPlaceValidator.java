@@ -1,7 +1,7 @@
 package boombimapi.domain.favorite.application.validator;
 
-import boombimapi.domain.place.entity.PlaceType;
-import boombimapi.domain.place.repository.MemberPlaceRepository;
+import boombimapi.domain.place.shared.type.PlaceType;
+import boombimapi.domain.place.command.repository.MemberPlaceRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;

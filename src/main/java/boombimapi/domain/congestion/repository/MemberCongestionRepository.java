@@ -1,7 +1,7 @@
 package boombimapi.domain.congestion.repository;
 
 import boombimapi.domain.congestion.entity.MemberCongestion;
-import boombimapi.domain.place.entity.MemberPlace;
+import boombimapi.domain.place.command.entity.MemberPlace;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

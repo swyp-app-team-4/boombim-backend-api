@@ -1,7 +1,7 @@
 package boombimapi.domain.congestion.entity;
 
 import boombimapi.domain.member.domain.entity.Member;
-import boombimapi.domain.place.entity.MemberPlace;
+import boombimapi.domain.place.command.entity.MemberPlace;
 import boombimapi.global.base.BaseExpiringEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -24,6 +24,7 @@ spring:
       jakarta.persistence.query.timeout: 2000
       hibernate.query.timeout: 2000
       hibernate:
+        highlight_sql: true
         default_schema: root        # 기본 스키마
         jdbc:
           batch_size: 1000          # 배치 insert/update 사이즈
@@ -80,6 +81,8 @@ logging:
     org:
       springframework:
         web: ERROR
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate: DEBUG
 
 # 보류
 oauth2:
@@ -175,5 +178,3 @@ management:
         request:
           autotime:
             enabled: true        # 👈 status 라벨 포함된 http_server_requests 메트릭 활성화
-
-

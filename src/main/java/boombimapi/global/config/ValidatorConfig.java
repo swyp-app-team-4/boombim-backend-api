@@ -1,7 +1,7 @@
 package boombimapi.global.config;
 
 import boombimapi.domain.favorite.application.validator.PlaceValidator;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;

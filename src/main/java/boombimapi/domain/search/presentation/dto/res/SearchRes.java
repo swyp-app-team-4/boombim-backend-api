@@ -2,7 +2,7 @@ package boombimapi.domain.search.presentation.dto.res;
 
 import java.time.LocalDateTime;
 
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.shared.type.PlaceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "검색 결과 응답 모델")

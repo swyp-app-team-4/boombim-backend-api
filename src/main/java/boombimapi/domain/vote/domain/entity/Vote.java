@@ -2,18 +2,15 @@ package boombimapi.domain.vote.domain.entity;
 
 
 import boombimapi.domain.member.domain.entity.Member;
-import boombimapi.domain.place.entity.MemberPlace;
+import boombimapi.domain.place.command.entity.MemberPlace;
 import boombimapi.domain.vote.domain.entity.type.VoteStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 

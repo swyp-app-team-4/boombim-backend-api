@@ -1,6 +1,7 @@
 package boombimapi.domain.favorite.application;
 
-import static boombimapi.domain.place.entity.PlaceType.*;
+import static boombimapi.domain.place.shared.type.PlaceType.MEMBER_PLACE;
+import static boombimapi.domain.place.shared.type.PlaceType.OFFICIAL_PLACE;
 import static boombimapi.global.infra.exception.error.ErrorCode.*;
 
 import boombimapi.domain.congestion.entity.MemberCongestion;
@@ -14,21 +15,20 @@ import boombimapi.domain.favorite.dto.response.FavoriteResponse;
 import boombimapi.domain.favorite.dto.response.MemberPlaceFavoriteResponse;
 import boombimapi.domain.favorite.dto.response.OfficialPlaceFavoriteResponse;
 import boombimapi.domain.favorite.entity.Favorite;
-import boombimapi.domain.place.entity.OfficialPlace;
-import boombimapi.domain.place.entity.PlaceType;
+import boombimapi.domain.place.command.entity.OfficialPlace;
+import boombimapi.domain.place.shared.type.PlaceType;
 import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
-import boombimapi.domain.place.entity.MemberPlace;
-import boombimapi.domain.place.repository.MemberPlaceRepository;
-import boombimapi.domain.place.repository.OfficialPlaceRepository;
+import boombimapi.domain.place.command.entity.MemberPlace;
+import boombimapi.domain.place.command.repository.MemberPlaceRepository;
+import boombimapi.domain.place.command.repository.OfficialPlaceRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
