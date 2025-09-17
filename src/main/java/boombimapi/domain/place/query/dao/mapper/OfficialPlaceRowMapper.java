@@ -1,5 +1,24 @@
 package boombimapi.domain.place.query.dao.mapper;
 
-public class OfficialPlaceRowMapper {
+import boombimapi.domain.place.query.dao.row.OfficialPlaceViewportRow;
+import org.springframework.jdbc.core.RowMapper;
+
+public final class OfficialPlaceRowMapper {
+
+    private OfficialPlaceRowMapper() {
+    }
+
+    public static final RowMapper<OfficialPlaceViewportRow> OFFICIAL_PLACE_VIEWPORT = (resultSet, i) ->
+        new OfficialPlaceViewportRow(
+            resultSet.getLong("id"),
+            resultSet.getString("name"),
+            resultSet.getString("legal_dong"),
+            resultSet.getString("image_url"),
+            resultSet.getDouble("centroid_latitude"),
+            resultSet.getDouble("centroid_longitude"),
+            resultSet.getString("congestion_level_name"),
+            resultSet.getString("congestion_message"),
+            resultSet.getBoolean("is_favorite")
+        );
 
 }
