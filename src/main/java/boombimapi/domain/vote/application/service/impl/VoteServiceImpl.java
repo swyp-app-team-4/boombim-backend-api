@@ -231,12 +231,12 @@ public class VoteServiceImpl implements VoteService {
         /**
          * QA 떄문에 잠시 닫겠음
          */
-        // List<Vote> votes = calculate300(latitude, longitude);
+        List<Vote> votes = calculate300(latitude, longitude);
 
         /**
          * QA 끝나면 주석 처리 할 예정
          */
-        List<Vote> votes = voteRepository.findAll();
+        // List<Vote> votes = voteRepository.findAll();
 
         for (Vote vote : votes) {
             if (!vote.isVoteActivate() || vote.getVoteStatus().equals(VoteStatus.END))
