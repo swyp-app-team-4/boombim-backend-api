@@ -81,8 +81,8 @@ logging:
     org:
       springframework:
         web: ERROR
-    org.springframework.jdbc.core.JdbcTemplate: DEBUG
-    org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate: DEBUG
+#    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+#    org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate: DEBUG
 
 # 보류
 oauth2:
