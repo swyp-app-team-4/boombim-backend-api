@@ -246,7 +246,7 @@ public class VoteServiceImpl implements VoteService {
             boolean voteFlag = voteUsercheck(vote, user);
 
             voteResList.add(
-                    VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+                    VoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size()+1, vote.getCreatedAt(), vote.getPosName(),
                             vote.getPosImage(),
                             voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "투표하기", voteFlag));
         }
@@ -263,7 +263,7 @@ public class VoteServiceImpl implements VoteService {
             List<Long> voteAnswer = voteAnswerCnt(vote);
             boolean voteFlag = voteUsercheck(vote, user);
             myVoteRes.add(
-                    MyVoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+                    MyVoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size()+1, vote.getCreatedAt(), vote.getPosName(),
                             voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3),
                             "내 질문", vote.getVoteStatus(), voteFlag));
         }
@@ -278,7 +278,7 @@ public class VoteServiceImpl implements VoteService {
             List<Long> voteAnswer = voteAnswerCnt(vote);
             boolean voteFlag = voteUsercheck(vote, user);
             myVoteRes.add(
-                    MyVoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), vote.getPosName(),
+                    MyVoteRes.of(vote.getId(), profileTopThree(vote), (long) vote.getVoteDuplications().size()+1, vote.getCreatedAt(), vote.getPosName(),
                             voteAnswer.get(0), voteAnswer.get(1), voteAnswer.get(2), voteAnswer.get(3), "내 질문", vote.getVoteStatus(), voteFlag));
         }
 
