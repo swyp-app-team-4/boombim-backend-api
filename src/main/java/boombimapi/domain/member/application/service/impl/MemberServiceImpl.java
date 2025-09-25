@@ -120,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size()+1, vote.getCreatedAt(), posName, voteAnswerTypes,
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size() + 1, vote.getCreatedAt(), posName, voteAnswerTypes,
                     vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
@@ -161,7 +161,7 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size()+1, vote.getCreatedAt(), posName, voteAnswerTypes,
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size() + 1, vote.getCreatedAt(), posName, voteAnswerTypes,
                     vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
 
         }
@@ -185,7 +185,7 @@ public class MemberServiceImpl implements MemberService {
             // 상위 3건 유저 프로필 사진
             List<String> profile = profileTopThree(vote);
 
-            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size(),vote.getCreatedAt(), posName, voteAnswerTypes,
+            bottomResult.add(MPVoteRes.of(vote.getId(), profile, (long) vote.getVoteDuplications().size(), vote.getCreatedAt(), posName, voteAnswerTypes,
                     vote4Answer.get(0), vote4Answer.get(1), vote4Answer.get(2), vote4Answer.get(3), voteALlCnt, vote.getVoteStatus()));
         }
 
@@ -330,11 +330,24 @@ public class MemberServiceImpl implements MemberService {
 
     // 상위 3건 유저 프로필 이미지 링크
     public List<String> profileTopThree(Vote vote) {
-        return vote.getVoteDuplications().stream()
-                .map(voteAnswer -> voteAnswer.getMember().getProfile()) // Member의 프로필 URL 추출
-                .filter(Objects::nonNull)                               // null 값 제거 (안전)
-                .limit(3)                                               // 최대 3개만
+        List<String> profiles = new ArrayList<>();
+
+        // 1. 생성자 프로필 추가
+        String ownerProfile = vote.getMember().getProfile();
+        if (ownerProfile != null) {
+            profiles.add(ownerProfile);
+        }
+
+        // 2. 참여자 프로필 중 최대 2개 추가
+        List<String> participantProfiles = vote.getVoteDuplications().stream()
+                .map(voteDuplication -> voteDuplication.getMember().getProfile()) // 참여자 프로필
+                .filter(Objects::nonNull)                                         // null 제거
+                .limit(2)                                                         // 최대 2개
                 .toList();
+
+        profiles.addAll(participantProfiles);
+
+        return profiles;
     }
 
 
