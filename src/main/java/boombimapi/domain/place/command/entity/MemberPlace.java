@@ -52,15 +52,13 @@ public class MemberPlace extends BaseEntity {
         String name,
         String address,
         Double latitude,
-        Double longitude,
-        String imageUrl
+        Double longitude
     ) {
         this.uuid = uuid;
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.imageUrl = imageUrl;
     }
 
     public static MemberPlace of(
@@ -68,8 +66,7 @@ public class MemberPlace extends BaseEntity {
         String name,
         String address,
         Double latitude,
-        Double longitude,
-        String imageUrl
+        Double longitude
     ) {
         return MemberPlace.builder()
             .uuid(uuid)
@@ -77,7 +74,6 @@ public class MemberPlace extends BaseEntity {
             .address(address)
             .latitude(latitude)
             .longitude(longitude)
-            .imageUrl(imageUrl)
             .build();
     }
 

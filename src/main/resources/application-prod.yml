@@ -178,3 +178,14 @@ management:
         request:
           autotime:
             enabled: true        # 👈 status 라벨 포함된 http_server_requests 메트릭 활성화
+
+static-map:
+  base-url: https://maps.apigw.ntruss.com
+  api-key-id: ${STATIC_MAP_API_KEY_ID}
+  api-key: ${STATIC_MAP_API_KEY}
+  width: 300
+  height: 300
+  level: 16
+  scale: 2
+  marker-style: "size:mid|color:blue"
+  view-size-ratio: 0.5
