@@ -1,7 +1,5 @@
 package boombimapi.global.infra.s3.presentation.application.impl;
 
-import boombimapi.domain.member.domain.repository.MemberRepository;
-
 import boombimapi.global.infra.s3.presentation.application.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +11,13 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class S3ServiceImpl implements S3Service {
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName; // 버킷 이름 설정
 
@@ -41,23 +38,47 @@ public class S3ServiceImpl implements S3Service {
 
         // S3에 파일 업로드 (AWS SDK v2 방식)
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(finalFile)
-                .contentType(multipartFile.getContentType())
-                .build();
+            .bucket(bucketName)
+            .key(finalFile)
+            .contentType(multipartFile.getContentType())
+            .build();
 
         s3Client.putObject(putObjectRequest,
-                RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
+            RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
 
         // 업로드된 파일의 URL 생성
         String fileUrl = String.format("https://%s.s3.%s.amazonaws.com/%s",
-                bucketName,               // S3 버킷 이름
-                bucketRegion,             // S3 리전
-                finalFile           // 저장된 파일 이름
+            bucketName,               // S3 버킷 이름
+            bucketRegion,             // S3 리전
+            finalFile           // 저장된 파일 이름
         );
 
-
         return fileUrl;
+    }
+
+    @Override
+    public String storeStaticMapImage(
+        String key,
+        byte[] bytes,
+        String contentType
+    ) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .contentType(contentType)
+            .build();
+
+        s3Client.putObject(
+            putObjectRequest,
+            RequestBody.fromBytes(bytes)
+        );
+
+        return String.format(
+            "https://%s.s3.%s.amazonaws.com/%s",
+            bucketName,
+            bucketRegion,
+            key
+        );
     }
 
     private static String createStoreFileName(String originalFilename) {
