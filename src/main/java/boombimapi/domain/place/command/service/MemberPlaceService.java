@@ -10,6 +10,7 @@ import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.place.command.api.dto.request.ResolveMemberPlaceRequest;
+import boombimapi.domain.place.command.infrastructure.NaverStaticMapWebClient;
 import boombimapi.domain.place.query.api.dto.request.ViewportRequest;
 import boombimapi.domain.place.query.api.dto.response.member.GetMemberPlaceDetailResponse;
 import boombimapi.domain.place.query.api.dto.response.member.MemberPlaceSummaryResponse;
@@ -19,6 +20,7 @@ import boombimapi.domain.place.query.api.dto.response.node.ViewportNodeResponse;
 import boombimapi.domain.place.query.api.dto.response.node.ViewportPlaceNodeResponse;
 import boombimapi.domain.place.command.entity.MemberPlace;
 import boombimapi.domain.place.command.repository.MemberPlaceRepository;
+import boombimapi.global.infra.s3.presentation.application.S3Service;
 import boombimapi.global.vo.Coordinate;
 import boombimapi.global.geo.core.ClusterMarker;
 import boombimapi.global.geo.core.ClusterPoint;
@@ -39,6 +41,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -52,24 +55,40 @@ public class MemberPlaceService {
     private final Clusterer clusterer;
     private final FavoriteRepository favoriteRepository;
 
+    private final NaverStaticMapWebClient naverStaticMapWebClient;
+    private final S3Service s3Service;
+
+    // TODO: 추후 트랜잭션 분리 시 리팩터링
+    @Transactional
     public ResolveMemberPlaceResponse resolveMemberPlace(
         ResolveMemberPlaceRequest request
     ) {
+        Optional<MemberPlace> memberPlaceOptional = memberPlaceRepository.findByUuid(request.uuid());
 
-        // TODO: 레이스 컨디션 처리 필요(동일 uuid 동시 생성 방지)
-        MemberPlace memberPlace = memberPlaceRepository.findByUuid(request.uuid())
-            .orElseGet(() -> memberPlaceRepository.save(
-                MemberPlace.of(
-                    request.uuid(),
-                    request.name(),
-                    request.address(),
-                    request.latitude(),
-                    request.longitude(),
-                    request.imageUrl()
-                )
-            ));
+        if (memberPlaceOptional.isPresent()) {
+            return ResolveMemberPlaceResponse.from(memberPlaceOptional.get());
+        }
 
-        return ResolveMemberPlaceResponse.from(memberPlace);
+        MemberPlace created = memberPlaceRepository.save(
+            MemberPlace.of(
+                request.uuid(),
+                request.name(),
+                request.address(),
+                request.latitude(),
+                request.longitude()
+            )
+        );
+
+        try {
+            byte[] bytes = naverStaticMapWebClient.fetchStaticMapImage(request.latitude(), request.longitude());
+            String key = "maps/naver/static-map/%d.png".formatted(created.getId());
+            String url = s3Service.storeStaticMapImage(key, bytes, "image/png");
+            memberPlaceRepository.updateImageUrl(created.getId(), url);
+        } catch (Exception e) {
+            log.warn("Static map generation failed. placeId={}, err={}", created.getId(), e.toString());
+        }
+
+        return ResolveMemberPlaceResponse.from(created);
     }
 
     public GetMemberPlaceDetailResponse getMemberPlaceDetail(
