@@ -185,7 +185,7 @@ static-map:
   api-key: ${STATIC_MAP_API_KEY}
   width: 300
   height: 300
-  level: 16
+  level: 17
   scale: 2
   marker-style: "size:mid|color:blue"
   view-size-ratio: 0.5
