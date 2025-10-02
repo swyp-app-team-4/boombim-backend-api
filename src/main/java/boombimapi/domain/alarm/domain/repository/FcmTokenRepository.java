@@ -34,8 +34,13 @@ public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
     // 토큰으로 조회
     Optional<FcmToken> findByToken(String token);
 
+    // 중복 가능 토큰 조회 (List)
+    List<FcmToken> findAllByToken(String token);
+
     // 사용자와 토큰으로 조회
     Optional<FcmToken> findByMemberIdAndToken(String userId, String token);
+
+
 
     // 비활성화된 토큰 삭제
     @Modifying

@@ -43,12 +43,25 @@ public class FcmServiceImpl implements FcmService {
     public void registerToken(Member user, String token, DeviceType deviceType) {
         try {
             // 기존 토큰이 있는지 확인
-            Optional<FcmToken> existingToken = fcmTokenRepository.findByMemberIdAndToken(user.getId(), token);
+            // Optional<FcmToken> existingToken = fcmTokenRepository.findByMemberIdAndToken(user.getId(), token);
 
-            if (existingToken.isPresent()) {
+            List<FcmToken> existingToken = fcmTokenRepository.findAllByToken(token);
+
+            if (!existingToken.isEmpty()) {
                 // 기존 토큰이 있으면 활성화 및 마지막 사용 시간 업데이트
-                FcmToken fcmToken = existingToken.get();
-                fcmToken.activate();
+                if (existingToken.size() == 1) {
+                    FcmToken fcmToken = existingToken.get(0);
+                    fcmToken.activate();
+                } else {
+                    for (FcmToken findFcmToken : existingToken) {
+                        if (findFcmToken.getMember().getId().equals(user.getId())) {
+                            findFcmToken.activate();
+                        } else {
+                            fcmTokenRepository.deleteAllByMember(findFcmToken.getMember());
+                        }
+                    }
+                }
+
                 log.info("기존 FCM 토큰 활성화: userId={}, deviceType={}", user.getId(), deviceType);
             } else {
                 // 새로운 토큰 생성
@@ -278,7 +291,7 @@ public class FcmServiceImpl implements FcmService {
     @Override
     public void deleteFcmToken(String userId) {
         Member member = memberRepository.findById(userId).orElse(null);
-        if(member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
 
         fcmTokenRepository.deleteAllByMember(member);
     }
