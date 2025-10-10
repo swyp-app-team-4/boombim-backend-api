@@ -6,6 +6,7 @@ import boombimapi.global.infra.exception.error.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,23 +37,20 @@ public class JWTUtil {
     public String getId(String token) {
         try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", String.class);
-        }
-        catch(ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             throw new BoombimException(ErrorCode.JWT_EXPIRE_TOKEN);
-        }
-        catch(JwtException e) {
+        } catch (JwtException e) {
             throw new BoombimException(ErrorCode.JWT_ERROR_TOKEN);
         }
     }
 
     public Role getRole(String token) {
         try {
-            return Role.getByValue("ROLE_" + Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class));
-        }
-        catch(ExpiredJwtException e) {
+            return Role.getByValue(
+                "ROLE_" + Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class));
+        } catch (ExpiredJwtException e) {
             throw new BoombimException(ErrorCode.JWT_EXPIRE_TOKEN);
-        }
-        catch(JwtException e) {
+        } catch (JwtException e) {
             throw new BoombimException(ErrorCode.JWT_ERROR_TOKEN);
         }
     }
@@ -67,20 +65,43 @@ public class JWTUtil {
 
     private String createJWT(String id, Role role, String email, String category, Long expiredMS) {
         return Jwts.builder()
-                .claim("category", category)
-                .claim("id", id)
-                .claim("role", String.valueOf(role))
-                .claim("email", email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMS))
-                .signWith(secretKey)
-                .compact();
+            .claim("category", category)
+            .claim("id", id)
+            .claim("role", String.valueOf(role))
+            .claim("email", email)
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + expiredMS))
+            .signWith(secretKey)
+            .compact();
     }
 
     public String getAccessTokenFromHeaders(HttpServletRequest request) {
-        if(request.getHeader(HttpHeaders.AUTHORIZATION) != null) {
+        if (request.getHeader(HttpHeaders.AUTHORIZATION) != null) {
             return request.getHeader("Authorization").replace("Bearer ", "");
         }
+        return null;
+    }
+
+    public String getAccessTokenFromCookie(
+        HttpServletRequest request,
+        String cookieName
+    ) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookieName.equals(cookie.getName())) {
+                String value = cookie.getValue();
+                if (value != null && !value.isBlank()) {
+                    return value;
+                }
+                return null;
+            }
+        }
+
         return null;
     }
 
@@ -91,8 +112,7 @@ public class JWTUtil {
         try {
             String tokenType = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
             return tokenType != null && tokenType.equals(type);
-        }
-        catch(JwtException e) {
+        } catch (JwtException e) {
             log.error("JWT 검증 실패: {}", e.getMessage());
             return false;
         }
