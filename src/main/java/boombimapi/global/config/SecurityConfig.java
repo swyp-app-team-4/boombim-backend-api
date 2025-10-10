@@ -2,7 +2,6 @@ package boombimapi.global.config;
 
 import boombimapi.global.infra.filter.BoombimJWTFilter;
 import boombimapi.global.infra.exception.auth.BoombimAuthExceptionFilter;
-import boombimapi.global.infra.filter.CustomSecurityLogger;
 import boombimapi.global.jwt.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,7 +57,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://boombim.netlify.app"));
+                    config.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:3000", "https://boombim.netlify.app"));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
