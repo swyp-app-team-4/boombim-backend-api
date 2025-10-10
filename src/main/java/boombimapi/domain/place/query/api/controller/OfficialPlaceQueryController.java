@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/query/official-place")
+@RequestMapping("/api/query/official-place")
 public class OfficialPlaceQueryController {
 
     private final OfficialPlaceQueryService officialPlaceQueryService;
