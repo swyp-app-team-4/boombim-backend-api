@@ -30,15 +30,20 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
     private final List<String> excludedPaths;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
+    protected void doFilterInternal(
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain
+    )
+        throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
 
         String method = request.getMethod();
 
         // 소셜 로그인 요청에 대한 중복 로그인 체크
         if ((requestURI.contains("/api/oauth2/login") && "POST".equals(method)) ||
-                (requestURI.contains("/api/oauth2/callback"))) {
+            (requestURI.contains("/api/oauth2/callback"))) {
             String accessToken = jwtUtil.getAccessTokenFromHeaders(request);
             if (accessToken != null && jwtUtil.jwtVerify(accessToken, "access")) {
                 throw new BoombimException(ErrorCode.DUPLICATE_LOGIN_NOT_EXIST);
@@ -48,6 +53,11 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
         }
 
         String accessToken = jwtUtil.getAccessTokenFromHeaders(request);
+
+        if (accessToken == null) {
+            accessToken = jwtUtil.getAccessTokenFromCookie(request, "at");
+        }
+
         log.debug("Access Token: {}", accessToken);
 
         if (accessToken == null || accessToken.equals("undefined") || accessToken.equals("null")) {
@@ -73,9 +83,11 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+    protected boolean shouldNotFilter(
+        @NonNull HttpServletRequest request
+    ) {
         return excludedPaths.stream()
-                .anyMatch(pattern ->
-                        new AntPathMatcher().match(pattern, request.getServletPath()));
+            .anyMatch(pattern ->
+                new AntPathMatcher().match(pattern, request.getServletPath()));
     }
 }
