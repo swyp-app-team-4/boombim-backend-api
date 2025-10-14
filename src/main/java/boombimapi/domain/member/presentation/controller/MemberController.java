@@ -56,35 +56,9 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getMember(userId));
     }
 
-//    @Operation(summary = "마이페이지(2번 구간) 즐겨찾기 조회 API", description = "사용자가 즐겨찾기한 장소를 조회합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-//            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
-//    })
-//    @GetMapping("/favorite")
-//    public ResponseEntity<List<GetFavoriteRes>>  getFavorite(@AuthenticationPrincipal String userId) {
-//        return ResponseEntity.ok(memberService.getFavorites(userId));
-//    }
 
-    @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
-    })
-    @GetMapping("/my-answer")
-    public ResponseEntity<List<MyPageVoteRes>> getMpVoteAnswer(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getMyVoteAnswer(userId));
-    }
 
-    @Operation(summary = "마이페이지(4번 구간) 나의 질문 조회 API", description = "나의 질문을 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
-    })
-    @GetMapping("/my-question")
-    public ResponseEntity<List<MyPageVoteRes>> getMpVote(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getMyVoteQuestion(userId));
-    }
+
 
     @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
     @ApiResponses(value = {
@@ -109,6 +83,27 @@ public class MemberController {
     public ResponseEntity<ProfileRes> updateProfile(@AuthenticationPrincipal String userId, MultipartFile multipartFile) throws IOException {
         return ResponseEntity.ok(memberService.updateProfile(userId, multipartFile));
     }
+
+
+    /* @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @GetMapping("/my-answer")
+    public ResponseEntity<List<MyPageVoteRes>> getMpVoteAnswer(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(memberService.getMyVoteAnswer(userId));
+    }*/
+
+    /*@Operation(summary = "마이페이지(4번 구간) 나의 질문 조회 API", description = "나의 질문을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @GetMapping("/my-question")
+    public ResponseEntity<List<MyPageVoteRes>> getMpVote(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(memberService.getMyVoteQuestion(userId));
+    }*/
 
 
 }
