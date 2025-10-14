@@ -1,0 +1,44 @@
+package boombimapi.domain.point.domain.entity;
+
+import boombimapi.domain.member.domain.entity.Member;
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
+
+@Getter
+@Entity
+@NoArgsConstructor
+@DynamicUpdate
+@Table(name = "point")
+public class Point {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
+    private Member member;
+
+    @Column(name = "balance", nullable = false)
+    private Long balance;
+
+
+    @Builder
+    public Point(Member member) {
+        this.member = member;
+        this.balance = 0L;
+    }
+
+
+    public void addBalance(int amount) {
+        this.balance += amount;
+    }
+
+    public void subtractBalance(int amount) {
+        this.balance -= amount;
+    }
+
+}

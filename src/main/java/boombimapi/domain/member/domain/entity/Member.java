@@ -6,6 +6,8 @@ import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.favorite.entity.Favorite;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
+import boombimapi.domain.point.domain.entity.Point;
+import boombimapi.domain.point.domain.entity.PointHistory;
 import boombimapi.domain.search.domain.entity.Search;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
@@ -44,15 +46,15 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FcmToken> fcmTokens = new ArrayList<>();
 
-    // 4) 내 투표 목록들  주인
+    // 4) 내 투표 목록들  주인 - 폐쇄
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votess = new ArrayList<>();
 
-    // 5) 내 투표 목록들  부하
+    // 5) 내 투표 목록들  부하 - 폐쇄
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteDuplication> voteDuplications = new ArrayList<>();
 
-    // 6) 내 투표 답변들
+    // 6) 내 투표 답변들 - 폐쇄
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteAnswer> voteAnswers = new ArrayList<>();
 
@@ -67,6 +69,16 @@ public class Member {
     // 8) 즐겨찾기
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites = new ArrayList<>();
+
+    // 9) 포인트
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Point point;
+
+    // 10) 포인트 내역 조회
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PointHistory pointHistory;
+
+
 
     @Column(nullable = false)
     private String email;
