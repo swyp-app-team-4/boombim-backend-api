@@ -14,14 +14,7 @@ public interface MemberService {
     // 1번 구간
     GetMemberRes getMember(String userId);
 
-    // 2번 구간
-//    List<GetFavoriteRes>  getFavorites(String userId);
 
-    // 3번 구간
-    List<MyPageVoteRes> getMyVoteAnswer(String userId);
-
-    // 4번 구간
-    List<MyPageVoteRes> getMyVoteQuestion(String userId);
 
     void updateNickname(String userId, String name);
 
@@ -32,6 +25,16 @@ public interface MemberService {
 
     // 프로필 수정
     ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException;
+
+
+    /**
+     * 폐지
+     */
+    /*// 3번 구간
+    List<MyPageVoteRes> getMyVoteAnswer(String userId);
+
+    // 4번 구간
+    List<MyPageVoteRes> getMyVoteQuestion(String userId);*/
 
 
 }

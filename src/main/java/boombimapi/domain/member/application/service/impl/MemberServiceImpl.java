@@ -14,6 +14,8 @@ import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.res.*;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.MPVoteRes;
+import boombimapi.domain.point.domain.entity.Point;
+import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.VoteDuplication;
@@ -36,6 +38,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static boombimapi.global.infra.exception.error.ErrorCode.POINT_NOT_EXIST;
+import static boombimapi.global.infra.exception.error.ErrorCode.USER_NOT_EXIST;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -43,54 +48,70 @@ import java.util.stream.Collectors;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository userRepository;
-    private final VoteAnswerRepository voteAnswerRepository;
-    private final VoteDuplicationRepository voteDuplicationRepository;
-    private final VoteRepository voteRepository;
     private final S3Service s3Service;
     private final MemberLeaveRepository memberLeaveRepository;
     private final FcmService fcmService;
+    private final PointRepository pointRepository;
 
     @Override
     public GetMemberRes getMember(String userId) {
-        Member user = userRepository.findById(userId).orElse(null);
-        if (user == null)
-            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        Member member = userRepository.findById(userId)
+                .orElseThrow(() -> new BoombimException(USER_NOT_EXIST));
 
-        // 투표수
-        List<VoteAnswer> voteAnswers = voteAnswerRepository.findByMember(user);
+        Point point = pointRepository.findByMember(member)
+                .orElseThrow(() -> new BoombimException(POINT_NOT_EXIST));
 
-        //질문수
-        List<VoteDuplication> voteDus = voteDuplicationRepository.findByMember(user);
-        List<Vote> votes = voteRepository.findByMember(user);
 
-        return GetMemberRes.of(user, (long) voteAnswers.size(), (long) (voteDus.size() + votes.size()));
+        return GetMemberRes.of(member, point.getBalance());
     }
 
-//    @Override
-//    public List<GetFavoriteRes> getFavorites(String userId) {
-//        Member user = userRepository.findById(userId).orElse(null);
-//        if (user == null)
-//            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-//
-//        List<GetFavoriteRes> result = new ArrayList<>();
-//
-//        List<Favorite> byFavorites = favoriteRepository.findByMemberWithJoin(user);
-//
-//        for (Favorite byFavorite : byFavorites) {
-//
-//            long todyPeopleCnt = memberCongestionRepository.countTodayByPlace(byFavorite.getMemberPlace().getId());
-//            GetFavoriteRes getFavoriteRes = GetFavoriteRes.of("",
-//                byFavorite.getMemberPlace().getName(),
-//                byFavorite.getMemberPlace().getId(),
-//                byFavorite.getMemberPlace().getMemberCongestions().get(0).getCongestionLevel().getName(),
-//                String.valueOf(todyPeopleCnt));
-//            result.add(getFavoriteRes);
-//        }
-//
-//        return result;
-//    }
 
-    // 3번 api 투표
+    @Override
+    public void updateNickname(String userId, String name) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        member.updateName(name);
+    }
+
+    @Override
+    public GetNicknameRes getNameFlag(String userId) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        return GetNicknameRes.of(member.isNameFlag());
+    }
+
+    @Override
+    public void memberDelete(String userId, MemberLeaveReq req) {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        fcmService.deleteFcmToken(userId);
+        memberLeaveRepository.save(MemberLeave.builder().leaveReason(req.leaveReason()).build());
+
+        userRepository.delete(member);
+    }
+
+    @Override
+    public ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException {
+        Member member = userRepository.findById(userId).orElse(null);
+        if (member == null)
+            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+
+        String profile = s3Service.storeUserProFile(multipartFile, userId);
+        member.updateProfile(profile);
+        return ProfileRes.of(profile);
+    }
+
+    /**
+     * 폐지
+     * */
+
+  /*  // 3번 api 투표
     @Override
     public List<MyPageVoteRes> getMyVoteAnswer(String userId) {
         Member member = userRepository.findById(userId).orElse(null);
@@ -197,49 +218,6 @@ public class MemberServiceImpl implements MemberService {
 
 
     }
-
-
-    @Override
-    public void updateNickname(String userId, String name) {
-        Member member = userRepository.findById(userId).orElse(null);
-        if (member == null)
-            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-
-        member.updateName(name);
-    }
-
-    @Override
-    public GetNicknameRes getNameFlag(String userId) {
-        Member member = userRepository.findById(userId).orElse(null);
-        if (member == null)
-            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-
-        return GetNicknameRes.of(member.isNameFlag());
-    }
-
-    @Override
-    public void memberDelete(String userId, MemberLeaveReq req) {
-        Member member = userRepository.findById(userId).orElse(null);
-        if (member == null)
-            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-
-        fcmService.deleteFcmToken(userId);
-        memberLeaveRepository.save(MemberLeave.builder().leaveReason(req.leaveReason()).build());
-
-        userRepository.delete(member);
-    }
-
-    @Override
-    public ProfileRes updateProfile(String userId, MultipartFile multipartFile) throws IOException {
-        Member member = userRepository.findById(userId).orElse(null);
-        if (member == null)
-            throw new BoombimException(ErrorCode.USER_NOT_EXIST);
-
-        String profile = s3Service.storeUserProFile(multipartFile, userId);
-        member.updateProfile(profile);
-        return ProfileRes.of(profile);
-    }
-
     // 인기 투표 타입 리스트 반환 (동점 허용)
     public List<VoteAnswerType> popularTypes(Vote vote) {
         List<VoteAnswer> voteAnswers = vote.getVoteAnswers();
@@ -348,7 +326,7 @@ public class MemberServiceImpl implements MemberService {
         profiles.addAll(participantProfiles);
 
         return profiles;
-    }
+    }*/
 
 
 }

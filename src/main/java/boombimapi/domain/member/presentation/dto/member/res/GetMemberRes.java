@@ -19,20 +19,18 @@ public record GetMemberRes(
         @Schema(description = "소셜 로그인 제공자", example = "KAKAO")
         SocialProvider socialProvider,
 
-        @Schema(description = "참여한 투표 수", example = "12")
-        Long voteCnt,
+        @Schema(description = "사용자 포인트", example = "12")
+        Long Point
 
-        @Schema(description = "작성한 답변 수", example = "34")
-        Long questionCnt
 ) {
-    public static GetMemberRes of(Member user, Long voteCnt, Long questionCnt) {
+    public static GetMemberRes of(Member user, Long point) {
         return new GetMemberRes(
                 user.getName(),
                 user.getProfile(),
                 user.getEmail(),
                 user.getSocialProvider(),
-                voteCnt,
-                questionCnt
+                point
+
         );
     }
 }
