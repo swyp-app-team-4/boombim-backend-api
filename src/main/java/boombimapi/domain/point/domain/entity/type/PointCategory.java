@@ -9,8 +9,8 @@ import java.util.Arrays;
 
 @Getter
 public enum PointCategory {
-    CONGESTION("혼잡도"),
-    EVENT("이벤트");
+    CONGESTION("혼잡도 알리기"),
+    EVENT("이벤트 응모");
 
     private final String key;
 

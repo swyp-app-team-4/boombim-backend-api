@@ -40,11 +40,11 @@ public class Point {
     }
 
 
-    public void addBalance(int amount) {
+    public void addBalance(Long amount) {
         this.balance += amount;
     }
 
-    public void subtractBalance(int amount) {
+    public void subtractBalance(Long amount) {
         this.balance -= amount;
     }
 

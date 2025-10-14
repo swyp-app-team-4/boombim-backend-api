@@ -43,14 +43,19 @@ public class PointHistory {
     @Comment("포인트 변동량")
     private Long amount;
 
+    @Column(name = "amount", nullable = false)
+    @Comment("포인트 총 보유량")
+    private Long balance;
+
     @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Builder
-    public PointHistory(Member member, Long amount, PointCategory pointCategory, PointAction pointAction) {
+    public PointHistory(Member member, Long amount, Long balance, PointCategory pointCategory, PointAction pointAction) {
         this.member = member;
         this.amount = amount;
+        this.balance= balance;
         this.pointCategory = pointCategory;
         this.pointAction = pointAction;
     }
