@@ -8,7 +8,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -40,6 +43,9 @@ public class PointHistory {
     @Comment("포인트 변동량")
     private Long amount;
 
+    @Column(nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Builder
     public PointHistory(Member member, Long amount, PointCategory pointCategory, PointAction pointAction) {

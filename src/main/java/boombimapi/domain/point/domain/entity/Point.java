@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -25,6 +28,10 @@ public class Point {
     @Column(name = "balance", nullable = false)
     private Long balance;
 
+
+    @Column(nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Builder
     public Point(Member member) {
