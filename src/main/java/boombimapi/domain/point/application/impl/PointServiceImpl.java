@@ -10,6 +10,7 @@ import boombimapi.domain.point.domain.entity.type.PointCategory;
 import boombimapi.domain.point.domain.repository.PointHistoryRepository;
 import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.domain.point.presentation.dto.res.GetPointHistoryRes;
+import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -52,9 +53,12 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<GetPointHistoryRes> getPointHistory(String memberId) {
+    public GetPointRes getPointHistory(String memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BoombimException(USER_NOT_EXIST));
+
+        Point point = pointRepository.findByMember(member)
+                .orElseThrow(() -> new BoombimException(POINT_NOT_EXIST));
 
         List<PointHistory> pointHistories = pointHistoryRepository.findAllByMemberOrderByCreatedAtDesc(member);
 
@@ -65,7 +69,7 @@ public class PointServiceImpl implements PointService {
         }
 
 
-        return result;
+        return GetPointRes.of(point.getBalance(), result);
     }
 
     @Override

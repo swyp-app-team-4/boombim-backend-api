@@ -2,6 +2,7 @@ package boombimapi.domain.point.presentation.controller;
 
 import boombimapi.domain.point.application.PointService;
 import boombimapi.domain.point.presentation.dto.res.GetPointHistoryRes;
+import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,7 +29,7 @@ public class PointController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
     })
     @GetMapping
-    public ResponseEntity<List<GetPointHistoryRes>> getPointHistory(@AuthenticationPrincipal String memberId) {
+    public ResponseEntity<GetPointRes> getPointHistory(@AuthenticationPrincipal String memberId) {
         return ResponseEntity.ok(pointService.getPointHistory(memberId));
     }
 
