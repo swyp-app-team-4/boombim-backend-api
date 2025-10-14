@@ -96,8 +96,11 @@ public enum ErrorCode {
 
 
     // point
-    POINT_NOT_EXIST(-1000, "해당 포인트가 존재하지 않습니다.",404),
-    POINT_HISTORY_NOT_EXIST(-1001, "해당 포인트 내역이 존재하지 않습니다.",404);
+    POINT_NOT_EXIST(-1000, "해당 포인트가 존재하지 않습니다.", 404),
+    POINT_HISTORY_NOT_EXIST(-1001, "해당 포인트 내역이 존재하지 않습니다.", 404),
+    EVENT_PARTICIPATION_LIMIT_EXCEEDED(-1002, "이벤트 응모 가능 횟수를 초과했습니다.", 400),
+    INSUFFICIENT_POINT_FOR_EVENT(-1003, "포인트가 부족하여 이벤트에 응모할 수 없습니다.", 400);
+
 
     private final int code;
     private final String message;

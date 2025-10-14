@@ -76,8 +76,16 @@ public class PointServiceImpl implements PointService {
         Point point = pointRepository.findByMember(member)
                 .orElseThrow(() -> new BoombimException(POINT_NOT_EXIST));
 
+        if (point.getBalance() - balance <= 0) {
+            throw new BoombimException(INSUFFICIENT_POINT_FOR_EVENT);
+        }
+
+        if (point.getApplyEventCount() == 5) {
+            throw new BoombimException(INSUFFICIENT_POINT_FOR_EVENT);
+        }
 
         point.subtractBalance(balance);
+        point.addApplyEventCnt();
 
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)

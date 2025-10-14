@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -28,6 +29,10 @@ public class Point {
     @Column(name = "balance", nullable = false)
     private Long balance;
 
+    @Column(name = "apply_event_countt", nullable = false)
+    @Comment("이벤트 응모권 수 하루 최대 5회")
+    private Long applyEventCount;
+
 
     @Column(nullable = false)
     @CreationTimestamp
@@ -37,6 +42,15 @@ public class Point {
     public Point(Member member) {
         this.member = member;
         this.balance = 0L;
+        this.applyEventCount = 0L;
+    }
+
+    public void addApplyEventCnt() {
+        this.applyEventCount += 1;
+    }
+
+    public void initApplyEventCnt() {
+        this.applyEventCount = 0L;
     }
 
 
