@@ -26,6 +26,7 @@ import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.infra.scheduled.v1.MessageServiceV1;
+import boombimapi.global.infra.scheduled.v2.MessageServiceV2;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class AlarmServiceImplV2 implements AlarmService {
     private final FcmService fcmService;
     private final AlarmRecipientRepository alarmRecipientRepository;
     private final PushProducer pushProducer;
-    private final MessageServiceV1 messageService;
+    private final MessageServiceV2 messageService;
 
     @Value("${admin.id}")
     private String adminId;
