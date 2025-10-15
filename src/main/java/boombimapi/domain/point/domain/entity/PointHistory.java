@@ -43,7 +43,7 @@ public class PointHistory {
     @Comment("포인트 변동량")
     private Long amount;
 
-    @Column(name = "amount", nullable = false)
+    @Column(name = "balance", nullable = false)
     @Comment("포인트 총 보유량")
     private Long balance;
 
