@@ -10,32 +10,38 @@ import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoTokenResponse;
 import boombimapi.domain.oauth2.presentation.dto.res.oatuh.KakaoUserResponse;
 import boombimapi.domain.member.domain.entity.Role;
-
+import boombimapi.domain.point.domain.entity.Point;
+import java.util.*;
 import boombimapi.domain.member.domain.repository.MemberRepository;
+import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.SocialToken;
 import boombimapi.global.jwt.domain.repository.SocialTokenRepository;
 import jakarta.transaction.Transactional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
+
 
 @Service
 @Transactional
 @Slf4j
 public class SocialLoginServiceImpl implements SocialLoginService {
 
-    private final java.util.Map<SocialProvider, OAuth2Service> oauth2Services;
+    private final Map<SocialProvider, OAuth2Service> oauth2Services;
     private final CreateAccessTokenAndRefreshTokenService tokenService;
     private final MemberRepository userRepository;
     private final SocialTokenRepository socialTokenRepository;
+
+    private final PointRepository pointRepository;
+
 
     @Value("${oauth2.apple.profile}")
     private String appleProfile;
@@ -43,10 +49,12 @@ public class SocialLoginServiceImpl implements SocialLoginService {
     public SocialLoginServiceImpl(List<OAuth2Service> oauth2Services,
                                   CreateAccessTokenAndRefreshTokenService tokenService,
                                   MemberRepository userRepository,
-                                  SocialTokenRepository socialTokenRepository) {
+                                  SocialTokenRepository socialTokenRepository,
+                                  PointRepository pointRepository) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
         this.socialTokenRepository = socialTokenRepository;
+        this.pointRepository= pointRepository;
 
         log.info("=== OAuth2Service 목록 ===");
         oauth2Services.forEach(service -> {
@@ -97,6 +105,9 @@ public class SocialLoginServiceImpl implements SocialLoginService {
 
         // 4. 사용자 생성 또는 업데이트
         Member user = createSocialUser(provider, tokenResponse, userResponse);
+
+        Point point= Point.builder().member(user).build();
+        pointRepository.save(point);
 
         // 5. JWT 토큰 생성 및 반환
         return tokenService.createAccessTokenAndRefreshToken(
