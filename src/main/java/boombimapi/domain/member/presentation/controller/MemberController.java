@@ -6,6 +6,7 @@ import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.*;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetCongestionHistoryRes;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV1;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV2;
 import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,7 @@ public class MemberController {
     })
     @PatchMapping("/name")
     public ResponseEntity<BaseOKResponse<Void>> updateNickname(@AuthenticationPrincipal String userId, @RequestBody NicknameReq req) {
-        memberService1.updateNickname(userId, req.name());
+        memberService.updateNickname(userId, req.name());
         return ResponseEntity.ok(
                 BaseOKResponse.of(
                         HttpStatus.OK,
@@ -55,8 +56,8 @@ public class MemberController {
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @GetMapping
-    public ResponseEntity<GetMemberResV2> getMember(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getMember(userId));
+    public ResponseEntity<GetMemberResV1> getMember(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(memberService1.getMember(userId));
     }
 
 
