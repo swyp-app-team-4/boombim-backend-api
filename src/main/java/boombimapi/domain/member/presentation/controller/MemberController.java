@@ -1,5 +1,6 @@
 package boombimapi.domain.member.presentation.controller;
 
+import boombimapi.domain.member.application.service.MemberServiceV1;
 import boombimapi.domain.member.application.service.MemberServiceV2;
 import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
@@ -32,6 +33,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 public class MemberController {
 
     private final MemberServiceV2 memberService;
+    private final MemberServiceV1 memberService1;
 
     @Operation(summary = "닉네임 수정 API", description = "닉네임을 수정합니다.")
     @ApiResponses(value = {
@@ -40,7 +42,7 @@ public class MemberController {
     })
     @PatchMapping("/name")
     public ResponseEntity<BaseOKResponse<Void>> updateNickname(@AuthenticationPrincipal String userId, @RequestBody NicknameReq req) {
-        memberService.updateNickname(userId, req.name());
+        memberService1.updateNickname(userId, req.name());
         return ResponseEntity.ok(
                 BaseOKResponse.of(
                         HttpStatus.OK,
@@ -96,25 +98,25 @@ public class MemberController {
     }
 
 
-    /* @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
+     @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @GetMapping("/my-answer")
     public ResponseEntity<List<MyPageVoteRes>> getMpVoteAnswer(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getMyVoteAnswer(userId));
-    }*/
+        return ResponseEntity.ok(memberService1.getMyVoteAnswer(userId));
+    }
 
-    /*@Operation(summary = "마이페이지(4번 구간) 나의 질문 조회 API", description = "나의 질문을 조회합니다.")
+    @Operation(summary = "마이페이지(4번 구간) 나의 질문 조회 API", description = "나의 질문을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @GetMapping("/my-question")
     public ResponseEntity<List<MyPageVoteRes>> getMpVote(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService.getMyVoteQuestion(userId));
-    }*/
+        return ResponseEntity.ok(memberService1.getMyVoteQuestion(userId));
+    }
 
 
 }
