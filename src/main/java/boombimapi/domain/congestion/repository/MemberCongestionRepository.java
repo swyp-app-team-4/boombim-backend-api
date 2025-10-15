@@ -1,6 +1,7 @@
 package boombimapi.domain.congestion.repository;
 
 import boombimapi.domain.congestion.entity.MemberCongestion;
+import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.place.command.entity.MemberPlace;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,4 +57,6 @@ public interface MemberCongestionRepository extends JpaRepository<MemberCongesti
         Pageable pageable
     );
 
+
+    List<MemberCongestion> findAllByMemberOrderByCreatedAtDesc(Member member);
 }

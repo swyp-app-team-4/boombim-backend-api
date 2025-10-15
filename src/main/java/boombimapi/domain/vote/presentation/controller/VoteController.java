@@ -26,7 +26,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 @RequestMapping("/api/vote")
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Vote", description = "투표 관련 API")
+@Tag(name = "Vote", description = "투표 관련 API --- 폐지됐습니다.")
 public class VoteController {
 
     private final VoteService voteService;
