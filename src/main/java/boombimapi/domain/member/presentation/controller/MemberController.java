@@ -4,12 +4,14 @@ import boombimapi.domain.member.application.service.MemberServiceV2;
 import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.*;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.GetCongestionHistoryRes;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV2;
 import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,7 @@ public class MemberController {
 
     @Operation(summary = "닉네임 수정 API", description = "닉네임을 수정합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @PatchMapping("/name")
@@ -61,7 +63,7 @@ public class MemberController {
 
     @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @PostMapping
@@ -75,12 +77,22 @@ public class MemberController {
 
     @Operation(summary = "프로필 사진 바꾸기 API", description = "회원의 프로필 사진을 바꿉니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @PatchMapping("/profile")
     public ResponseEntity<ProfileRes> updateProfile(@AuthenticationPrincipal String userId, MultipartFile multipartFile) throws IOException {
         return ResponseEntity.ok(memberService.updateProfile(userId, multipartFile));
+    }
+
+    @Operation(summary = "해당 유저 혼잡도 내역 조회 API", description = "유저가 혼잡도 작성한 내역을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+    })
+    @GetMapping("/congestion")
+    public ResponseEntity<List<GetCongestionHistoryRes>> getCongestionUserHistoryRes(@AuthenticationPrincipal String memberId){
+        return ResponseEntity.ok(memberService.getUserCongestionHistory(memberId));
     }
 
 
