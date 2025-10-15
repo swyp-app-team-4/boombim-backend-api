@@ -26,7 +26,7 @@ import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
-import boombimapi.global.infra.scheduled.MessageService;
+import boombimapi.global.infra.scheduled.v1.MessageServiceV1;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final FcmService fcmService;
     private final AlarmRecipientRepository alarmRecipientRepository;
     private final PushProducer pushProducer;
-    private final MessageService messageService;
+    private final MessageServiceV1 messageService;
 
     @Value("${admin.id}")
     private String adminId;
