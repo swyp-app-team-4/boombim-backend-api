@@ -1,11 +1,11 @@
 package boombimapi.domain.member.presentation.controller;
 
-import boombimapi.domain.member.application.service.MemberService;
+import boombimapi.domain.member.application.service.MemberServiceV2;
 import boombimapi.domain.member.presentation.dto.member.req.MemberLeaveReq;
 import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.*;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV2;
 import boombimapi.global.response.BaseOKResponse;
-import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 import static boombimapi.global.response.ResponseMessage.*;
 
@@ -30,7 +29,7 @@ import static boombimapi.global.response.ResponseMessage.*;
 @Tag(name = "Member", description = "사용자 전용 API")
 public class MemberController {
 
-    private final MemberService memberService;
+    private final MemberServiceV2 memberService;
 
     @Operation(summary = "닉네임 수정 API", description = "닉네임을 수정합니다.")
     @ApiResponses(value = {
@@ -52,7 +51,7 @@ public class MemberController {
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @GetMapping
-    public ResponseEntity<GetMemberRes> getMember(@AuthenticationPrincipal String userId) {
+    public ResponseEntity<GetMemberResV2> getMember(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService.getMember(userId));
     }
 
