@@ -1,6 +1,7 @@
 package boombimapi.domain.point.presentation.controller;
 
 import boombimapi.domain.point.application.PointService;
+import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,6 +55,7 @@ public class PointController {
      * - 포인트 잔액 부족 또는 응모 횟수 초과 시 예외 발생.
      *
      * @param memberId 인증된 회원 ID
+     * @param req 이벤트 응모 요청 (이벤트 캠페인 ID 및 차감할 포인트 금액 포함)
      * @return HTTP 200 OK (성공 시 바디 없음)
      */
     @Operation(summary = "이벤트 응모 API", description = "이벤트에 응모하여 포인트를 차감합니다. (1회당 20포인트 차감)")
@@ -63,8 +65,9 @@ public class PointController {
             @ApiResponse(responseCode = "404", description = "포인트 정보가 존재하지 않음")
     })
     @PatchMapping
-    public ResponseEntity<Void> applyEvent(@AuthenticationPrincipal String memberId) {
-        pointService.usePointForEvent(memberId, 20L);
+    public ResponseEntity<Void> applyEvent(@AuthenticationPrincipal String memberId,
+                                           @RequestBody UsePointForEventReq req) {
+        pointService.usePointForEvent(memberId, req);
         return ResponseEntity.ok().build();
     }
 }
