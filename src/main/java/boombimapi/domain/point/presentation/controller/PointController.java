@@ -26,7 +26,7 @@ public class PointController {
 
     @Operation(summary = "포인트 내역 조회 API", description = "포인트 내역을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "포인트 내역 조회 성공"),
     })
     @GetMapping
     public ResponseEntity<GetPointRes> getPointHistory(@AuthenticationPrincipal String memberId) {
@@ -36,7 +36,7 @@ public class PointController {
 
     @Operation(summary = "이벤트 응모 API", description = "이벤트 응모를 해서 포인트를 차감합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "포인트 차감 성공"),
             @ApiResponse(responseCode = "404", description = "포인트가 존재하지 않음"),
     })
     @PatchMapping
