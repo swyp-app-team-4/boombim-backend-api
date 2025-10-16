@@ -1,4 +1,4 @@
-package boombimapi.global.geo.internal;
+package boombimapi.domain.place.cluster;
 
 /**
  * Web Mercator
