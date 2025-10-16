@@ -3,10 +3,13 @@ package boombimapi.domain.point.application.impl;
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.point.application.PointService;
+import boombimapi.domain.point.domain.entity.EventCampaign;
 import boombimapi.domain.point.domain.entity.Point;
 import boombimapi.domain.point.domain.entity.PointHistory;
+import boombimapi.domain.point.domain.entity.type.EventCategory;
 import boombimapi.domain.point.domain.entity.type.PointAction;
 import boombimapi.domain.point.domain.entity.type.PointCategory;
+import boombimapi.domain.point.domain.repository.EventCampaignRepository;
 import boombimapi.domain.point.domain.repository.PointHistoryRepository;
 import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.domain.point.presentation.dto.res.GetPointHistoryRes;
@@ -32,6 +35,7 @@ public class PointServiceImpl implements PointService {
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final MemberRepository memberRepository;
+    private final EventCampaignRepository eventCampaignRepository;
 
     @Override
     public void earnPointForCongestion(Member member, Long balance) {
@@ -88,8 +92,16 @@ public class PointServiceImpl implements PointService {
             throw new BoombimException(EVENT_PARTICIPATION_LIMIT_EXCEEDED);
         }
 
-        point.subtractBalance(balance);
-        point.addApplyEventCnt();
+        point.subtractBalance(balance); // 포인트 감소
+        point.addApplyEventCnt(); // 이벤트 횟수 추가
+
+        EventCampaign eventCampaign = EventCampaign
+                .builder()
+                .member(member)
+                .eventCategory(EventCategory.EVENT_PARTICIPATION_TICKET)
+                .build();
+
+        eventCampaignRepository.save(eventCampaign);
 
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
