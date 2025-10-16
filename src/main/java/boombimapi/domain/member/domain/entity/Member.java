@@ -6,6 +6,7 @@ import boombimapi.domain.alarm.domain.entity.fcm.FcmToken;
 import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.favorite.entity.Favorite;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
+import boombimapi.domain.point.domain.entity.EventCampaign;
 import boombimapi.domain.point.domain.entity.Point;
 import boombimapi.domain.point.domain.entity.PointHistory;
 import boombimapi.domain.search.domain.entity.Search;
@@ -78,6 +79,9 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private PointHistory pointHistory;
 
+    // 11) 이벤트 응모
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EventCampaign eventCampaign;
 
 
     @Column(nullable = false)
