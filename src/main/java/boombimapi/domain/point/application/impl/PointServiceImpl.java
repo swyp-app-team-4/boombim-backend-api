@@ -15,7 +15,6 @@ import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.domain.point.presentation.dto.res.GetPointHistoryRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 import boombimapi.global.infra.exception.error.BoombimException;
-import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +25,13 @@ import java.util.List;
 
 import static boombimapi.global.infra.exception.error.ErrorCode.*;
 
+/**
+ * PointServiceImpl
+ * 포인트 적립, 조회, 사용(이벤트 응모) 관련 비즈니스 로직을 담당한다.
+ * - 혼잡도 작성 시 포인트 적립
+ * - 포인트 및 이력 조회
+ * - 이벤트 응모 시 포인트 차감 및 응모 이력 생성
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -37,14 +43,23 @@ public class PointServiceImpl implements PointService {
     private final MemberRepository memberRepository;
     private final EventCampaignRepository eventCampaignRepository;
 
+    /**
+     * [혼잡도 작성 시 포인트 적립]
+     * - 특정 회원의 포인트 잔액을 증가시키고, 적립 이력을 저장한다.
+     * - 포인트가 존재하지 않으면 예외 발생.
+     *
+     * @param member  포인트를 적립할 회원
+     * @param balance 적립할 포인트 금액
+     */
     @Override
     public void earnPointForCongestion(Member member, Long balance) {
         Point point = pointRepository.findByMember(member)
                 .orElseThrow(() -> new BoombimException(POINT_NOT_EXIST));
 
-
+        // 포인트 적립
         point.addBalance(balance);
 
+        // 포인트 이력 생성
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
                 .amount(balance)
@@ -56,6 +71,14 @@ public class PointServiceImpl implements PointService {
         pointHistoryRepository.save(pointHistory);
     }
 
+    /**
+     * [회원 포인트 및 이력 조회]
+     * - 회원의 현재 포인트 잔액과 포인트 거래 이력을 조회한다.
+     * - 회원 또는 포인트 정보가 존재하지 않으면 예외 발생.
+     *
+     * @param memberId 조회할 회원 ID
+     * @return 포인트 잔액 및 거래 이력 응답 DTO
+     */
     @Override
     public GetPointRes getPointHistory(String memberId) {
         Member member = memberRepository.findById(memberId)
@@ -65,17 +88,24 @@ public class PointServiceImpl implements PointService {
                 .orElseThrow(() -> new BoombimException(POINT_NOT_EXIST));
 
         List<PointHistory> pointHistories = pointHistoryRepository.findAllByMemberOrderByCreatedAtDesc(member);
-
         List<GetPointHistoryRes> result = new ArrayList<>();
 
         for (PointHistory pointHistory : pointHistories) {
             result.add(GetPointHistoryRes.of(pointHistory));
         }
 
-
         return GetPointRes.of(point.getBalance(), result);
     }
 
+    /**
+     * [이벤트 응모 시 포인트 차감]
+     * - 회원 포인트 잔액에서 지정 금액을 차감하고, 응모 이력을 저장한다.
+     * - 응모 횟수가 5회를 초과하면 예외 발생.
+     * - 포인트가 부족한 경우 예외 발생.
+     *
+     * @param memberId 회원 ID
+     * @param balance  차감할 포인트 금액
+     */
     @Override
     public void usePointForEvent(String memberId, Long balance) {
         Member member = memberRepository.findById(memberId)
@@ -84,25 +114,29 @@ public class PointServiceImpl implements PointService {
         Point point = pointRepository.findByMember(member)
                 .orElseThrow(() -> new BoombimException(POINT_NOT_EXIST));
 
+        // 포인트 잔액 부족 예외
         if (point.getBalance() - balance < 0) {
             throw new BoombimException(INSUFFICIENT_POINT_FOR_EVENT);
         }
 
+        // 이벤트 응모 제한 초과 예외
         if (point.getApplyEventCount() == 5) {
             throw new BoombimException(EVENT_PARTICIPATION_LIMIT_EXCEEDED);
         }
 
-        point.subtractBalance(balance); // 포인트 감소
-        point.addApplyEventCnt(); // 이벤트 횟수 추가
+        // 포인트 차감 및 응모 횟수 증가
+        point.subtractBalance(balance);
+        point.addApplyEventCnt();
 
-        EventCampaign eventCampaign = EventCampaign
-                .builder()
+        // 이벤트 응모 이력 저장
+        EventCampaign eventCampaign = EventCampaign.builder()
                 .member(member)
                 .eventCategory(EventCategory.EVENT_PARTICIPATION_TICKET)
                 .build();
 
         eventCampaignRepository.save(eventCampaign);
 
+        // 포인트 거래 이력 저장
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
                 .amount(balance)
