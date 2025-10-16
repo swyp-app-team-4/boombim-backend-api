@@ -1,4 +1,4 @@
-package boombimapi.domain.place.query.api.dto.response.node;
+package boombimapi.domain.place.query.api.dto.response.marker;
 
 import boombimapi.domain.place.query.api.dto.MarkerType;
 import boombimapi.domain.place.shared.type.PlaceType;
