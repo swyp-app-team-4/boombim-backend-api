@@ -38,7 +38,7 @@ public class MemberController {
 
     @Operation(summary = "닉네임 수정 API", description = "닉네임을 수정합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @PatchMapping("/name")
@@ -66,7 +66,7 @@ public class MemberController {
 
     @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @PostMapping
@@ -80,7 +80,7 @@ public class MemberController {
 
     @Operation(summary = "프로필 사진 바꾸기 API", description = "회원의 프로필 사진을 바꿉니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "200", description = "프로필 바꾸기 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @PatchMapping("/profile")
@@ -90,7 +90,7 @@ public class MemberController {
 
     @Operation(summary = "해당 유저 혼잡도 내역 조회 API", description = "유저가 혼잡도 작성한 내역을 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "200", description = "혼잡도 내역 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @GetMapping("/congestion")
