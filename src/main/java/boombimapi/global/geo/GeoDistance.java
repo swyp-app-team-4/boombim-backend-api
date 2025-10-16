@@ -1,4 +1,4 @@
-package boombimapi.global.geo.internal;
+package boombimapi.global.geo;
 
 public final class GeoDistance {
 
