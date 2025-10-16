@@ -7,6 +7,7 @@ import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.favorite.entity.Favorite;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.point.domain.entity.EventCampaign;
+import boombimapi.domain.point.domain.entity.EventLog;
 import boombimapi.domain.point.domain.entity.Point;
 import boombimapi.domain.point.domain.entity.PointHistory;
 import boombimapi.domain.search.domain.entity.Search;
@@ -83,6 +84,9 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventCampaign> eventCampaigns = new ArrayList<>();
 
+    // 11) 이벤트 로그
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventLog> eventLogs = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;
