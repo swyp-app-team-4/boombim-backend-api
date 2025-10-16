@@ -76,12 +76,12 @@ public class Member {
     private Point point;
 
     // 10) 포인트 내역 조회
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PointHistory pointHistory;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PointHistory> pointHistory = new ArrayList<>();
 
     // 11) 이벤트 응모
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private EventCampaign eventCampaign;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventCampaign> eventCampaign = new ArrayList<>();
 
 
     @Column(nullable = false)
