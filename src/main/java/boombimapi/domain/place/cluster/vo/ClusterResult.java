@@ -1,4 +1,4 @@
-package boombimapi.global.geo.core;
+package boombimapi.domain.place.cluster.vo;
 
 import java.util.List;
 
