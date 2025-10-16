@@ -77,11 +77,11 @@ public class Member {
 
     // 10) 포인트 내역 조회
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PointHistory> pointHistory = new ArrayList<>();
+    private List<PointHistory> pointHistories = new ArrayList<>();
 
     // 11) 이벤트 응모
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventCampaign> eventCampaign = new ArrayList<>();
+    private List<EventCampaign> eventCampaigns = new ArrayList<>();
 
 
     @Column(nullable = false)
