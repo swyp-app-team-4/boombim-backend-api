@@ -42,7 +42,7 @@ public class EventCampaign {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "eventCampaign", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventLog> eventlogs = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
