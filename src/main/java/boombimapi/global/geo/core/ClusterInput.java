@@ -1,6 +1,6 @@
 package boombimapi.global.geo.core;
 
-public record ClusterPoint(
+public record ClusterInput(
     Long id,
     double latitude,
     double longitude
