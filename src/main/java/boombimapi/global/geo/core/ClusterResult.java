@@ -2,7 +2,7 @@ package boombimapi.global.geo.core;
 
 import java.util.List;
 
-public record ClusterMarker(
+public record ClusterResult(
     double latitude,
     double longitude,
     int count,
