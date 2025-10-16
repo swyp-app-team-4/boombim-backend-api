@@ -106,9 +106,6 @@ public class SocialLoginServiceImpl implements SocialLoginService {
         // 4. 사용자 생성 또는 업데이트
         Member user = createSocialUser(provider, tokenResponse, userResponse);
 
-        Point point= Point.builder().member(user).build();
-        pointRepository.save(point);
-
         // 5. JWT 토큰 생성 및 반환
         return tokenService.createAccessTokenAndRefreshToken(
                 user.getId(),
@@ -210,6 +207,8 @@ public class SocialLoginServiceImpl implements SocialLoginService {
                         .build();
             }
 
+            Point point= Point.builder().member(user).build();
+            pointRepository.save(point);
             userRepository.save(user);
         } else {
             if (!user.getEmail().equals(userResponse.getEmail())) {
