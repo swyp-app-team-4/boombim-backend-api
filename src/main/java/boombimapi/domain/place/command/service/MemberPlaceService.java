@@ -8,24 +8,25 @@ import boombimapi.domain.congestion.entity.MemberCongestion;
 import boombimapi.domain.congestion.repository.MemberCongestionRepository;
 import boombimapi.domain.favorite.repository.FavoriteRepository;
 import boombimapi.domain.member.domain.entity.Member;
-import boombimapi.domain.member.domain.repository.MemberRepository;
+import boombimapi.domain.place.cluster.WebMercator;
 import boombimapi.domain.place.command.api.dto.request.ResolveMemberPlaceRequest;
 import boombimapi.domain.place.command.infrastructure.NaverStaticMapWebClient;
 import boombimapi.domain.place.query.api.dto.request.ViewportRequest;
 import boombimapi.domain.place.query.api.dto.response.member.GetMemberPlaceDetailResponse;
 import boombimapi.domain.place.query.api.dto.response.member.MemberPlaceSummaryResponse;
 import boombimapi.domain.place.command.api.dto.response.ResolveMemberPlaceResponse;
-import boombimapi.domain.place.query.api.dto.response.node.ViewportClusterNodeResponse;
-import boombimapi.domain.place.query.api.dto.response.node.ViewportNodeResponse;
-import boombimapi.domain.place.query.api.dto.response.node.ViewportPlaceNodeResponse;
+import boombimapi.domain.place.query.api.dto.response.marker.ViewportClusterMarkerResponse;
+import boombimapi.domain.place.query.api.dto.response.marker.ViewportMarkerResponse;
+import boombimapi.domain.place.query.api.dto.response.marker.ViewportPlaceMarkerResponse;
 import boombimapi.domain.place.command.entity.MemberPlace;
 import boombimapi.domain.place.command.repository.MemberPlaceRepository;
 import boombimapi.global.infra.s3.presentation.application.S3Service;
+import boombimapi.global.properties.ClusterProperties;
 import boombimapi.global.vo.Coordinate;
-import boombimapi.global.geo.core.ClusterMarker;
-import boombimapi.global.geo.core.ClusterPoint;
-import boombimapi.global.geo.core.Clusterer;
-import boombimapi.global.geo.internal.GeoDistance;
+import boombimapi.domain.place.cluster.vo.ClusterResult;
+import boombimapi.domain.place.cluster.vo.ClusterInput;
+import boombimapi.domain.place.cluster.Clusterer;
+import boombimapi.global.geo.GeoDistance;
 
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.time.LocalDateTime;
@@ -48,11 +49,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberPlaceService {
 
-    private final MemberRepository memberRepository;
     private final MemberPlaceRepository memberPlaceRepository;
     private final MemberCongestionRepository memberCongestionRepository;
 
-    private final Clusterer clusterer;
     private final FavoriteRepository favoriteRepository;
 
     private final NaverStaticMapWebClient naverStaticMapWebClient;
@@ -149,14 +148,15 @@ public class MemberPlaceService {
         );
     }
 
-    public List<ViewportNodeResponse> getViewportNodes(
+    public List<ViewportMarkerResponse> getViewportMarkers(
         String memberId,
-        ViewportRequest request
+        ViewportRequest request,
+        Clusterer clusterer,
+        ClusterProperties properties
     ) {
 
-//        log.info("[MemberPlaceService] getViewportNodes() zoomLevel: {}", request.zoomLevel());
-
         // 1) 뷰포트 경계 계산
+        // TODO: 추출 필요
         double lat1 = request.topLeft().latitude();
         double lng1 = request.topLeft().longitude();
         double lat2 = request.bottomRight().latitude();
@@ -173,65 +173,118 @@ public class MemberPlaceService {
 
         // 3) 유효 혼잡도 존재 장소만 필터링
         LocalDateTime now = LocalDateTime.now();
-        List<ClusterPoint> clusterPoints = new ArrayList<>();
-        Map<Long, MemberPlace> memberPlaceMap = new HashMap<>(allPlaces.size());
-
+        List<MemberPlace> validPlaces = new ArrayList<>(allPlaces.size());
         for (MemberPlace memberPlace : allPlaces) {
-            boolean exists = memberCongestionRepository
-                .existsByMemberPlaceIdAndExpiresAtAfter(memberPlace.getId(), now);
-            if (exists) {
-                clusterPoints.add(new ClusterPoint(memberPlace.getId(), memberPlace.getLatitude(), memberPlace.getLongitude()));
-                memberPlaceMap.put(memberPlace.getId(), memberPlace);
+            if (memberCongestionRepository.existsByMemberPlaceIdAndExpiresAtAfter(memberPlace.getId(), now)) {
+                validPlaces.add(memberPlace);
             }
         }
-
-        if (clusterPoints.isEmpty()) {
+        if (validPlaces.isEmpty()) {
             return List.of();
         }
 
         int zoomLevel = request.zoomLevel();
-
-        // Clustering
-        List<ClusterMarker> clusterMarkers = clusterer.cluster(
-            clusterPoints,
-            minLatitude,
-            maxLatitude,
-            minLongitude,
-            maxLongitude,
-            zoomLevel
-        );
-
-        int minClusterSize = 2;
-        int detailZoom = 20;
-        boolean highZoom = zoomLevel >= detailZoom;
-
+        boolean isMaxZoom = zoomLevel == properties.maxZoomAtRefZ();
         double memberLatitude = request.memberCoordinate().latitude();
         double memberLongitude = request.memberCoordinate().longitude();
 
-        List<ViewportNodeResponse> nodes = new ArrayList<>(clusterMarkers.size());
+        if (isMaxZoom) {
+            List<ViewportMarkerResponse> markers = new ArrayList<>(validPlaces.size());
 
-        for (ClusterMarker clusterMarker : clusterMarkers) {
-            // (A) 클러스터 모드
-            if (!highZoom && clusterMarker.count() >= minClusterSize) {
+            for (MemberPlace memberPlace : validPlaces) {
+                Optional<MemberCongestion> memberCongestionOptional = memberCongestionRepository
+                    .findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(memberPlace.getId(), now);
+                if (memberCongestionOptional.isEmpty()) {
+                    continue;
+                }
+
+                MemberCongestion memberCongestion = memberCongestionOptional.get();
+                Double memberPlaceLatitude = memberPlace.getLatitude();
+                Double memberPlaceLongitude = memberPlace.getLongitude();
+
+                double distanceMeters = GeoDistance.haversineMeters(
+                    memberLatitude,
+                    memberLongitude,
+                    memberPlaceLatitude,
+                    memberPlaceLongitude
+                );
+
+                boolean isFavorite = isFavorite(memberId, memberPlace.getId());
+
+                markers.add(
+                    ViewportPlaceMarkerResponse.of(
+                        memberPlace.getId(),
+                        memberPlace.getName(),
+                        new Coordinate(memberPlaceLatitude, memberPlaceLongitude),
+                        distanceMeters,
+                        memberCongestion.getCongestionLevel().getName(),
+                        memberCongestion.getCongestionMessage(),
+                        memberCongestion.getCreatedAt(),
+                        isFavorite
+                    )
+                );
+
+            }
+
+            return markers;
+        }
+
+        List<ClusterInput> clusterInputs = new ArrayList<>(validPlaces.size());
+
+        for (MemberPlace memberPlace : validPlaces) {
+            ClusterInput clusterInput = new ClusterInput(
+                memberPlace.getId(),
+                memberPlace.getLatitude(),
+                memberPlace.getLongitude()
+            );
+            clusterInputs.add(clusterInput);
+        }
+
+        List<ClusterResult> clusterResults = clusterer.cluster(clusterInputs, zoomLevel);
+
+        Map<Long, MemberPlace> memberPlaceMap = new HashMap<>(validPlaces.size());
+        for (MemberPlace memberPlace : validPlaces) {
+            memberPlaceMap.put(memberPlace.getId(), memberPlace);
+        }
+
+        final int minClusterSize = properties.minClusterSize();
+        final int refZ = properties.refZ();
+        final double tileSize = properties.tileSize();
+
+        List<ViewportMarkerResponse> markers = new ArrayList<>(clusterResults.size());
+        for (ClusterResult clusterResult : clusterResults) {
+            if (clusterResult.count() >= minClusterSize) {
+                double longitude = WebMercator.worldPixelXToLongitude(
+                    clusterResult.centroidWorldPixelX(),
+                    refZ,
+                    tileSize
+                );
+
+                double latitude = WebMercator.worldPixelYToLatitude(
+                    clusterResult.centroidWorldPixelY(),
+                    refZ,
+                    tileSize
+                );
+
                 Map<String, Integer> levelCounts = new HashMap<>();
 
-                for (Long placeId : clusterMarker.memberPlaceIds()) {
-                    Optional<MemberCongestion> optionalMemberCongestion =
+                for (Long placeId : clusterResult.placeIds()) {
+                    Optional<MemberCongestion> memberCongestionOptional =
                         memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
                             placeId, now
                         );
 
-                    if (optionalMemberCongestion.isEmpty())
+                    if (memberCongestionOptional.isEmpty())
                         continue;
 
-                    String levelName = optionalMemberCongestion.get().getCongestionLevel().getName();
+                    String levelName = memberCongestionOptional.get().getCongestionLevel().getName();
                     levelCounts.merge(levelName, 1, Integer::sum);
                 }
 
-                nodes.add(
-                    ViewportClusterNodeResponse.of(
-                        new Coordinate(clusterMarker.latitude(), clusterMarker.longitude()),
-                        clusterMarker.count(),
+                markers.add(
+                    ViewportClusterMarkerResponse.of(
+                        new Coordinate(latitude, longitude),
+                        clusterResult.count(),
                         levelCounts
                     )
                 );
@@ -239,21 +292,20 @@ public class MemberPlaceService {
                 continue;
             }
 
-            for (Long placeId : clusterMarker.memberPlaceIds()) {
+            for (Long placeId : clusterResult.placeIds()) {
                 MemberPlace memberPlace = memberPlaceMap.get(placeId);
-
-                if (memberPlace == null)
+                if (memberPlace == null) {
                     continue;
+                }
 
-                Optional<MemberCongestion> optionalMemberCongestion =
-                    memberCongestionRepository.findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(
-                        placeId, now
-                    );
+                Optional<MemberCongestion> memberCongestionOptional = memberCongestionRepository
+                    .findFirstByMemberPlaceIdAndExpiresAtAfterOrderByCreatedAtDesc(placeId, now);
 
-                if (optionalMemberCongestion.isEmpty())
+                if (memberCongestionOptional.isEmpty()) {
                     continue;
+                }
 
-                MemberCongestion memberCongestion = optionalMemberCongestion.get();
+                MemberCongestion memberCongestion = memberCongestionOptional.get();
 
                 double distanceMeters = GeoDistance.haversineMeters(
                     memberLatitude,
@@ -264,8 +316,8 @@ public class MemberPlaceService {
 
                 boolean isFavorite = isFavorite(memberId, memberPlace.getId());
 
-                nodes.add(
-                    ViewportPlaceNodeResponse.of(
+                markers.add(
+                    ViewportPlaceMarkerResponse.of(
                         memberPlace.getId(),
                         memberPlace.getName(),
                         new Coordinate(memberPlace.getLatitude(), memberPlace.getLongitude()),
@@ -276,11 +328,11 @@ public class MemberPlaceService {
                         isFavorite
                     )
                 );
-
             }
+
         }
 
-        return nodes;
+        return markers;
     }
 
     private int sanitizeSize(
