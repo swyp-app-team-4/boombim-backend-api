@@ -1,5 +1,15 @@
 package boombimapi.global.properties;
 
-public interface ClusterProperties {
+public sealed interface ClusterProperties
+    permits WebClusterProperties, AppClusterProperties {
 
+    int refZ();
+
+    int maxZoomAtRefZ();
+
+    int baseCellPixel();
+
+    double tileSize();
+
+    int minClusterSize();
 }
