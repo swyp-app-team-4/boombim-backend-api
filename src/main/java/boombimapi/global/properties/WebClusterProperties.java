@@ -4,9 +4,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "cluster.web")
 public record WebClusterProperties(
-    int zMappingBase,
+    int refZ,
+    int maxZoomAtRefZ,
     int baseCellPixel,
-    double tileSize
-) {
+    double tileSize,
+    int minClusterSize
+) implements ClusterProperties {
 
 }
