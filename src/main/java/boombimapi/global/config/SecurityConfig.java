@@ -36,7 +36,7 @@ public class SecurityConfig {
         "/swagger-ui/**",
         "/swagger-ui.html",
         "/favicon.ico",
-        "/api/reissue",
+        "/api/app/reissue",
         "/api/web/reissue",
         "/api/region",
         "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
