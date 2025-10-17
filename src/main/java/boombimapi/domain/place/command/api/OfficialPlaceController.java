@@ -34,6 +34,7 @@ public class OfficialPlaceController {
 
     private final OfficialPlaceService officialPlaceService;
 
+    // TODO: deprecated됨 -> 프론트에 전달 후 삭제 예정
     @Operation(summary = "뷰포트 내 공식 장소 조회", description = "뷰포트 내 공식 장소들의 정보를 리스트로 반환합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "뷰포트 내 공식 장소 조회 성공")
