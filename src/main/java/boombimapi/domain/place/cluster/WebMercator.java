@@ -18,7 +18,7 @@ public final class WebMercator {
      * @param tileSize  타일 한 변의 픽셀 수
      * @return 월드 X 픽셀 좌표 [0, tileSize * 2^zoomLevel]
      */
-    public static double longitudeToWorldX(
+    public static double longitudeToWorldPixelX(
         double longitude,
         int zoomLevel,
         double tileSize
@@ -35,7 +35,7 @@ public final class WebMercator {
      * @param tileSize  타일 한 변의 픽셀 수
      * @return 월드 Y 픽셀 좌표 [0, tileSize * 2^zoomLevel]
      */
-    public static double latitudeToWorldY(
+    public static double latitudeToWorldPixelY(
         double latitude,
         int zoomLevel,
         double tileSize
@@ -54,7 +54,7 @@ public final class WebMercator {
      * @param tileSize  타일 한 변의 픽셀 수
      * @return 경도
      */
-    public static double worldXToLongitude(
+    public static double worldPixelXToLongitude(
         double worldX,
         int zoomLevel,
         double tileSize
@@ -71,7 +71,7 @@ public final class WebMercator {
      * @param tileSize  타일 한 변의 픽셀 수
      * @return 위도
      */
-    public static double worldYToLatitude(
+    public static double worldPixelYToLatitude(
         double worldY,
         int zoomLevel,
         double tileSize
