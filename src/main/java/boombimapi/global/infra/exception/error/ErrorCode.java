@@ -92,7 +92,15 @@ public enum ErrorCode {
     AI_ATTEMPT_TOKEN_NO_ACTIVE_POINTER(-903, "활성 AI 생성 토큰이 없습니다.", 406),
     AI_ATTEMPT_TOKEN_ALREADY_USED(-904, "AI 생성 토큰이 이미 사용되었습니다.", 409),
     AI_ATTEMPT_TOKEN_SUPERSEDED(-905, "AI 생성 토큰이 이미 교체되었습니다.", 424),
-    AI_ATTEMPT_RATE_LIMITED(-906, "AI 생성 요청이 너무 빠릅니다.", 429);
+    AI_ATTEMPT_RATE_LIMITED(-906, "AI 생성 요청이 너무 빠릅니다.", 429),
+
+
+    // point
+    POINT_NOT_EXIST(-1000, "해당 포인트가 존재하지 않습니다.", 404),
+    POINT_HISTORY_NOT_EXIST(-1001, "해당 포인트 내역이 존재하지 않습니다.", 404),
+    EVENT_PARTICIPATION_LIMIT_EXCEEDED(-1002, "이벤트 응모 가능 횟수를 초과했습니다.", 400),
+    INSUFFICIENT_POINT_FOR_EVENT(-1003, "포인트가 부족하여 이벤트에 응모할 수 없습니다.", 400),
+    EVENT_NOT_EXIST(-1004,"존재하지 않는 이벤트입니다.",404);
 
     private final int code;
     private final String message;

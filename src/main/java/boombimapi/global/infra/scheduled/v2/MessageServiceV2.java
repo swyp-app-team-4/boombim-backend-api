@@ -1,0 +1,30 @@
+package boombimapi.global.infra.scheduled.v2;
+
+import boombimapi.domain.vote.domain.entity.Vote;
+import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
+import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class MessageServiceV2 {
+    public String dailyCommunityTitle() {
+        return "\uD83D\uDC40 붐빔 정도를 알고 싶어하는 사람이 있어요";
+    }
+
+    public String dailyCommunityMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("지금 있는 곳의 혼잡도를 공유해보세요!");
+        return sb.toString();
+    }
+
+
+}

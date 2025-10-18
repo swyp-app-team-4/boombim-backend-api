@@ -1,11 +1,11 @@
-package boombimapi.domain.member.presentation.dto.member.res;
+package boombimapi.domain.member.presentation.dto.member.res.mypage;
 
-import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "마이페이지 1번 구간 응답")
-public record GetMemberRes(
+public record GetMemberResV1(
 
         @Schema(description = "사용자 이름", example = "최승호")
         String name,
@@ -25,14 +25,14 @@ public record GetMemberRes(
         @Schema(description = "작성한 답변 수", example = "34")
         Long questionCnt
 ) {
-    public static GetMemberRes of(Member user, Long voteCnt, Long questionCnt) {
-        return new GetMemberRes(
-                user.getName(),
-                user.getProfile(),
-                user.getEmail(),
-                user.getSocialProvider(),
-                voteCnt,
-                questionCnt
-        );
-    }
+public static GetMemberResV1 of(Member user, Long voteCnt, Long questionCnt) {
+    return new GetMemberResV1(
+            user.getName(),
+            user.getProfile(),
+            user.getEmail(),
+            user.getSocialProvider(),
+            voteCnt,
+            questionCnt
+    );
+}
 }

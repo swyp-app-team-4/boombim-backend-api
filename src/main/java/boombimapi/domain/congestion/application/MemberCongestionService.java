@@ -12,6 +12,7 @@ import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.place.command.entity.MemberPlace;
 import boombimapi.domain.place.command.repository.MemberPlaceRepository;
+import boombimapi.domain.point.application.PointService;
 import boombimapi.global.infra.exception.error.BoombimException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class MemberCongestionService {
     private final MemberPlaceRepository memberPlaceRepository;
     private final MemberCongestionRepository memberCongestionRepository;
     private final CongestionLevelRepository congestionLevelRepository;
+    private final PointService pointService;
 
     public CreateMemberCongestionResponse createMemberCongestion(
         String memberId,
@@ -43,6 +45,8 @@ public class MemberCongestionService {
         if (congestionMessage.isEmpty()) {
             congestionMessage = congestionLevel.getMessage();
         }
+
+        pointService.earnPointForCongestion(member, 10L);
 
         MemberCongestion memberCongestion = MemberCongestion.of(
             member,

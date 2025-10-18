@@ -1,21 +1,18 @@
-package boombimapi.global.infra.scheduled;
+package boombimapi.global.infra.scheduled.v1;
 
 import boombimapi.domain.vote.domain.entity.Vote;
-import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
-import boombimapi.domain.vote.domain.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MessageService {
+public class MessageServiceV1 {
     private final VoteAnswerRepository voteAnswerRepository;
 
     public String endAlarmTitle(Vote vote) {

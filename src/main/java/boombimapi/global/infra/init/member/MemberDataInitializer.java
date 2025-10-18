@@ -7,12 +7,15 @@ import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.alarm.domain.repository.FcmTokenRepository;
+import boombimapi.domain.point.domain.entity.Point;
+import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.domain.vote.domain.entity.Vote;
 import boombimapi.domain.vote.domain.entity.VoteAnswer;
 import boombimapi.domain.vote.domain.entity.type.VoteAnswerType;
 import boombimapi.domain.vote.domain.repository.VoteAnswerRepository;
 import boombimapi.domain.vote.domain.repository.VoteRepository;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -29,10 +32,10 @@ public class MemberDataInitializer {
     private final FcmTokenRepository fcmTokenRepository;
     private final VoteRepository voteRepository;
     private final VoteAnswerRepository voteAnswerRepository;
-
+    private final PointRepository pointRepository;
     private static final String FCM_TOKEN = "e5y6VivpfCYAjx2g8r5-Kx:APA91bGfCtdsZ7jqYn7G-U8lLICS4QvzA6Lp__AdSnyAOEZe99icXeNlMQFfxapLNeUVW1J-agbBCj36OBWzyXG7c_UihrOQZLLEGFdGXSo1qPoyfO-r8hU";
 
-    @PostConstruct
+    //@PostConstruct
     @Transactional
     public void initializeMembers() {
         // 이미 데이터가 있으면 초기화하지 않음
@@ -41,12 +44,11 @@ public class MemberDataInitializer {
 //            return;
 //        }
 
-
         Vote vote = voteRepository.findById(8L).orElse(null);
         for (int i = 1; i <= 1000; i++) {
             // Member 생성
             Member member = Member.builder()
-                    .id(i+"test")
+                    .id(i + "test")
                     .email("test" + i + "@kakao.com")
                     .name("테스트유저" + i)
                     .profile("https://example.com/profile" + i + ".jpg")
@@ -55,7 +57,6 @@ public class MemberDataInitializer {
                     .build();
 
             Member savedMember = memberRepository.save(member);
-
 
             // 투표자 생성
             VoteAnswer voteAnswer = VoteAnswer.builder()
@@ -80,8 +81,35 @@ public class MemberDataInitializer {
             }
         }
 
-
-
         log.info("회원 데이터 초기화가 완료되었습니다. 총 100명의 회원과 FCM 토큰이 생성되었습니다.");
+    }
+
+
+    @PostConstruct
+    @Transactional
+    public void initializePoints() {
+        List<String> memberIds = List.of(
+
+        );
+
+        int success = 0;
+        int fail = 0;
+
+        for (String memberId : memberIds) {
+            Member member = memberRepository.findById(memberId).orElse(null);
+            if (member == null) {
+                log.info("❌ Member not found: " + memberId);
+                fail++;
+                continue;
+            }
+
+            Point point = Point.builder().member(member).build();
+            pointRepository.save(point);
+            success++;
+        }
+
+        log.info("✅ 성공적으로 저장된 포인트 수: " + success);
+        log.info("⚠️ 실패한 멤버 수: " + fail);
+
     }
 }
