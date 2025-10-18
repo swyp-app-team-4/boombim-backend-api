@@ -1,7 +1,7 @@
 package boombimapi.domain.oauth2.presentation.controller;
 
-import boombimapi.domain.member.application.service.MemberService;
-import boombimapi.domain.member.presentation.dto.member.res.GetMemberRes;
+import boombimapi.domain.member.application.service.MemberServiceV2;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV2;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.response.BaseResponse;
@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Auth (Web)", description = "웹에서 로그인 시 주입된 쿠키 확인을 위한 엔드포인트")
 public class AuthController {
 
-    private final MemberService memberService;
+    private final MemberServiceV2 memberService;
 
     @GetMapping("/me")
-    public ResponseEntity<BaseResponse<GetMemberRes>> me(
+    public ResponseEntity<BaseResponse<GetMemberResV2>> me(
         @AuthenticationPrincipal String memberId
     ) {
         if (memberId == null) {
