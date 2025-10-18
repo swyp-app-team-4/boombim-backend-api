@@ -87,31 +87,6 @@ public class MemberPlaceController {
         );
     }
 
-    @Operation(summary = "(Web) 뷰포트 내 사용자 장소 조회", description = "뷰포트 내 사용자 장소들 중 1시간 내 작성된 혼잡도가 존재하는 장소들을 리스트로 반환합니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "뷰포트 내 사용자 장소 조회 성공")
-    })
-    @PostMapping("/web/member-place")
-    public ResponseEntity<BaseResponse<List<ViewportMarkerResponse>>> getMemberPlacesInViewportWeb(
-        @AuthenticationPrincipal String memberId,
-        @RequestBody ViewportRequest request
-    ) {
-        List<ViewportMarkerResponse> viewportMarkers = memberPlaceService.getViewportMarkers(
-            memberId,
-            request,
-            webClusterer,
-            webClusterProperties
-        );
-
-        return ResponseEntity.ok(
-            BaseResponse.of(
-                HttpStatus.OK,
-                GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
-                viewportMarkers
-            )
-        );
-    }
-
     @Operation(summary = "특정 사용자 장소 상세 조회", description = "특정 사용자 장소를 상세 조회하여 해당 장소에 작성된 혼잡도들을 확인합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "특정 사용자 장소 상세 조회 성공")
@@ -139,6 +114,31 @@ public class MemberPlaceController {
             )
         );
 
+    }
+
+    @Operation(summary = "(Web) 뷰포트 내 사용자 장소 조회", description = "뷰포트 내 사용자 장소들 중 1시간 내 작성된 혼잡도가 존재하는 장소들을 리스트로 반환합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "뷰포트 내 사용자 장소 조회 성공")
+    })
+    @PostMapping("/web/member-place")
+    public ResponseEntity<BaseResponse<List<ViewportMarkerResponse>>> getMemberPlacesInViewportWeb(
+        @AuthenticationPrincipal String memberId,
+        @RequestBody ViewportRequest request
+    ) {
+        List<ViewportMarkerResponse> viewportMarkers = memberPlaceService.getViewportMarkers(
+            memberId,
+            request,
+            webClusterer,
+            webClusterProperties
+        );
+
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
+                viewportMarkers
+            )
+        );
     }
 
 }
