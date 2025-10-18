@@ -23,13 +23,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static boombimapi.global.response.ResponseMessage.GET_ALARM_SUCCESS;
-import static boombimapi.global.response.ResponseMessage.VOTE_SUCCESS;
 
 @RestController
-@RequestMapping("/api/alarm")
+@RequestMapping("/api/app/alarm")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Alarm", description = "알림 관련 API")

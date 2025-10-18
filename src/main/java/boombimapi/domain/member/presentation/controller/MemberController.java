@@ -24,7 +24,7 @@ import java.util.List;
 import static boombimapi.global.response.ResponseMessage.*;
 
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Member", description = "사용자 전용 API")
@@ -37,7 +37,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PatchMapping("/name")
+    @PatchMapping("/app/member/name")
     public ResponseEntity<BaseOKResponse<Void>> updateNickname(@AuthenticationPrincipal String userId, @RequestBody NicknameReq req) {
         memberService.updateNickname(userId, req.name());
         return ResponseEntity.ok(
@@ -51,7 +51,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping
+    @GetMapping("/app/member")
     public ResponseEntity<GetMemberRes> getMember(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService.getMember(userId));
     }
@@ -91,7 +91,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PostMapping
+    @PostMapping("/app/member")
     public ResponseEntity<BaseOKResponse<Void>> memberDelete(@AuthenticationPrincipal String userId, @RequestBody MemberLeaveReq req) {
         memberService.memberDelete(userId, req);
         return ResponseEntity.ok(
@@ -105,7 +105,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PatchMapping("/profile")
+    @PatchMapping("/app/member/profile")
     public ResponseEntity<ProfileRes> updateProfile(@AuthenticationPrincipal String userId, MultipartFile multipartFile) throws IOException {
         return ResponseEntity.ok(memberService.updateProfile(userId, multipartFile));
     }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 @Tag(name = "Token", description = "토큰 재발급 API")
 public class ReissueController {
 
@@ -23,7 +24,7 @@ public class ReissueController {
     private final AuthCookieManager authCookieManager;
 
     @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급합니다.")
-    @PostMapping("/api/app/reissue")
+    @PostMapping("/app/reissue")
     public ResponseEntity<LoginToken> reissue(@RequestBody ReissueRequest request) {
         LoginToken loginToken = reissueService.reissue(request.refreshToken());
         return ResponseEntity.ok(loginToken);

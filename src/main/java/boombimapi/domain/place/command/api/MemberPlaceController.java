@@ -49,7 +49,7 @@ public class MemberPlaceController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 장소 확인 성공")
     })
-    @PostMapping("/app/resolve")
+    @PostMapping("/app/member-place/resolve")
     public ResponseEntity<BaseResponse<ResolveMemberPlaceResponse>> resolveMemberPlace(
         @RequestBody ResolveMemberPlaceRequest request
     ) {
@@ -116,7 +116,7 @@ public class MemberPlaceController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "특정 사용자 장소 상세 조회 성공")
     })
-    @GetMapping("/app/{memberPlaceId}")
+    @GetMapping("/app/member-place/{memberPlaceId}")
     public ResponseEntity<BaseResponse<GetMemberPlaceDetailResponse>> getMemberPlaceDetail(
         @PathVariable Long memberPlaceId,
         @RequestParam(required = false) @Min(1) @Max(100) Integer size,

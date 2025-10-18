@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/member-congestion")
+@RequestMapping("/api")
 @Tag(name = "Member Congestion", description = "사용자 혼잡도 관련 API")
 public class MemberCongestionController {
 
@@ -31,7 +31,7 @@ public class MemberCongestionController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 혼잡도 생성 성공")
     })
-    @PostMapping("/create")
+    @PostMapping("/app/member-congestion")
     public ResponseEntity<BaseResponse<CreateMemberCongestionResponse>> createMemberCongestion(
         @AuthenticationPrincipal String memberId,
         @RequestBody CreateMemberCongestionRequest request
