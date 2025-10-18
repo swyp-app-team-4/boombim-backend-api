@@ -27,7 +27,7 @@ import java.util.List;
 import static boombimapi.global.response.ResponseMessage.GET_ALARM_SUCCESS;
 
 @RestController
-@RequestMapping("/api/app/alarm")
+@RequestMapping("/api/alarm")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Alarm", description = "알림 관련 API")
