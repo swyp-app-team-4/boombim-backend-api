@@ -39,7 +39,8 @@ public class SecurityConfig {
         "/api/app/reissue",
         "/api/web/reissue",
         "/api/region",
-        "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
+        "/api/app/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
+        "/api/web/oauth2/login/**",
         "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
         "/api/healthcheck", "/api/admin/**",
         "/actuator/**"
@@ -68,8 +69,10 @@ public class SecurityConfig {
             }))
             .authorizeHttpRequests((url) -> url
                 .requestMatchers("/api/healthcheck").permitAll()
-                .requestMatchers("/api/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
-                .requestMatchers("/api/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
+                .requestMatchers("/api/app/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
+                .requestMatchers("/api/web/oauth2/login/**").permitAll()
+                .requestMatchers("/api/app/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
+                .requestMatchers("/api/web/oauth2/callback/**").permitAll()
                 .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/favicon.ico", "/api/region").permitAll()
