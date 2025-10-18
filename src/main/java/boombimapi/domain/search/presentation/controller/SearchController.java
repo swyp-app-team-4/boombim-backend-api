@@ -23,71 +23,72 @@ import static boombimapi.global.response.ResponseMessage.DELETE_SEARCH_SUCCESS;
 import static boombimapi.global.response.ResponseMessage.GET_ALARM_SUCCESS;
 
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Search", description = "검색 관련 API")
 public class SearchController {
 
     private final SearchService searchService;
+
     @Operation(summary = "검색 내역 조회", description = "사용자가 입력한 검색 내역 조회합니다. ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "검색 내역 조회 성공"),
+        @ApiResponse(responseCode = "200", description = "검색 내역 조회 성공"),
     })
-    @GetMapping("/history")
+    @GetMapping("/app/search/history")
     public ResponseEntity<List<SearchHistoryRes>> getSearchHistory(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(searchService.getSearchHistory(userId));
     }
 
     @Operation(summary = "연관 검색어", description = "연관 검색어가 나옵니다. 최대 20개까지 나옵니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "연관 검색어 조회 성공"),
+        @ApiResponse(responseCode = "200", description = "연관 검색어 조회 성공"),
     })
-    @GetMapping("/related")
+    @GetMapping("/app/search/related")
     public ResponseEntity<List<SearchRelatedRes>> getSearchRelated(@RequestParam String posName) {
         return ResponseEntity.ok(searchService.getSearchRelated(posName));
     }
 
     @Operation(summary = "검색 상세 조회", description = "검색 버튼을 누르면 실행되는 API 입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "검색 상세 조회 성공"),
+        @ApiResponse(responseCode = "200", description = "검색 상세 조회 성공"),
     })
-    @GetMapping
+    @GetMapping("/app/search")
     public ResponseEntity<List<SearchRes>> getSearch(
-            @RequestParam String posName,
-            @AuthenticationPrincipal String userId) {
+        @RequestParam String posName,
+        @AuthenticationPrincipal String userId) {
 
         return ResponseEntity.ok(searchService.getSearch(posName, userId));
     }
 
     @Operation(summary = "검색 내역 개별 삭제", description = "검색 내역을 개별 삭제를 합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "검색 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "검색 ID 존재하지가 않음"),
+        @ApiResponse(responseCode = "200", description = "검색 삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "검색 ID 존재하지가 않음"),
     })
-    @DeleteMapping("/{searchId}")
+    @DeleteMapping("/app/search/{searchId}")
     public ResponseEntity<BaseOKResponse<Void>> deletePersonal(
-            @AuthenticationPrincipal String userId,
-            @PathVariable Long searchId) {
+        @AuthenticationPrincipal String userId,
+        @PathVariable Long searchId) {
         searchService.deletePersonal(searchId, userId);
         return ResponseEntity.ok(
-                BaseOKResponse.of(
-                        HttpStatus.OK,
-                        DELETE_SEARCH_SUCCESS));
+            BaseOKResponse.of(
+                HttpStatus.OK,
+                DELETE_SEARCH_SUCCESS));
     }
 
     @Operation(summary = "검색 내역 전체 삭제", description = "검색 내역을 전체를 삭제를 합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "검색 전체 삭제 성공"),
+        @ApiResponse(responseCode = "200", description = "검색 전체 삭제 성공"),
     })
-    @DeleteMapping("/all")
+    @DeleteMapping("/app/search/all")
     public ResponseEntity<BaseOKResponse<Void>> deleteAll(@AuthenticationPrincipal String userId) {
 
         searchService.deleteAll(userId);
         return ResponseEntity.ok(
-                BaseOKResponse.of(
-                        HttpStatus.OK,
-                        DELETE_SEARCH_SUCCESS));
+            BaseOKResponse.of(
+                HttpStatus.OK,
+                DELETE_SEARCH_SUCCESS));
     }
 
 }
