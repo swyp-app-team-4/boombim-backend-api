@@ -2,13 +2,13 @@ package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
 import boombimapi.domain.oauth2.cookie.AuthCookieManager;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.global.response.BaseResponse;
 import boombimapi.global.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,27 +31,27 @@ public class ReissueController {
     }
 
     @Operation(summary = "(Web) 토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급하여 쿠키에 담아줍니다.")
-    @PostMapping("/api/web/reissue")
-    public ResponseEntity<BaseResponse<Void>> webReissue(
-        HttpServletRequest request,
-        HttpServletResponse response
+    @PostMapping("/web/reissue")
+    public ResponseEntity<BaseResponse<Void>> reissueWeb(
+        HttpServletRequest request
     ) {
         String extractedRefreshToken = authCookieManager.extractRefreshToken(request);
 
         LoginToken reissuedLoginTokens = reissueService.reissue(extractedRefreshToken);
 
-        authCookieManager.addTokens(
-            response,
+        AuthCookies authCookies = authCookieManager.reissueAuthCookies(
             reissuedLoginTokens.accessToken(),
             reissuedLoginTokens.refreshToken()
         );
 
-        return ResponseEntity.ok(
-            BaseResponse.of(
-                HttpStatus.OK,
-                ResponseMessage.REISSUE_TOKENS_SUCCESS)
-        );
-
+        return ResponseEntity.ok()
+            .header("Set-Cookie", authCookies.accessTokenCookie().toString())
+            .header("Set-Cookie", authCookies.refreshTokenCookie().toString())
+            .body(BaseResponse.of(
+                    HttpStatus.OK,
+                    ResponseMessage.REISSUE_TOKENS_SUCCESS
+                )
+            );
     }
 
     // 요청 DTO 추가
