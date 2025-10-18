@@ -26,14 +26,30 @@ public class OfficialPlaceQueryController {
 
     private final OfficialPlaceQueryService officialPlaceQueryService;
 
-    // TODO: 공식 장소에도 클러스터링이 도입된다면, app용 엔드포인트 하나 추가해야함
+    @Operation(summary = "뷰포트 내 공식 장소 조회", description = "뷰포트 내 공식 장소들의 정보를 리스트로 반환합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "뷰포트 내 공식 장소 조회 성공")
+    })
+    @PostMapping("/app/official-place")
+    public ResponseEntity<BaseResponse<List<ViewportResponse>>> getOfficialPlacesInViewportApp(
+        @AuthenticationPrincipal String memberId,
+        @RequestBody ViewportRequest request
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_OFFICIAL_PLACES_IN_VIEWPORT_SUCCESS,
+                officialPlaceQueryService.getOfficialPlacesInViewport(memberId, request)
+            )
+        );
+    }
 
     @Operation(summary = "뷰포트 내 공식 장소 조회", description = "뷰포트 내 공식 장소들의 정보를 리스트로 반환합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "뷰포트 내 공식 장소 조회 성공")
     })
     @PostMapping("/web/official-place")
-    public ResponseEntity<BaseResponse<List<ViewportResponse>>> getOfficialPlacesInViewport(
+    public ResponseEntity<BaseResponse<List<ViewportResponse>>> getOfficialPlacesInViewportWeb(
         @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
     ) {
