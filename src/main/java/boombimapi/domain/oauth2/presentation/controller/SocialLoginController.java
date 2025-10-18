@@ -2,13 +2,13 @@ package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.SocialLoginService;
 import boombimapi.domain.oauth2.cookie.AuthCookieManager;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.global.properties.CookieProperties;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +34,26 @@ public class SocialLoginController {
         final String loginUrl = socialLoginService.getLoginUrl(provider);
         return ResponseEntity.status(302)
             .header("Location", loginUrl)
+            .build();
+    }
+
+    @Operation(summary = "[WEB] 소셜 로그인 콜백", description = "쿠키(HttpOnly)로 AT/RT 세팅 후 프론트로 리다이렉트합니다.")
+    @GetMapping("/web/oauth2/callback/{provider}")
+    public ResponseEntity<Void> socialWebLogin(
+        @PathVariable SocialProvider provider,
+        @RequestParam("code") String code
+    ) {
+        LoginToken loginToken = socialLoginService.login(provider, code);
+
+        AuthCookies authCookies = authCookieManager.createAuthCookies(
+            loginToken.accessToken(),
+            loginToken.refreshToken()
+        );
+
+        return ResponseEntity.status(302)
+            .header("Location", cookieProperties.frontRedirect())
+            .header("Set-Cookie", authCookies.accessTokenCookie().toString())
+            .header("Set-Cookie", authCookies.refreshTokenCookie().toString())
             .build();
     }
 
