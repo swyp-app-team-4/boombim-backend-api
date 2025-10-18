@@ -29,7 +29,7 @@ public class Point {
     @Column(name = "balance", nullable = false)
     private Long balance;
 
-    @Column(name = "apply_event_countt", nullable = false)
+    @Column(name = "apply_event_count", nullable = false)
     @Comment("이벤트 응모권 수 하루 최대 5회")
     private Long applyEventCount;
 
