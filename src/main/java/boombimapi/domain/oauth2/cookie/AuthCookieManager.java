@@ -1,10 +1,13 @@
 package boombimapi.domain.oauth2.cookie;
 
+import static boombimapi.domain.oauth2.cookie.type.AuthCookieType.*;
+
+import boombimapi.domain.oauth2.cookie.type.AuthCookieType;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
 import boombimapi.global.properties.CookieProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -15,53 +18,81 @@ public class AuthCookieManager {
 
     private final CookieProperties cookieProperties;
 
-    public void addTokens(
-        HttpServletResponse response,
+    public AuthCookies createAuthCookies(
         String accessToken,
         String refreshToken
     ) {
-        addAccessToken(response, accessToken);
-        addRefreshToken(response, refreshToken);
+        return AuthCookies.login(
+            buildCookie(ACCESS, accessToken),
+            buildCookie(REFRESH, refreshToken)
+        );
+    }
+
+    public AuthCookies reissueAuthCookies(
+        String newAccessToken,
+        String newRefreshToken
+    ) {
+        return AuthCookies.reissue(
+            buildCookie(ACCESS, newAccessToken),
+            buildCookie(REFRESH, newRefreshToken)
+        );
+    }
+
+    public AuthCookies logout() {
+        return AuthCookies.logout(
+            buildLogoutCookie(ACCESS),
+            buildLogoutCookie(REFRESH)
+        );
     }
 
     public String extractRefreshToken(
         HttpServletRequest request
     ) {
+        if (request == null) {
+            return null;
+        }
+
         Cookie[] cookies = request.getCookies();
 
-        return Arrays.stream(cookies)
-            .filter(cookie -> cookieProperties.rtName().equals(cookie.getName()))
-            .map(Cookie::getValue)
-            .findFirst()
-            .orElse(null);
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookieProperties.rtName().equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 
-    private void addAccessToken(
-        HttpServletResponse response,
-        String accessToken
+    private ResponseCookie buildCookie(
+        AuthCookieType authCookieType,
+        String value
     ) {
-        ResponseCookie cookie = ResponseCookie.from(cookieProperties.atName(), accessToken)
+        long maxAgeMillis = authCookieType.maxAgeFrom(cookieProperties);
+
+        return ResponseCookie
+            .from(authCookieType.nameFrom(cookieProperties), value)
             .httpOnly(true)
             .secure(cookieProperties.secure())
             .sameSite(cookieProperties.sameSite())
-            .path("/")
-            .maxAge(cookieProperties.atMaxAgeMillis() / 1000)
+            .path(cookieProperties.path())
+            .maxAge(Duration.ofSeconds(Math.max(0, maxAgeMillis / 1000)))
             .build();
-        response.addHeader("Set-Cookie", cookie.toString());
     }
 
-    private void addRefreshToken(
-        HttpServletResponse response,
-        String refreshToken
+    private ResponseCookie buildLogoutCookie(
+        AuthCookieType authCookieType
     ) {
-        ResponseCookie cookie = ResponseCookie.from(cookieProperties.rtName(), refreshToken)
+        return ResponseCookie
+            .from(authCookieType.nameFrom(cookieProperties), "")
             .httpOnly(true)
             .secure(cookieProperties.secure())
             .sameSite(cookieProperties.sameSite())
-            .path("/")
-            .maxAge(cookieProperties.rtMaxAgeMillis() / 1000)
+            .path(cookieProperties.path())
+            .maxAge(Duration.ZERO)
             .build();
-        response.addHeader("Set-Cookie", cookie.toString());
     }
-
 }
