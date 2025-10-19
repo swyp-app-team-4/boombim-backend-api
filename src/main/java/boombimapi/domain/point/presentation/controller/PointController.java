@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * - 이벤트 응모(포인트 차감)
  */
 @RestController
-@RequestMapping("/api/point")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Point", description = "포인트 관련 API")
@@ -43,7 +43,7 @@ public class PointController {
             @ApiResponse(responseCode = "200", description = "포인트 내역 조회 성공"),
             @ApiResponse(responseCode = "404", description = "포인트 정보가 존재하지 않음")
     })
-    @GetMapping
+    @GetMapping("/app/point")
     public ResponseEntity<GetPointRes> getPointHistory(@AuthenticationPrincipal String memberId) {
         return ResponseEntity.ok(pointService.getPointHistory(memberId));
     }
@@ -64,7 +64,7 @@ public class PointController {
             @ApiResponse(responseCode = "400", description = "응모 횟수 초과 또는 포인트 부족"),
             @ApiResponse(responseCode = "404", description = "포인트 정보가 존재하지 않음")
     })
-    @PatchMapping
+    @PatchMapping("/app/point")
     public ResponseEntity<Void> applyEvent(@AuthenticationPrincipal String memberId,
                                            @RequestBody UsePointForEventReq req) {
         pointService.usePointForEvent(memberId, req);

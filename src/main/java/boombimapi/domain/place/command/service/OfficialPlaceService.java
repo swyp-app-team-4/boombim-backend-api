@@ -20,6 +20,7 @@ import boombimapi.domain.place.query.api.dto.response.ViewportResponse;
 import boombimapi.domain.place.command.entity.OfficialPlace;
 import boombimapi.domain.place.command.repository.OfficialPlaceRepository;
 import boombimapi.domain.place.query.dao.projection.NearbyNonCongestedOfficialPlaceProjection;
+import boombimapi.global.geo.GeoDistance;
 import boombimapi.global.vo.Coordinate;
 import boombimapi.global.infra.exception.error.BoombimException;
 import java.util.ArrayList;
@@ -43,14 +44,11 @@ public class OfficialPlaceService {
     private final OfficialCongestionDemographicsRepository demographicsRepository;
     private final FavoriteRepository favoriteRepository;
 
+    // TODO: deprecated 된 메서드 -> 프론트에 전달 후 삭제 예정
     public List<ViewportResponse> getOfficialPlacesInViewport(
         String memberId,
         ViewportRequest request
     ) {
-
-//        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() topLeft: {}", request.topLeft());
-//        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() bottomRight: {}", request.bottomRight());
-//        log.info("[OfficialPlaceService] getOfficialPlacesInViewport() zoomLevel: {}", request.zoomLevel());
 
         // TODO: 직선 거리 계산 부분 리팩터링 필요
         // 1. 뷰포트 범위 계산
@@ -93,7 +91,7 @@ public class OfficialPlaceService {
             Double centroidLatitude = officialPlace.getCentroidLatitude();
             Double centroidLongitude = officialPlace.getCentroidLongitude();
 
-            double distanceMeters = haversine(
+            double distanceMeters = GeoDistance.haversineMeters(
                 memberLatitude,
                 memberLongitude,
                 centroidLatitude,
@@ -204,15 +202,6 @@ public class OfficialPlaceService {
         }
 
         return result;
-    }
-
-    private double haversine(double aLat, double aLng, double bLat, double bLng) {
-        double dLat = Math.toRadians(bLat - aLat);
-        double dLng = Math.toRadians(bLng - aLng);
-        double s = Math.pow(Math.sin(dLat / 2), 2)
-            + Math.cos(Math.toRadians(aLat)) * Math.cos(Math.toRadians(bLat))
-            * Math.pow(Math.sin(dLng / 2), 2);
-        return 2 * 6_371_000 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
     }
 
     private boolean isFavorite(

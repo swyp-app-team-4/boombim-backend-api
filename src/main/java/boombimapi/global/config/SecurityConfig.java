@@ -2,7 +2,6 @@ package boombimapi.global.config;
 
 import boombimapi.global.infra.filter.BoombimJWTFilter;
 import boombimapi.global.infra.exception.auth.BoombimAuthExceptionFilter;
-import boombimapi.global.infra.filter.CustomSecurityLogger;
 import boombimapi.global.jwt.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,16 +32,18 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
 
     private final List<String> excludedUrls = Arrays.asList(
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/favicon.ico",
-            "/api/reissue",
-            "/api/region",
-            "/api/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
-            "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
-            "/api/healthcheck", "/api/admin/**",
-            "/actuator/**"
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/favicon.ico",
+        "/api/app/reissue",
+        "/api/web/reissue",
+        "/api/region",
+        "/api/app/oauth2/login/**",     // 새로운 토큰 방식 로그인 포함
+        "/api/web/oauth2/login/**",
+        "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
+        "/api/healthcheck", "/api/admin/**",
+        "/actuator/**"
     );
 
     @Bean
@@ -53,39 +54,41 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .cors((cors) -> cors.configurationSource(request -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://boombim.netlify.app"));
-                    config.setAllowedMethods(Collections.singletonList("*"));
-                    config.setAllowCredentials(true);
-                    config.setAllowedHeaders(Collections.singletonList("*"));
-                    config.setExposedHeaders(Collections.singletonList("Authorization"));
-                    config.setMaxAge(3600L);
-                    return config;
-                }))
-                .authorizeHttpRequests((url) -> url
-                        .requestMatchers("/api/healthcheck").permitAll()
-                        .requestMatchers("/api/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
-                        .requestMatchers("/api/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
-                        .requestMatchers( "/api/admin/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/favicon.ico", "/api/region").permitAll()
-                        .requestMatchers("/api/reissue").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().authenticated())
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(except -> except
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
-                        ))
+            .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .cors((cors) -> cors.configurationSource(request -> {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:3000", "https://boombim.netlify.app"));
+                config.setAllowedMethods(Collections.singletonList("*"));
+                config.setAllowCredentials(true);
+                config.setAllowedHeaders(Collections.singletonList("*"));
+                config.setExposedHeaders(Collections.singletonList("Authorization"));
+                config.setMaxAge(3600L);
+                return config;
+            }))
+            .authorizeHttpRequests((url) -> url
+                .requestMatchers("/api/healthcheck").permitAll()
+                .requestMatchers("/api/app/oauth2/login/**").permitAll()     // POST /api/oauth2/login/{provider} 허용
+                .requestMatchers("/api/web/oauth2/login/**").permitAll()
+                .requestMatchers("/api/app/oauth2/callback/**").permitAll()  // 기존 콜백 방식 허용
+                .requestMatchers("/api/web/oauth2/callback/**").permitAll()
+                .requestMatchers("/api/admin/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/favicon.ico", "/api/region").permitAll()
+                .requestMatchers("/api/reissue").permitAll()
+                .requestMatchers("/api/web/reissue").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
+                .anyRequest().authenticated())
+            .sessionManagement((session) -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(except -> except
+                .authenticationEntryPoint((request, response, authException) ->
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+                ))
 
-                .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
-                .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
-
+            .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
+            .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorite")
+@RequestMapping("/api")
 @Tag(name = "Favorite", description = "사용자 즐겨찾기 관련 API")
 public class FavoriteController {
 
@@ -37,7 +37,7 @@ public class FavoriteController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "즐겨찾기 추가 성공")
     })
-    @PostMapping
+    @PostMapping("/app/favorite")
     public ResponseEntity<BaseResponse<AddFavoriteResponse>> addFavorite(
         @AuthenticationPrincipal String memberId,
         @RequestBody AddFavoriteRequest request
@@ -55,7 +55,7 @@ public class FavoriteController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "즐겨찾기 삭제 성공")
     })
-    @DeleteMapping
+    @DeleteMapping("/app/favorite")
     public ResponseEntity<BaseResponse<Void>> deleteFavorite(
         @AuthenticationPrincipal String memberId,
         @RequestParam Long placeId,
@@ -76,7 +76,7 @@ public class FavoriteController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 즐겨찾기 조회 성공")
     })
-    @GetMapping
+    @GetMapping("/app/favorite")
     public ResponseEntity<BaseResponse<List<FavoriteResponse>>> getFavorites(
         @AuthenticationPrincipal String memberId
     ) {

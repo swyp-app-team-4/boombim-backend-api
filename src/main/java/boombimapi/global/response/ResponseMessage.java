@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ResponseMessage {
 
+    // auth
+    REISSUE_TOKENS_SUCCESS("토큰 재발급 성공"),
+
     // official place
     GET_OFFICIAL_PLACES_IN_VIEWPORT_SUCCESS("뷰포트 내 공식 장소 조회 성공"),
     GET_LATEST_OFFICIAL_CONGESTION_SUCCESS("최신 공식 혼잡도 조회 성공"),
@@ -38,6 +41,7 @@ public enum ResponseMessage {
     POST_NICKNAME_SUCCESS("닉네임 변경 성공"),
     MEMBER_DELETE("회원 탈퇴 성공"),
     LOGOUT_SUCCESS("로그아웃 성공"),
+    GET_MEMBER_INFO_SUCCESS("회원 정보 조회 성공"),
 
     // alarm
     GET_ALARM_SUCCESS("알림 성공"),

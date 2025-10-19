@@ -5,6 +5,7 @@ import boombimapi.domain.place.query.api.dto.response.ViewportResponse;
 import boombimapi.domain.place.query.dao.OfficialPlaceQueryDao;
 import boombimapi.domain.place.query.dao.param.OfficialPlaceViewportParam;
 import boombimapi.domain.place.query.dao.row.OfficialPlaceViewportRow;
+import boombimapi.global.geo.GeoDistance;
 import boombimapi.global.vo.Coordinate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -45,7 +46,7 @@ public class OfficialPlaceQueryService {
         for (OfficialPlaceViewportRow row : viewportRows) {
             Coordinate rowCoordinate = Coordinate.of(row.centroidLatitude(), row.centroidLongitude());
 
-            double distance = haversine(
+            double distance = GeoDistance.haversineMeters(
                 memberLatitude,
                 memberLongitude,
                 row.centroidLatitude(),
@@ -70,20 +71,6 @@ public class OfficialPlaceQueryService {
         result.sort(Comparator.comparingDouble(ViewportResponse::distance));
 
         return result;
-    }
-
-    private double haversine(
-        double aLatitude,
-        double aLongitude,
-        double bLatitude,
-        double bLongitude
-    ) {
-        double dLat = Math.toRadians(bLatitude - aLatitude);
-        double dLng = Math.toRadians(bLongitude - aLongitude);
-        double s = Math.pow(Math.sin(dLat / 2), 2)
-            + Math.cos(Math.toRadians(aLatitude)) * Math.cos(Math.toRadians(bLatitude))
-            * Math.pow(Math.sin(dLng / 2), 2);
-        return 2 * 6_371_000 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
     }
 
 }

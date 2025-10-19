@@ -1,11 +1,11 @@
-package boombimapi.domain.place.query.api.dto.response.node;
+package boombimapi.domain.place.query.api.dto.response.marker;
 
 import boombimapi.domain.place.query.api.dto.MarkerType;
 import boombimapi.domain.place.shared.type.PlaceType;
 import boombimapi.global.vo.Coordinate;
 import java.time.LocalDateTime;
 
-public record ViewportPlaceNodeResponse(
+public record ViewportPlaceMarkerResponse(
     MarkerType type,
     Long memberPlaceId,
     String name,
@@ -16,9 +16,9 @@ public record ViewportPlaceNodeResponse(
     String congestionMessage,
     LocalDateTime createdAt,
     boolean isFavorite
-) implements ViewportNodeResponse {
+) implements ViewportMarkerResponse {
 
-    public static ViewportPlaceNodeResponse of(
+    public static ViewportPlaceMarkerResponse of(
         Long memberPlaceId,
         String name,
         Coordinate coordinate,
@@ -28,7 +28,7 @@ public record ViewportPlaceNodeResponse(
         LocalDateTime createdAt,
         boolean isFavorite
     ) {
-        return new ViewportPlaceNodeResponse(
+        return new ViewportPlaceMarkerResponse(
             MarkerType.PLACE,
             memberPlaceId,
             name,

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/clova")
+@RequestMapping("/api")
 @Tag(name = "Clova", description = "NAVER CLOVA Studio 관련 API")
 public class ClovaController {
 
@@ -33,7 +33,7 @@ public class ClovaController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 혼잡도 메시지 생성 성공")
     })
-    @PostMapping("/congestion-message")
+    @PostMapping("/app/clova/congestion-message")
     public ResponseEntity<BaseResponse<GenerateCongestionMessageResponse>> generateCongestionMessage(
         @AuthenticationPrincipal String memberId,
         @RequestBody GenerateCongestionMessageRequest request
@@ -57,7 +57,7 @@ public class ClovaController {
         @ApiResponse(responseCode = "409", description = "AI 생성 토큰이 이미 사용되었습니다."),
         @ApiResponse(responseCode = "424", description = "AI 생성 토큰이 이미 교체되었습니다.")
     })
-    @PostMapping("/issue-ai-attempt-token")
+    @PostMapping("/app/clova/issue-ai-attempt-token")
     public ResponseEntity<BaseResponse<IssueAiAttemptTokenResponse>> issueAiAttemptToken(
         @AuthenticationPrincipal String memberId,
         @RequestBody IssueAiAttemptTokenRequest request

@@ -1,22 +1,22 @@
-package boombimapi.domain.place.query.api.dto.response.node;
+package boombimapi.domain.place.query.api.dto.response.marker;
 
 import boombimapi.domain.place.query.api.dto.MarkerType;
 import boombimapi.global.vo.Coordinate;
 import java.util.Map;
 
-public record ViewportClusterNodeResponse(
+public record ViewportClusterMarkerResponse(
     MarkerType type,
     Coordinate coordinate,
     int clusterSize,
     Map<String, Integer> congestionLevelCounts
-) implements ViewportNodeResponse {
+) implements ViewportMarkerResponse {
 
-    public static ViewportClusterNodeResponse of(
+    public static ViewportClusterMarkerResponse of(
         Coordinate coordinate,
         int clusterSize,
         Map<String, Integer> congestionLevelCounts
     ) {
-        return new ViewportClusterNodeResponse(
+        return new ViewportClusterMarkerResponse(
             MarkerType.CLUSTER,
             coordinate,
             clusterSize,

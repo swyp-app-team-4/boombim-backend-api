@@ -22,4 +22,16 @@ public record BaseResponse<T>(
         );
     }
 
+    public static <T> BaseResponse<T> of(
+        HttpStatus status,
+        ResponseMessage message
+    ) {
+        return new BaseResponse<>(
+            status.value(),
+            status.getReasonPhrase(),
+            message.getMessage(),
+            null
+        );
+    }
+
 }

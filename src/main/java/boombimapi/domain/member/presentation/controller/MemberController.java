@@ -7,7 +7,6 @@ import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.*;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetCongestionHistoryRes;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV1;
-import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV2;
 import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +26,7 @@ import java.io.IOException;
 import static boombimapi.global.response.ResponseMessage.*;
 
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Member", description = "사용자 전용 API")
@@ -38,83 +37,79 @@ public class MemberController {
 
     @Operation(summary = "닉네임 수정 API", description = "닉네임을 수정합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PatchMapping("/name")
+    @PatchMapping("/app/member/name")
     public ResponseEntity<BaseOKResponse<Void>> updateNickname(@AuthenticationPrincipal String userId, @RequestBody NicknameReq req) {
         memberService.updateNickname(userId, req.name());
         return ResponseEntity.ok(
-                BaseOKResponse.of(
-                        HttpStatus.OK,
-                        POST_NICKNAME_SUCCESS));
+            BaseOKResponse.of(
+                HttpStatus.OK,
+                POST_NICKNAME_SUCCESS));
     }
 
     @Operation(summary = "마이페이지(1번 구간) 사용자 정보 조회 API", description = "사용자 정보를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping
+    @GetMapping("/app/member")
     public ResponseEntity<GetMemberResV1> getMember(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService1.getMember(userId));
     }
 
-
-
-
-
     @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PostMapping
+    @PostMapping("/app/member")
     public ResponseEntity<BaseOKResponse<Void>> memberDelete(@AuthenticationPrincipal String userId, @RequestBody MemberLeaveReq req) {
         memberService.memberDelete(userId, req);
         return ResponseEntity.ok(
-                BaseOKResponse.of(
-                        HttpStatus.OK,
-                        MEMBER_DELETE));
+            BaseOKResponse.of(
+                HttpStatus.OK,
+                MEMBER_DELETE));
     }
 
     @Operation(summary = "프로필 사진 바꾸기 API", description = "회원의 프로필 사진을 바꿉니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "프로필 바꾸기 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "프로필 바꾸기 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @PatchMapping("/profile")
+    @PatchMapping("/app/member/profile")
     public ResponseEntity<ProfileRes> updateProfile(@AuthenticationPrincipal String userId, MultipartFile multipartFile) throws IOException {
         return ResponseEntity.ok(memberService.updateProfile(userId, multipartFile));
     }
 
     @Operation(summary = "해당 유저 혼잡도 내역 조회 API", description = "유저가 혼잡도 작성한 내역을 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "혼잡도 내역 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "혼잡도 내역 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping("/congestion")
-    public ResponseEntity<List<GetCongestionHistoryRes>> getCongestionUserHistoryRes(@AuthenticationPrincipal String memberId){
+    @GetMapping("/app/member/congestion")
+    public ResponseEntity<List<GetCongestionHistoryRes>> getCongestionUserHistoryRes(@AuthenticationPrincipal String memberId) {
         return ResponseEntity.ok(memberService.getUserCongestionHistory(memberId));
     }
 
 
-     @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
+    @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping("/my-answer")
+    @GetMapping("/app/member/my-answer")
     public ResponseEntity<List<MyPageVoteRes>> getMpVoteAnswer(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService1.getMyVoteAnswer(userId));
     }
 
     @Operation(summary = "마이페이지(4번 구간) 나의 질문 조회 API", description = "나의 질문을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
+        @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
-    @GetMapping("/my-question")
+    @GetMapping("/app/member/my-question")
     public ResponseEntity<List<MyPageVoteRes>> getMpVote(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService1.getMyVoteQuestion(userId));
     }
