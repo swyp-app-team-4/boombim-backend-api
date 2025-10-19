@@ -148,7 +148,7 @@ public class MemberPlaceService {
         );
     }
 
-    public List<ViewportMarkerResponse> getViewportMarkers(
+    public List<ViewportMarkerResponse> getMemberPlacesInViewport(
         String memberId,
         ViewportRequest request,
         Clusterer clusterer,
