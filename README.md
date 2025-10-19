@@ -2,7 +2,7 @@
 
 ## API Docs
 
-[API 명세서](https://api.boombim.p-e.kr/swagger-ui.html)
+[API 명세서](https://boombim.co.kr/swagger-ui/index.html)
 
 ## Members
 
