@@ -59,7 +59,7 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .cors((cors) -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:3000", "https://boombim.netlify.app"));
+                config.setAllowedOriginPatterns(List.of("http://localhost:5173", "https://boombim.co.kr", "https://boombim.netlify.app"));
                 config.setAllowedMethods(Collections.singletonList("*"));
                 config.setAllowCredentials(true);
                 config.setAllowedHeaders(Collections.singletonList("*"));
