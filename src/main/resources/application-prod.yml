@@ -189,3 +189,14 @@ static-map:
   scale: 2
   marker-style: "size:mid|color:blue"
   view-size-ratio: 0.5
+
+auth:
+  cookie:
+    secure: true
+    same-site: Lax
+    path: "/"
+    at-name: at
+    rt-name: rt
+    at-max-age-millis: 900000
+    rt-max-age-millis: 1209600000
+    front-redirect: ${COOKIE_FRONT_REDIRECT}
