@@ -71,7 +71,7 @@ public class MemberPlaceController {
         @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
     ) {
-        List<ViewportMarkerResponse> viewportMarkers = memberPlaceService.getViewportMarkers(
+        List<ViewportMarkerResponse> memberPlacesInViewport = memberPlaceService.getMemberPlacesInViewport(
             memberId,
             request,
             appClusterer,
@@ -82,7 +82,7 @@ public class MemberPlaceController {
             BaseResponse.of(
                 HttpStatus.OK,
                 GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
-                viewportMarkers
+                memberPlacesInViewport
             )
         );
     }
@@ -125,7 +125,7 @@ public class MemberPlaceController {
         @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
     ) {
-        List<ViewportMarkerResponse> viewportMarkers = memberPlaceService.getViewportMarkers(
+        List<ViewportMarkerResponse> viewportMarkers = memberPlaceService.getMemberPlacesInViewport(
             memberId,
             request,
             webClusterer,
