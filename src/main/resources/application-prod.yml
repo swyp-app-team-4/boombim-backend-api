@@ -81,8 +81,9 @@ logging:
     org:
       springframework:
         web: ERROR
-#    org.springframework.jdbc.core.JdbcTemplate: DEBUG
-#    org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate: DEBUG
+    org.springframework.web.cors: TRACE
+    org.springframework.web.filter.CorsFilter: TRACE
+    org.springframework.web.util: TRACE
 
 # 보류
 oauth2:
