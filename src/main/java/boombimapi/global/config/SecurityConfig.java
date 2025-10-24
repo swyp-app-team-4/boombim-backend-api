@@ -2,7 +2,6 @@ package boombimapi.global.config;
 
 import boombimapi.global.infra.filter.BoombimJWTFilter;
 import boombimapi.global.infra.exception.auth.BoombimAuthExceptionFilter;
-import boombimapi.global.infra.filter.CorsProbeFilter;
 import boombimapi.global.jwt.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,15 +87,9 @@ public class SecurityConfig {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                 ))
 
-            .addFilterBefore(corsProbeFilter(), CorsFilter.class)
             .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
             .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    CorsProbeFilter corsProbeFilter() {
-        return new CorsProbeFilter();
     }
 }
