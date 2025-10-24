@@ -1,5 +1,5 @@
-server:
-  forward-headers-strategy: framework
+#server:
+#  forward-headers-strategy: framework
 
 spring:
   application:
