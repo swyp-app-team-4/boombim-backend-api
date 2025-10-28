@@ -2,7 +2,7 @@ package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.LogoutService;
 import boombimapi.domain.oauth2.cookie.AuthCookieManager;
-import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookie;
 import boombimapi.global.response.BaseOKResponse;
 import boombimapi.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,11 +52,10 @@ public class LogoutController {
             refreshToken
         );
 
-        AuthCookies logoutCookies = authCookieManager.logout();
+        AuthCookie logoutCookie = authCookieManager.createLogoutCookie();
 
         return ResponseEntity.ok()
-            .header("Set-Cookie", logoutCookies.accessTokenCookie().toString())
-            .header("Set-Cookie", logoutCookies.refreshTokenCookie().toString())
+            .header("Set-Cookie", logoutCookie.refreshTokenCookie().toString())
             .body(BaseResponse.of(
                     HttpStatus.OK,
                     LOGOUT_SUCCESS
