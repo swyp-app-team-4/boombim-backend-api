@@ -27,12 +27,12 @@ public class MemberCongestionController {
 
     private final MemberCongestionService memberCongestionService;
 
-    @Operation(summary = "사용자 혼잡도 생성", description = "사용자 장소에 새로운 사용자 혼잡도를 추가합니다.")
+    @Operation(summary = "[APP] 사용자 혼잡도 생성", description = "사용자 장소에 새로운 사용자 혼잡도를 추가합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 혼잡도 생성 성공")
     })
     @PostMapping("/app/member-congestion")
-    public ResponseEntity<BaseResponse<CreateMemberCongestionResponse>> createMemberCongestion(
+    public ResponseEntity<BaseResponse<CreateMemberCongestionResponse>> createMemberCongestionApp(
         @AuthenticationPrincipal String memberId,
         @RequestBody CreateMemberCongestionRequest request
     ) {
@@ -45,5 +45,22 @@ public class MemberCongestionController {
         );
     }
 
+    @Operation(summary = "[WEB] 사용자 혼잡도 생성", description = "사용자 장소에 새로운 사용자 혼잡도를 추가합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "사용자 혼잡도 생성 성공")
+    })
+    @PostMapping("/web/member-congestion")
+    public ResponseEntity<BaseResponse<CreateMemberCongestionResponse>> createMemberCongestionWeb(
+        @AuthenticationPrincipal String memberId,
+        @RequestBody CreateMemberCongestionRequest request
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                CREATE_MEMBER_CONGESTION_SUCCESS,
+                memberCongestionService.createMemberCongestion(memberId, request)
+            )
+        );
+    }
 
 }
