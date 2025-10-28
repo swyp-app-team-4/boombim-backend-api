@@ -76,9 +76,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/favicon.ico", "/api/region").permitAll()
-                .requestMatchers("/api/reissue").permitAll()
+                .requestMatchers("/api/app/reissue").permitAll()
                 .requestMatchers("/api/web/reissue").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/app/public/**").permitAll()
                 .requestMatchers("/api/web/public/**").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement((session) -> session
