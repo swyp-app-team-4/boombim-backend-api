@@ -5,7 +5,7 @@ import boombimapi.global.vo.Coordinate;
 import java.util.Map;
 
 public record ViewportClusterMarkerResponse(
-    MarkerType type,
+    MarkerType markerType,
     Coordinate coordinate,
     int clusterSize,
     Map<String, Integer> congestionLevelCounts
