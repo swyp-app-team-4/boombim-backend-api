@@ -5,7 +5,6 @@ import java.util.function.Function;
 import java.util.function.ToLongFunction;
 
 public enum AuthCookieType {
-    ACCESS(CookieProperties::atName, CookieProperties::atMaxAgeMillis),
     REFRESH(CookieProperties::rtName, CookieProperties::rtMaxAgeMillis);
 
     private final Function<CookieProperties, String> nameFunction;
