@@ -3,7 +3,7 @@ package boombimapi.domain.oauth2.cookie;
 import static boombimapi.domain.oauth2.cookie.type.AuthCookieType.*;
 
 import boombimapi.domain.oauth2.cookie.type.AuthCookieType;
-import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookie;
 import boombimapi.global.properties.CookieProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,29 +18,46 @@ public class AuthCookieManager {
 
     private final CookieProperties cookieProperties;
 
-    public AuthCookies createAuthCookies(
-        String accessToken,
+//    public AuthCookies createAuthCookies(
+//        String accessToken,
+//        String refreshToken
+//    ) {
+//        return AuthCookies.login(
+//            buildCookie(ACCESS, accessToken),
+//            buildCookie(REFRESH, refreshToken)
+//        );
+//    }
+//
+//
+//    public AuthCookies reissueAuthCookies(
+//        String newAccessToken,
+//        String newRefreshToken
+//    ) {
+//        return AuthCookies.reissue(
+//            buildCookie(ACCESS, newAccessToken),
+//            buildCookie(REFRESH, newRefreshToken)
+//        );
+//    }
+//
+//
+//    public AuthCookies logout() {
+//        return AuthCookies.logout(
+//            buildLogoutCookie(ACCESS),
+//            buildLogoutCookie(REFRESH)
+//        );
+//    }
+
+    // TODO: createAuthCookie()와 createLogoutCookie() 공통화 전략 구상
+    public AuthCookie createAuthCookie(
         String refreshToken
     ) {
-        return AuthCookies.login(
-            buildCookie(ACCESS, accessToken),
+        return AuthCookie.createRefreshTokenCookie(
             buildCookie(REFRESH, refreshToken)
         );
     }
 
-    public AuthCookies reissueAuthCookies(
-        String newAccessToken,
-        String newRefreshToken
-    ) {
-        return AuthCookies.reissue(
-            buildCookie(ACCESS, newAccessToken),
-            buildCookie(REFRESH, newRefreshToken)
-        );
-    }
-
-    public AuthCookies logout() {
-        return AuthCookies.logout(
-            buildLogoutCookie(ACCESS),
+    public AuthCookie createLogoutCookie() {
+        return AuthCookie.createRefreshTokenCookie(
             buildLogoutCookie(REFRESH)
         );
     }
