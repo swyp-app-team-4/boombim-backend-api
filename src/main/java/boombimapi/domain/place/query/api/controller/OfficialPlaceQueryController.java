@@ -40,7 +40,7 @@ public class OfficialPlaceQueryController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "뷰포트 내 공식 장소 조회 성공")
     })
-    @PostMapping("/app/public/official-place")
+    @PostMapping({"/app/public/official-place", "/app/official-place"})
     public ResponseEntity<BaseResponse<List<ViewportResponse>>> getOfficialPlacesInViewportApp(
         @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
