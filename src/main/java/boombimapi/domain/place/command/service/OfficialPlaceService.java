@@ -123,6 +123,7 @@ public class OfficialPlaceService {
         return result;
     }
 
+    // TODO: OfficialPlaceQueryService에서 CQRS로 전환 예정
     public OfficialPlaceOverviewResponse getOverview(
         String memberId,
         Long officialPlaceId
@@ -159,6 +160,8 @@ public class OfficialPlaceService {
             officialPlace.getLegalDong(),
             officialPlace.getPoiCode(),
             officialPlace.getImageUrl(),
+            latestOfficialCongestion.getPopulationMin(),
+            latestOfficialCongestion.getPopulationMax(),
             latestOfficialCongestion.getCongestionLevel().getName(),
             latestOfficialCongestion.getCongestionLevel().getMessage(),
             latestOfficialCongestion.getObservedAt(),
