@@ -54,10 +54,6 @@ public class BoombimJWTFilter extends OncePerRequestFilter {
 
         String accessToken = jwtUtil.getAccessTokenFromHeaders(request);
 
-        if (accessToken == null) {
-            accessToken = jwtUtil.getAccessTokenFromCookie(request, "at");
-        }
-
         log.debug("Access Token: {}", accessToken);
 
         if (accessToken == null || accessToken.equals("undefined") || accessToken.equals("null")) {
