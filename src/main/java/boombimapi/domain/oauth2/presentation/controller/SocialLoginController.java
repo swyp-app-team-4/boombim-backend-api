@@ -2,7 +2,7 @@ package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.SocialLoginService;
 import boombimapi.domain.oauth2.cookie.AuthCookieManager;
-import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookie;
 import boombimapi.domain.oauth2.domain.entity.SocialProvider;
 import boombimapi.domain.oauth2.presentation.dto.req.SocialTokenRequest;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
@@ -30,7 +30,6 @@ public class SocialLoginController {
     public ResponseEntity<Void> redirectToProvider(
         @PathVariable SocialProvider provider
     ) {
-        log.info("{} 로그인 시작", provider);
         final String loginUrl = socialLoginService.getLoginUrl(provider);
         return ResponseEntity.status(302)
             .header("Location", loginUrl)
@@ -45,15 +44,12 @@ public class SocialLoginController {
     ) {
         LoginToken loginToken = socialLoginService.login(provider, code);
 
-        AuthCookies authCookies = authCookieManager.createAuthCookies(
-            loginToken.accessToken(),
-            loginToken.refreshToken()
-        );
+        AuthCookie authCookie = authCookieManager
+            .createAuthCookie(loginToken.refreshToken());
 
         return ResponseEntity.status(302)
             .header("Location", cookieProperties.frontRedirect())
-            .header("Set-Cookie", authCookies.accessTokenCookie().toString())
-            .header("Set-Cookie", authCookies.refreshTokenCookie().toString())
+            .header("Set-Cookie", authCookie.refreshTokenCookie().toString())
             .build();
     }
 
