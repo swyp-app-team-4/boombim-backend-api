@@ -207,9 +207,7 @@ auth:
   cookie:
     secure: true
     same-site: Lax
-    path: "/"
-    at-name: at
+    path: "/api/web"
     rt-name: rt
-    at-max-age-millis: 900000
     rt-max-age-millis: 1209600000
     front-redirect: ${COOKIE_FRONT_REDIRECT}

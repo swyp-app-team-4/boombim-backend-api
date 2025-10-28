@@ -2,7 +2,6 @@ package boombimapi.global.config;
 
 import boombimapi.global.infra.filter.BoombimJWTFilter;
 import boombimapi.global.infra.exception.auth.BoombimAuthExceptionFilter;
-import boombimapi.global.infra.filter.CorsProbeFilter;
 import boombimapi.global.jwt.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -77,9 +76,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/favicon.ico", "/api/region").permitAll()
-                .requestMatchers("/api/reissue").permitAll()
+                .requestMatchers("/api/app/reissue").permitAll()
                 .requestMatchers("/api/web/reissue").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/app/public/**").permitAll()
+                .requestMatchers("/api/web/public/**").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -88,15 +89,9 @@ public class SecurityConfig {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                 ))
 
-            .addFilterBefore(corsProbeFilter(), CorsFilter.class)
             .addFilterAfter(new BoombimAuthExceptionFilter(objectMapper), CorsFilter.class)
             .addFilterAfter(new BoombimJWTFilter(jwtUtil, excludedUrls), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    CorsProbeFilter corsProbeFilter() {
-        return new CorsProbeFilter();
     }
 }

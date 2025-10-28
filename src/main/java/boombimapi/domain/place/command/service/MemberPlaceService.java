@@ -215,6 +215,7 @@ public class MemberPlaceService {
                     ViewportPlaceMarkerResponse.of(
                         memberPlace.getId(),
                         memberPlace.getName(),
+                        MEMBER_PLACE,
                         new Coordinate(memberPlaceLatitude, memberPlaceLongitude),
                         distanceMeters,
                         memberCongestion.getCongestionLevel().getName(),
@@ -320,6 +321,7 @@ public class MemberPlaceService {
                     ViewportPlaceMarkerResponse.of(
                         memberPlace.getId(),
                         memberPlace.getName(),
+                        MEMBER_PLACE,
                         new Coordinate(memberPlace.getLatitude(), memberPlace.getLongitude()),
                         distanceMeters,
                         memberCongestion.getCongestionLevel().getName(),

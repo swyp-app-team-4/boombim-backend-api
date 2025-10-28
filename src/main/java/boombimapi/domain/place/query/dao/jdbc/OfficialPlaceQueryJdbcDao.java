@@ -31,6 +31,7 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
                 op.centroid_longitude,
                 cl.name    AS congestion_level_name,
                 cl.message AS congestion_message,
+                oc.observed_at AS observed_at,
                 CASE 
                   WHEN :memberId IS NULL THEN FALSE
                   WHEN f.place_id IS NOT NULL THEN TRUE

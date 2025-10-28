@@ -49,13 +49,13 @@ public class OfficialPlaceController {
 //        );
 //    }
 
-    @Operation(summary = "특정 공식 장소 정보 조회", description = "특정 공식 장소의 인구 통계 및 예상 혼잡도를 반환합니다.")
+    @Operation(summary = "[APP] 특정 공식 장소 정보 조회", description = "특정 공식 장소의 인구 통계 및 예상 혼잡도를 반환합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "특정 공식 장소의 정보 조회 성공"),
         @ApiResponse(responseCode = "400", description = "존재하지 않는 공식 장소"),
         @ApiResponse(responseCode = "401", description = "존재하지 않는 공식 혼잡도 정보")
     })
-    @GetMapping("/app/official-place/{officialPlaceId}/overview")
+    @GetMapping("/app/public/official-place/{officialPlaceId}/overview")
     public ResponseEntity<BaseResponse<OfficialPlaceOverviewResponse>> getOfficialPlaceOverview(
         @AuthenticationPrincipal String memberId,
         @PathVariable Long officialPlaceId
@@ -69,14 +69,34 @@ public class OfficialPlaceController {
         );
     }
 
+    @Operation(summary = "[WEB] 특정 공식 장소 정보 조회", description = "특정 공식 장소의 인구 통계 및 예상 혼잡도를 반환합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "특정 공식 장소의 정보 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "존재하지 않는 공식 장소"),
+        @ApiResponse(responseCode = "401", description = "존재하지 않는 공식 혼잡도 정보")
+    })
+    @GetMapping("/web/public/official-place/{officialPlaceId}/overview")
+    public ResponseEntity<BaseResponse<OfficialPlaceOverviewResponse>> getOfficialPlaceOverviewWeb(
+        @AuthenticationPrincipal String memberId,
+        @PathVariable Long officialPlaceId
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_OFFICIAL_PLACE_OVERVIEW_SUCCESS,
+                officialPlaceService.getOverview(memberId, officialPlaceId)
+            )
+        );
+    }
+
     @Operation(
-        summary = "인근 한산한 공식 장소 TOP 10",
+        summary = "[APP] 인근 한산한 공식 장소 TOP 10",
         description = "사용자 위치 기준으로 혼잡도 수준이 '여유' 또는 '보통'인 공식 장소 10개를 거리순으로 반환합니다."
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
     })
-    @GetMapping("/app/official-place/nearby-non-congested")
+    @GetMapping("/app/public/official-place/nearby-non-congested")
     public ResponseEntity<BaseResponse<List<NearbyNonCongestedOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlace(
         @RequestParam double latitude,
         @RequestParam double longitude
@@ -91,14 +111,53 @@ public class OfficialPlaceController {
     }
 
     @Operation(
-        summary = "붐비는 공식 장소 TOP 5",
+        summary = "[WEB] 인근 한산한 공식 장소 TOP 10",
+        description = "사용자 위치 기준으로 혼잡도 수준이 '여유' 또는 '보통'인 공식 장소 10개를 거리순으로 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
+    })
+    @GetMapping("/web/public/official-place/nearby-non-congested")
+    public ResponseEntity<BaseResponse<List<NearbyNonCongestedOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlaceWeb(
+        @RequestParam double latitude,
+        @RequestParam double longitude
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_NEARBY_NON_CROWDED_OFFICIAL_PLACES_SUCCESS,
+                officialPlaceService.getNearbyNonCongestedOfficialPlace(latitude, longitude)
+            )
+        );
+    }
+
+    @Operation(
+        summary = "[APP] 붐비는 공식 장소 TOP 5",
         description = "실시간 공식 장소들 중 가장 붐비는 장소 5개를 반환합니다."
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "실시간 붐비는 장소 상위 5개 조회 성공")
     })
-    @GetMapping("/app/official-place/top-congested")
+    @GetMapping("/app/public/official-place/top-congested")
     public ResponseEntity<BaseResponse<List<CongestedOfficialPlaceResponse>>> getCongestedOfficialPlace() {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_CONGESTED_OFFICIAL_PLACES_SUCCESS,
+                officialPlaceService.getCongestedOfficialPlace()
+            )
+        );
+    }
+
+    @Operation(
+        summary = "[WEB] 붐비는 공식 장소 TOP 5",
+        description = "실시간 공식 장소들 중 가장 붐비는 장소 5개를 반환합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "실시간 붐비는 장소 상위 5개 조회 성공")
+    })
+    @GetMapping("/web/public/official-place/top-congested")
+    public ResponseEntity<BaseResponse<List<CongestedOfficialPlaceResponse>>> getCongestedOfficialPlaceWeb() {
         return ResponseEntity.ok(
             BaseResponse.of(
                 HttpStatus.OK,

@@ -6,8 +6,8 @@ import boombimapi.global.vo.Coordinate;
 import java.time.LocalDateTime;
 
 public record ViewportPlaceMarkerResponse(
-    MarkerType type,
-    Long memberPlaceId,
+    MarkerType markerType,
+    Long placeId,
     String name,
     PlaceType placeType,
     Coordinate coordinate,
@@ -19,8 +19,9 @@ public record ViewportPlaceMarkerResponse(
 ) implements ViewportMarkerResponse {
 
     public static ViewportPlaceMarkerResponse of(
-        Long memberPlaceId,
+        Long placeId,
         String name,
+        PlaceType placeType,
         Coordinate coordinate,
         Double distance,
         String congestionLevelName,
@@ -30,9 +31,9 @@ public record ViewportPlaceMarkerResponse(
     ) {
         return new ViewportPlaceMarkerResponse(
             MarkerType.PLACE,
-            memberPlaceId,
+            placeId,
             name,
-            PlaceType.MEMBER_PLACE,
+            placeType,
             coordinate,
             distance,
             congestionLevelName,

@@ -6,9 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record CookieProperties(
     boolean secure,
     String sameSite,
-    String atName,
     String rtName,
-    Long atMaxAgeMillis,
     Long rtMaxAgeMillis,
     String path,
     String frontRedirect
