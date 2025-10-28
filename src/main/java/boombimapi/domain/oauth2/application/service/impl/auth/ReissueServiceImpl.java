@@ -1,12 +1,13 @@
 package boombimapi.domain.oauth2.application.service.impl.auth;
 
+import static boombimapi.global.infra.exception.error.ErrorCode.*;
+
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.member.domain.repository.MemberRepository;
 import boombimapi.domain.oauth2.application.service.ReissueService;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
 import boombimapi.domain.member.domain.entity.Role;
 import boombimapi.global.infra.exception.error.BoombimException;
-import boombimapi.global.infra.exception.error.ErrorCode;
 import boombimapi.global.jwt.domain.entity.JsonWebToken;
 import boombimapi.global.jwt.domain.repository.JsonWebTokenRepository;
 import boombimapi.global.jwt.util.JWTUtil;
@@ -27,16 +28,13 @@ public class ReissueServiceImpl implements ReissueService {
 
     @Override
     public LoginToken reissue(String refreshToken) {
-        if(!jwtUtil.jwtVerify(refreshToken, "refresh")) {
+        if (!jwtUtil.jwtVerify(refreshToken, "refresh")) {
             log.info("Refresh token not valid");
-            throw new BoombimException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new BoombimException(INVALID_REFRESH_TOKEN);
         }
 
-        JsonWebToken jsonWebToken = jsonWebTokenRepository.findById(refreshToken).orElse(null);
-
-        if(jsonWebToken == null) {
-            throw new BoombimException(ErrorCode.REFRESH_TOKEN_NOT_EXIST);
-        }
+        JsonWebToken jsonWebToken = jsonWebTokenRepository.findById(refreshToken)
+            .orElseThrow(() -> new BoombimException(REFRESH_TOKEN_NOT_EXIST));
 
         String userId = jsonWebToken.getProviderId();
         Role role = jsonWebToken.getRole();
@@ -46,22 +44,22 @@ public class ReissueServiceImpl implements ReissueService {
         String newRefreshToken = jwtUtil.createRefreshToken(userId, role, email);
 
         JsonWebToken newJsonWebToken = JsonWebToken.builder()
-                .refreshToken(newRefreshToken)
-                .providerId(userId)
-                .email(email)
-                .role(role)
-                .build();
+            .refreshToken(newRefreshToken)
+            .providerId(userId)
+            .email(email)
+            .role(role)
+            .build();
 
         jsonWebTokenRepository.delete(jsonWebToken);
         jsonWebTokenRepository.save(newJsonWebToken);
-
 
         return LoginToken.of(newAccessToken, newRefreshToken, onBoarding(userId));
     }
 
     public boolean onBoarding(String userId) {
         Member member = memberRepository.findById(userId).orElse(null);
-        if (member == null) throw new BoombimException(ErrorCode.USER_NOT_EXIST);
+        if (member == null)
+            throw new BoombimException(USER_NOT_EXIST);
 
         return member.isNameFlag();
     }
