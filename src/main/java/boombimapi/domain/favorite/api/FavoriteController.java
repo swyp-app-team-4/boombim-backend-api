@@ -33,12 +33,12 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    @Operation(summary = "즐겨찾기 추가", description = "해당 장소를 즐겨찾기에 추가합니다.")
+    @Operation(summary = "[APP] 즐겨찾기 추가", description = "해당 장소를 즐겨찾기에 추가합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "즐겨찾기 추가 성공")
     })
     @PostMapping("/app/favorite")
-    public ResponseEntity<BaseResponse<AddFavoriteResponse>> addFavorite(
+    public ResponseEntity<BaseResponse<AddFavoriteResponse>> addFavoriteApp(
         @AuthenticationPrincipal String memberId,
         @RequestBody AddFavoriteRequest request
     ) {
@@ -51,12 +51,30 @@ public class FavoriteController {
         );
     }
 
-    @Operation(summary = "즐겨찾기 삭제", description = "해당 장소를 즐겨찾기에서 삭제합니다.")
+    @Operation(summary = "[WEB] 즐겨찾기 추가", description = "해당 장소를 즐겨찾기에 추가합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "즐겨찾기 추가 성공")
+    })
+    @PostMapping("/web/favorite")
+    public ResponseEntity<BaseResponse<AddFavoriteResponse>> addFavoriteWeb(
+        @AuthenticationPrincipal String memberId,
+        @RequestBody AddFavoriteRequest request
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                ADD_FAVORITE_SUCCESS,
+                favoriteService.addFavorite(memberId, request)
+            )
+        );
+    }
+
+    @Operation(summary = "[APP] 즐겨찾기 삭제", description = "해당 장소를 즐겨찾기에서 삭제합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "즐겨찾기 삭제 성공")
     })
     @DeleteMapping("/app/favorite")
-    public ResponseEntity<BaseResponse<Void>> deleteFavorite(
+    public ResponseEntity<BaseResponse<Void>> deleteFavoriteApp(
         @AuthenticationPrincipal String memberId,
         @RequestParam Long placeId,
         @RequestParam PlaceType placeType
@@ -72,12 +90,50 @@ public class FavoriteController {
         );
     }
 
-    @Operation(summary = "즐겨찾기 조회", description = "사용자가 즐겨찾기한 장소들을 조회합니다.")
+    @Operation(summary = "[WEB] 즐겨찾기 삭제", description = "해당 장소를 즐겨찾기에서 삭제합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "즐겨찾기 삭제 성공")
+    })
+    @DeleteMapping("/web/favorite")
+    public ResponseEntity<BaseResponse<Void>> deleteFavoriteWeb(
+        @AuthenticationPrincipal String memberId,
+        @RequestParam Long placeId,
+        @RequestParam PlaceType placeType
+    ) {
+        favoriteService.deleteFavorite(memberId, placeId, placeType);
+
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                DELETE_FAVORITE_SUCCESS,
+                null
+            )
+        );
+    }
+
+    @Operation(summary = "[APP] 즐겨찾기 조회", description = "사용자가 즐겨찾기한 장소들을 조회합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 즐겨찾기 조회 성공")
     })
     @GetMapping("/app/favorite")
-    public ResponseEntity<BaseResponse<List<FavoriteResponse>>> getFavorites(
+    public ResponseEntity<BaseResponse<List<FavoriteResponse>>> getFavoritesApp(
+        @AuthenticationPrincipal String memberId
+    ) {
+        return ResponseEntity.ok(
+            BaseResponse.of(
+                HttpStatus.OK,
+                GET_FAVORITES_SUCCESS,
+                favoriteService.getMemberFavorites(memberId)
+            )
+        );
+    }
+
+    @Operation(summary = "[WEB] 즐겨찾기 조회", description = "사용자가 즐겨찾기한 장소들을 조회합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "사용자 즐겨찾기 조회 성공")
+    })
+    @GetMapping("/web/favorite")
+    public ResponseEntity<BaseResponse<List<FavoriteResponse>>> getFavoritesWeb(
         @AuthenticationPrincipal String memberId
     ) {
         return ResponseEntity.ok(
