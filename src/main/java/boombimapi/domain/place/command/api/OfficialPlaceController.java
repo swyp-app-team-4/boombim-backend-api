@@ -55,7 +55,7 @@ public class OfficialPlaceController {
         @ApiResponse(responseCode = "400", description = "존재하지 않는 공식 장소"),
         @ApiResponse(responseCode = "401", description = "존재하지 않는 공식 혼잡도 정보")
     })
-    @GetMapping("/app/official-place/{officialPlaceId}/overview")
+    @GetMapping("/app/public/official-place/{officialPlaceId}/overview")
     public ResponseEntity<BaseResponse<OfficialPlaceOverviewResponse>> getOfficialPlaceOverview(
         @AuthenticationPrincipal String memberId,
         @PathVariable Long officialPlaceId
@@ -96,7 +96,7 @@ public class OfficialPlaceController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "인근 여유 공식 장소 조회 성공")
     })
-    @GetMapping("/app/official-place/nearby-non-congested")
+    @GetMapping("/app/public/official-place/nearby-non-congested")
     public ResponseEntity<BaseResponse<List<NearbyNonCongestedOfficialPlaceResponse>>> getNearbyNonCongestedOfficialPlace(
         @RequestParam double latitude,
         @RequestParam double longitude
@@ -138,7 +138,7 @@ public class OfficialPlaceController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "실시간 붐비는 장소 상위 5개 조회 성공")
     })
-    @GetMapping("/app/official-place/top-congested")
+    @GetMapping("/app/public/official-place/top-congested")
     public ResponseEntity<BaseResponse<List<CongestedOfficialPlaceResponse>>> getCongestedOfficialPlace() {
         return ResponseEntity.ok(
             BaseResponse.of(

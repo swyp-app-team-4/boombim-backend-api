@@ -83,7 +83,7 @@ public class MemberPlaceController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "뷰포트 내 사용자 장소 조회 성공")
     })
-    @PostMapping("/app/member-place")
+    @PostMapping("/app/public/member-place")
     public ResponseEntity<BaseResponse<List<ViewportMarkerResponse>>> getMemberPlacesInViewportApp(
         @AuthenticationPrincipal String memberId,
         @RequestBody ViewportRequest request
@@ -133,7 +133,7 @@ public class MemberPlaceController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "특정 사용자 장소 상세 조회 성공")
     })
-    @GetMapping("/app/member-place/{memberPlaceId}")
+    @GetMapping("/app/public/member-place/{memberPlaceId}")
     public ResponseEntity<BaseResponse<GetMemberPlaceDetailResponse>> getMemberPlaceDetailApp(
         @PathVariable Long memberPlaceId,
         @RequestParam(required = false) @Min(1) @Max(100) Integer size,
