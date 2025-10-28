@@ -2,8 +2,9 @@ package boombimapi.domain.oauth2.presentation.controller;
 
 import boombimapi.domain.oauth2.application.service.ReissueService;
 import boombimapi.domain.oauth2.cookie.AuthCookieManager;
-import boombimapi.domain.oauth2.cookie.vo.AuthCookies;
+import boombimapi.domain.oauth2.cookie.vo.AuthCookie;
 import boombimapi.domain.oauth2.presentation.dto.res.LoginToken;
+import boombimapi.domain.oauth2.presentation.dto.res.WebLoginToken;
 import boombimapi.global.response.BaseResponse;
 import boombimapi.global.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,38 +26,37 @@ public class ReissueController {
 
     @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급합니다.")
     @PostMapping("/app/reissue")
-    public ResponseEntity<LoginToken> reissue(@RequestBody ReissueRequest request) {
+    public ResponseEntity<LoginToken> reissueApp(@RequestBody ReissueRequest request) {
         LoginToken loginToken = reissueService.reissue(request.refreshToken());
         return ResponseEntity.ok(loginToken);
     }
 
-    @Operation(summary = "(Web) 토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급하여 쿠키에 담아줍니다.")
+    @Operation(summary = "(Web) 토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급합니다.")
     @PostMapping("/web/reissue")
-    public ResponseEntity<BaseResponse<Void>> reissueWeb(
+    public ResponseEntity<BaseResponse<WebLoginToken>> reissueWeb(
         HttpServletRequest request
     ) {
         String extractedRefreshToken = authCookieManager.extractRefreshToken(request);
 
         LoginToken reissuedLoginTokens = reissueService.reissue(extractedRefreshToken);
 
-        AuthCookies authCookies = authCookieManager.reissueAuthCookies(
-            reissuedLoginTokens.accessToken(),
-            reissuedLoginTokens.refreshToken()
-        );
+        AuthCookie authCookie = authCookieManager
+            .createAuthCookie(reissuedLoginTokens.refreshToken());
 
         return ResponseEntity.ok()
-            .header("Set-Cookie", authCookies.accessTokenCookie().toString())
-            .header("Set-Cookie", authCookies.refreshTokenCookie().toString())
+            .header("Set-Cookie", authCookie.refreshTokenCookie().toString())
             .body(BaseResponse.of(
                     HttpStatus.OK,
-                    ResponseMessage.REISSUE_TOKENS_SUCCESS
+                    ResponseMessage.REISSUE_TOKENS_SUCCESS,
+                    WebLoginToken.from(reissuedLoginTokens.accessToken())
                 )
             );
     }
 
     // 요청 DTO 추가
     public record ReissueRequest(
-        String refreshToken) {
+        String refreshToken
+    ) {
 
     }
 }
