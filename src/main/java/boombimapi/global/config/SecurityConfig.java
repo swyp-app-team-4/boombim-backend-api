@@ -79,6 +79,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/reissue").permitAll()
                 .requestMatchers("/api/web/reissue").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/web/public/**").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
