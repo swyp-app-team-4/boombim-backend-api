@@ -69,8 +69,23 @@ public class PointController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * [GET] 진행 중인 이벤트 페이지 조회 API
+     * <p>
+     * - 현재 진행 중인 이벤트 캠페인을 조회한다.<br>
+     * - 가장 최근 생성된 이벤트 캠페인 기준으로 데이터를 반환한다.<br>
+     * - 이벤트 기간(시작일, 종료일, 당첨자 발표일) 정보를 포함한다.
+     *
+     * @return 진행 중인 이벤트 페이지 응답 DTO
+     */
+    @Operation(summary = "진행 중인 이벤트 페이지 조회 API", description = "현재 진행 중인 이벤트 캠페인을 조회합니다. (이벤트 기간 및 당첨자 발표일 포함)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이벤트 페이지 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "진행 중인 이벤트가 존재하지 않음")
+    })
     @GetMapping("/event")
     public ResponseEntity<EventPageRes> getOngoingEventPage() {
         return ResponseEntity.ok(pointService.getOngoingEventPage());
     }
+
 }
