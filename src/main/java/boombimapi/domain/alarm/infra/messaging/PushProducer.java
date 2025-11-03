@@ -1,3 +1,4 @@
+/*
 package boombimapi.domain.alarm.infra.messaging;
 
 import boombimapi.domain.alarm.application.messaging.EndVoteMessage;
@@ -31,3 +32,4 @@ public class PushProducer {
     }
 
 }
+*/

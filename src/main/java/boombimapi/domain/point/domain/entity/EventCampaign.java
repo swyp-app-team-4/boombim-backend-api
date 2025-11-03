@@ -50,13 +50,31 @@ public class EventCampaign {
     @Comment("이벤트 타입 ex) EVENT_PARTICIPATION_TICKETE")
     private EventCategory eventCategory;
 
+    @Comment("이벤트 시작일")
+    @Column(name = "event_start_date", nullable = false)
+    private LocalDateTime eventStartDate;
+
+    @Comment("이벤트 종료일")
+    @Column(name = "event_end_date", nullable = false)
+    private LocalDateTime eventEndDate;
+
+    @Comment("당첨자 발표일")
+    @Column(name = "winner_announcement_date", nullable = false)
+    private LocalDateTime winnerAnnouncementDate;
+
+
     @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Builder
-    public EventCampaign(Member member, EventCategory eventCategory) {
+    public EventCampaign(Member member, EventCategory eventCategory,
+                         LocalDateTime eventStartDate, LocalDateTime eventEndDate,
+                         LocalDateTime winnerAnnouncementDate) {
         this.member = member;
         this.eventCategory = eventCategory;
+        this.eventStartDate = eventStartDate;
+        this.eventEndDate = eventEndDate;
+        this.winnerAnnouncementDate = winnerAnnouncementDate;
     }
 }

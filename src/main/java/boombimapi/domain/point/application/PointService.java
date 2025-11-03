@@ -2,6 +2,7 @@ package boombimapi.domain.point.application;
 
 import boombimapi.domain.member.domain.entity.Member;
 import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
+import boombimapi.domain.point.presentation.dto.res.EventPageRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 
 /**
@@ -40,4 +41,7 @@ public interface PointService {
      * @param req 이벤트 응모 요청 (이벤트 캠페인 ID 및 차감할 포인트 금액 포함)
      */
     void usePointForEvent(String memberId, UsePointForEventReq req);
+
+
+    EventPageRes getOngoingEventPage();
 }
