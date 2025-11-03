@@ -14,6 +14,7 @@ import boombimapi.domain.point.domain.repository.EventCampaignRepository;
 import boombimapi.domain.point.domain.repository.EventLogRepository;
 import boombimapi.domain.point.domain.repository.PointHistoryRepository;
 import boombimapi.domain.point.domain.repository.PointRepository;
+import boombimapi.domain.point.presentation.dto.req.CreateEventCampaignReq;
 import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
 import boombimapi.domain.point.presentation.dto.res.EventPageRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointHistoryRes;
@@ -21,6 +22,7 @@ import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 import boombimapi.global.infra.exception.error.BoombimException;
 import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
+import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -153,5 +155,17 @@ public class PointServiceImpl implements PointService {
         if(eventCampaign == null) throw new BoombimException(EVENT_NOT_EXIST);
 
         return EventPageRes.of(eventCampaign);
+    }
+
+    @Override
+    public void createEventCampaign(CreateEventCampaignReq req) {
+        EventCampaign eventCampaign = EventCampaign.builder()
+                .eventStartDate(req.eventStartDate())
+                .eventEndDate(req.eventEndDate())
+                .winnerAnnouncementDate(req.winnerAnnouncementDate())
+                .eventCategory(req.eventCategory())
+                .build();
+
+        eventCampaignRepository.save(eventCampaign);
     }
 }

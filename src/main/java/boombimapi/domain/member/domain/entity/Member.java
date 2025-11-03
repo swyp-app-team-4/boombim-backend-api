@@ -80,10 +80,6 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PointHistory> pointHistories = new ArrayList<>();
 
-    // 11) 이벤트 응모
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventCampaign> eventCampaigns = new ArrayList<>();
-
     // 11) 이벤트 로그
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventLog> eventLogs = new ArrayList<>();
