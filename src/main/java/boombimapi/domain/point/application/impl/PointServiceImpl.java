@@ -15,9 +15,11 @@ import boombimapi.domain.point.domain.repository.EventLogRepository;
 import boombimapi.domain.point.domain.repository.PointHistoryRepository;
 import boombimapi.domain.point.domain.repository.PointRepository;
 import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
+import boombimapi.domain.point.presentation.dto.res.EventPageRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointHistoryRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 import boombimapi.global.infra.exception.error.BoombimException;
+import boombimapi.global.infra.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -143,5 +145,13 @@ public class PointServiceImpl implements PointService {
                 .build();
 
         pointHistoryRepository.save(pointHistory);
+    }
+
+    @Override
+    public EventPageRes getOngoingEventPage() {
+        EventCampaign eventCampaign = eventCampaignRepository.findTopByOrderByCreatedAtDesc().orElse(null);
+        if(eventCampaign == null) throw new BoombimException(EVENT_NOT_EXIST);
+
+        return EventPageRes.of(eventCampaign);
     }
 }
