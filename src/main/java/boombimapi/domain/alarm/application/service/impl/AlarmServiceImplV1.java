@@ -1,3 +1,4 @@
+/*
 package boombimapi.domain.alarm.application.service.impl;
 
 
@@ -12,7 +13,6 @@ import boombimapi.domain.alarm.domain.entity.alarm.type.DeliveryStatus;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
-import boombimapi.domain.alarm.infra.messaging.PushProducer;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
@@ -55,9 +55,11 @@ public class AlarmServiceImplV1 implements AlarmService {
 
 
 
-    /**
+    */
+/**
      * FCM 토큰 등록
-     */
+     *//*
+
     @Override
     public RegisterFcmTokenResponse registerFcmToken(String userId, RegisterFcmTokenRequest request) {
         try {
@@ -78,19 +80,23 @@ public class AlarmServiceImplV1 implements AlarmService {
         }
     }
 
-    /**
+    */
+/**
      * 알림 내역 조회
-     */
+     *//*
+
     @Override
     public List<HistoryResponse> getAlarmHistory(String userId, DeviceType deviceType) {
         Member user = userRepository.findById(userId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
-        /*** // 나중에 관리자 권함 추가
+        */
+/*** // 나중에 관리자 권함 추가
          *         if (!isAdmin(user)) {
          *             throw new BoombimException(ErrorCode.FORBIDDEN, "관리자 권한이 필요합니다.");
          *         }
-         */
+         *//*
+
 
 
         List<AlarmRecipient> alarmHistores = alarmRecipientRepository.findAllByMemberAndDeviceTypeOrderByCreatedAtAsc(user, DeviceType.valueOf(deviceType.name()));
@@ -300,3 +306,4 @@ public class AlarmServiceImplV1 implements AlarmService {
 
 
 }
+*/

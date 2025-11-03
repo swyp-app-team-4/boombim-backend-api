@@ -7,12 +7,10 @@ import boombimapi.domain.alarm.application.service.FcmService;
 import boombimapi.domain.alarm.domain.entity.alarm.Alarm;
 import boombimapi.domain.alarm.domain.entity.alarm.AlarmRecipient;
 import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmStatus;
-import boombimapi.domain.alarm.domain.entity.alarm.type.AlarmType;
 import boombimapi.domain.alarm.domain.entity.alarm.type.DeliveryStatus;
 import boombimapi.domain.alarm.domain.entity.fcm.type.DeviceType;
 import boombimapi.domain.alarm.domain.repository.AlarmRecipientRepository;
 import boombimapi.domain.alarm.domain.repository.AlarmRepository;
-import boombimapi.domain.alarm.infra.messaging.PushProducer;
 import boombimapi.domain.alarm.presentation.dto.AlarmSendResult;
 import boombimapi.domain.alarm.presentation.dto.req.RegisterFcmTokenRequest;
 import boombimapi.domain.alarm.presentation.dto.req.SendAlarmRequest;
@@ -48,7 +46,6 @@ public class AlarmServiceImplV2 implements AlarmService {
     private final MemberRepository userRepository;
     private final FcmService fcmService;
     private final AlarmRecipientRepository alarmRecipientRepository;
-    private final PushProducer pushProducer;
     private final MessageServiceV2 messageService;
 
     @Value("${admin.id}")
@@ -139,7 +136,7 @@ public class AlarmServiceImplV2 implements AlarmService {
     }
 
 
-    public SendAlarmResponse sendAllAlarmV1(String senderUserId, SendAlarmRequest request) {
+    /*public SendAlarmResponse sendAllAlarmV1(String senderUserId, SendAlarmRequest request) {
         Member sender = userRepository.findById(senderUserId)
                 .orElseThrow(() -> new BoombimException(ErrorCode.USER_NOT_EXIST));
 
@@ -160,7 +157,7 @@ public class AlarmServiceImplV2 implements AlarmService {
 
         // 3) 응답 (전송은 비동기 처리)
         return SendAlarmResponse.of(saved, 0, 0, 0);
-    }
+    }*/
 
     @Override
     public SendAlarmResponse sendAllAlarm(String senderUserId, SendAlarmRequest request) {
