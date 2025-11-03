@@ -1,6 +1,7 @@
 package boombimapi.domain.point.application;
 
 import boombimapi.domain.member.domain.entity.Member;
+import boombimapi.domain.point.presentation.dto.req.CreateEventCampaignReq;
 import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
 import boombimapi.domain.point.presentation.dto.res.EventPageRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
@@ -44,4 +45,6 @@ public interface PointService {
 
 
     EventPageRes getOngoingEventPage();
+
+    void createEventCampaign(CreateEventCampaignReq req);
 }

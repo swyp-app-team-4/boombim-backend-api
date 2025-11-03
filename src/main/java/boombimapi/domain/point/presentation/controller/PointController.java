@@ -1,6 +1,8 @@
 package boombimapi.domain.point.presentation.controller;
 
 import boombimapi.domain.point.application.PointService;
+import boombimapi.domain.point.domain.entity.type.EventCategory;
+import boombimapi.domain.point.presentation.dto.req.CreateEventCampaignReq;
 import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
 import boombimapi.domain.point.presentation.dto.res.EventPageRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
@@ -72,9 +74,7 @@ public class PointController {
     /**
      * [GET] 진행 중인 이벤트 페이지 조회 API
      * <p>
-     * - 현재 진행 중인 이벤트 캠페인을 조회한다.<br>
-     * - 가장 최근 생성된 이벤트 캠페인 기준으로 데이터를 반환한다.<br>
-     * - 이벤트 기간(시작일, 종료일, 당첨자 발표일) 정보를 포함한다.
+     * - 현재 진행 중인 이벤트 캠페인을 조회한다.<br> - 가장 최근 생성된 이벤트 캠페인 기준으로 데이터를 반환한다.<br> - 이벤트 기간(시작일, 종료일, 당첨자 발표일) 정보를 포함한다.
      *
      * @return 진행 중인 이벤트 페이지 응답 DTO
      */
@@ -87,5 +87,28 @@ public class PointController {
     public ResponseEntity<EventPageRes> getOngoingEventPage() {
         return ResponseEntity.ok(pointService.getOngoingEventPage());
     }
+
+    /**
+     * [POST] 이벤트 캠페인 등록 API
+     * <p>
+     * - 새로운 이벤트 캠페인을 등록한다.<br>
+     * - 이벤트 시작일, 종료일, 당첨자 발표일, 카테고리 정보를 요청 본문으로 전달받는다.<br>
+     * - 성공 시 HTTP 200 OK를 반환한다.
+     *
+     * @param req 이벤트 캠페인 등록 요청 DTO
+     * @return HTTP 200 OK (등록 성공)
+     */
+    @Operation(summary = "[관리자 전용] 이벤트 캠페인 등록 API", description = "새로운 이벤트 캠페인을 등록합니다. (시작일, 종료일, 당첨자 발표일, 카테고리 포함)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이벤트 캠페인 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/event")
+    public ResponseEntity<Void> createEventCampaign(@RequestBody CreateEventCampaignReq req) {
+        pointService.createEventCampaign(req);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

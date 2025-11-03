@@ -38,10 +38,6 @@ public class EventCampaign {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
     @OneToMany(mappedBy = "eventCampaign", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventLog> eventlogs = new ArrayList<>();
 
@@ -68,10 +64,9 @@ public class EventCampaign {
     private LocalDateTime createdAt;
 
     @Builder
-    public EventCampaign(Member member, EventCategory eventCategory,
+    public EventCampaign(EventCategory eventCategory,
                          LocalDateTime eventStartDate, LocalDateTime eventEndDate,
                          LocalDateTime winnerAnnouncementDate) {
-        this.member = member;
         this.eventCategory = eventCategory;
         this.eventStartDate = eventStartDate;
         this.eventEndDate = eventEndDate;
