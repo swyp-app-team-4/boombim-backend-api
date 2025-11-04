@@ -55,7 +55,7 @@ public interface PointService {
      *
      * @return 진행 중인 이벤트 페이지 응답 DTO
      */
-    EventPageRes getOngoingEventPage();
+    EventPageRes getOngoingEventPage(String userId);
 
     /**
      * 새로운 이벤트 캠페인 생성.
