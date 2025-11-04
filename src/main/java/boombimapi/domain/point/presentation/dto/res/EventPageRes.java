@@ -7,14 +7,20 @@ public record EventPageRes(
         Long eventCampaignId,
         LocalDateTime eventStartDate,
         LocalDateTime eventEndDate,
-        LocalDateTime winnerAnnouncementDate
+        LocalDateTime winnerAnnouncementDate,
+
+        Long memberPoint,
+
+        Long currentTicket
 ) {
-    public static EventPageRes of(EventCampaign campaign) {
+    public static EventPageRes of(EventCampaign campaign, Long memberPoint, Long currentTicket) {
         return new EventPageRes(
                 campaign.getId(),
                 campaign.getEventStartDate(),
                 campaign.getEventEndDate(),
-                campaign.getWinnerAnnouncementDate()
+                campaign.getWinnerAnnouncementDate(),
+                memberPoint,
+                currentTicket
         );
     }
 }

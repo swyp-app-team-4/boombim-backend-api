@@ -9,7 +9,10 @@ import boombimapi.domain.point.presentation.dto.res.GetPointRes;
 /**
  * PointService 포인트 관련 핵심 기능 정의 인터페이스.
  * <p>
- * - 혼잡도 작성 시 포인트 적립<br> - 포인트 및 이력 조회<br> - 이벤트 응모 시 포인트 차감
+ * - 혼잡도 작성 시 포인트 적립<br>
+ * - 포인트 및 이력 조회<br>
+ * - 이벤트 응모 시 포인트 차감<br>
+ * - 진행 중인 이벤트 조회 및 신규 이벤트 생성
  */
 public interface PointService {
 
@@ -36,15 +39,31 @@ public interface PointService {
     /**
      * 이벤트 응모 시 포인트 차감.
      * <p>
-     * 회원의 포인트 잔액에서 지정 금액을 차감하고, 응모 이력 및 포인트 사용 이력을 기록한다.
+     * 회원의 포인트 잔액에서 지정 금액을 차감하고,
+     * 응모 이력 및 포인트 사용 이력을 기록한다.
      *
      * @param memberId 회원 ID
-     * @param req 이벤트 응모 요청 (이벤트 캠페인 ID 및 차감할 포인트 금액 포함)
+     * @param req      이벤트 응모 요청 (이벤트 캠페인 ID 및 차감할 포인트 금액 포함)
      */
     void usePointForEvent(String memberId, UsePointForEventReq req);
 
+    /**
+     * 진행 중인 이벤트 페이지 조회.
+     * <p>
+     * 최신에 생성된 이벤트 캠페인을 기준으로,
+     * 현재 참여 가능한 이벤트 정보를 반환한다.
+     *
+     * @return 진행 중인 이벤트 페이지 응답 DTO
+     */
+    EventPageRes getOngoingEventPage(String userId);
 
-    EventPageRes getOngoingEventPage();
-
+    /**
+     * 새로운 이벤트 캠페인 생성.
+     * <p>
+     * 이벤트 시작일, 종료일, 당첨자 발표일 및 카테고리 정보를 기반으로
+     * 새로운 이벤트 캠페인을 등록한다.
+     *
+     * @param req 이벤트 캠페인 생성 요청 DTO
+     */
     void createEventCampaign(CreateEventCampaignReq req);
 }

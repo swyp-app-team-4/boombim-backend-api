@@ -84,16 +84,14 @@ public class PointController {
             @ApiResponse(responseCode = "404", description = "진행 중인 이벤트가 존재하지 않음")
     })
     @GetMapping("/event")
-    public ResponseEntity<EventPageRes> getOngoingEventPage() {
-        return ResponseEntity.ok(pointService.getOngoingEventPage());
+    public ResponseEntity<EventPageRes> getOngoingEventPage(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(pointService.getOngoingEventPage(userId));
     }
 
     /**
      * [POST] 이벤트 캠페인 등록 API
      * <p>
-     * - 새로운 이벤트 캠페인을 등록한다.<br>
-     * - 이벤트 시작일, 종료일, 당첨자 발표일, 카테고리 정보를 요청 본문으로 전달받는다.<br>
-     * - 성공 시 HTTP 200 OK를 반환한다.
+     * - 새로운 이벤트 캠페인을 등록한다.<br> - 이벤트 시작일, 종료일, 당첨자 발표일, 카테고리 정보를 요청 본문으로 전달받는다.<br> - 성공 시 HTTP 200 OK를 반환한다.
      *
      * @param req 이벤트 캠페인 등록 요청 DTO
      * @return HTTP 200 OK (등록 성공)
