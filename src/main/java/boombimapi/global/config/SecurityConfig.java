@@ -43,8 +43,7 @@ public class SecurityConfig {
             "/api/web/oauth2/login/**",
             "/api/oauth2/callback/**",  // 기존 콜백 방식 (테스트용)
             "/api/healthcheck", "/api/admin/**",
-            "/actuator/**",
-            "/api/app/evnet"
+            "/actuator/**"
     );
 
     @Bean
@@ -80,7 +79,7 @@ public class SecurityConfig {
                         .requestMatchers("/favicon.ico", "/api/region").permitAll()
                         .requestMatchers("/api/app/reissue").permitAll()
                         .requestMatchers("/api/web/reissue").permitAll()
-                        .requestMatchers("/actuator/**", "/api/app/evnet").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/app/public/**").permitAll()
                         .requestMatchers("/api/web/public/**").permitAll()
                         .anyRequest().authenticated())
