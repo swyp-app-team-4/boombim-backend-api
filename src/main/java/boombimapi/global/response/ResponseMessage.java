@@ -47,7 +47,9 @@ public enum ResponseMessage {
     GET_ALARM_SUCCESS("알림 성공"),
 
     // search
-    DELETE_SEARCH_SUCCESS("검색 삭제 성공");
+    DELETE_SEARCH_SUCCESS("검색 삭제 성공"),
+
+    POINT_SELECT_SUCCESS("포인트 성공");
 
 
     private final String message;

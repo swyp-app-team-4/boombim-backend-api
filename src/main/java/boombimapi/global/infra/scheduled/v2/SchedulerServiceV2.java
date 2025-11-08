@@ -42,7 +42,7 @@ public class SchedulerServiceV2 {
 
 
     // 매일 오후 4시에 혼잡도 알림
-    @Scheduled(cron = "0 0 16 * * *") // 매일 오후 4시
+    //@Scheduled(cron = "0 0 16 * * *") // 매일 오후 4시
     public void sendDailyNotification() {
         log.info("오후 4시 알림 작업 시작");
         try {

@@ -1,11 +1,15 @@
 package boombimapi.domain.point.presentation.controller;
 
+import static boombimapi.global.response.ResponseMessage.MEMBER_DELETE;
+import static boombimapi.global.response.ResponseMessage.POINT_SELECT_SUCCESS;
+
 import boombimapi.domain.point.application.PointService;
 import boombimapi.domain.point.domain.entity.type.EventCategory;
 import boombimapi.domain.point.presentation.dto.req.CreateEventCampaignReq;
 import boombimapi.domain.point.presentation.dto.req.UsePointForEventReq;
 import boombimapi.domain.point.presentation.dto.res.EventPageRes;
 import boombimapi.domain.point.presentation.dto.res.GetPointRes;
+import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -65,10 +70,12 @@ public class PointController {
             @ApiResponse(responseCode = "404", description = "포인트 정보가 존재하지 않음")
     })
     @PatchMapping("/point")
-    public ResponseEntity<Void> applyEvent(@AuthenticationPrincipal String memberId,
-                                           @RequestBody UsePointForEventReq req) {
+    public ResponseEntity<BaseOKResponse<Void>> applyEvent(@AuthenticationPrincipal String memberId,
+                                                           @RequestBody UsePointForEventReq req) {
         pointService.usePointForEvent(memberId, req);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK, POINT_SELECT_SUCCESS));
     }
 
     /**
@@ -103,9 +110,11 @@ public class PointController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @PostMapping("/event")
-    public ResponseEntity<Void> createEventCampaign(@RequestBody CreateEventCampaignReq req) {
+    public ResponseEntity<BaseOKResponse<Void>> createEventCampaign(@RequestBody CreateEventCampaignReq req) {
         pointService.createEventCampaign(req);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+                BaseOKResponse.of(
+                        HttpStatus.OK, POINT_SELECT_SUCCESS));
     }
 
 
