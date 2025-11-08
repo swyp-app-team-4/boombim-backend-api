@@ -7,6 +7,7 @@ import boombimapi.domain.member.presentation.dto.member.req.NicknameReq;
 import boombimapi.domain.member.presentation.dto.member.res.*;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetCongestionHistoryRes;
 import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV1;
+import boombimapi.domain.member.presentation.dto.member.res.mypage.GetMemberResV2;
 import boombimapi.global.response.BaseOKResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,7 +34,6 @@ import static boombimapi.global.response.ResponseMessage.*;
 public class MemberController {
 
     private final MemberServiceV2 memberService;
-    private final MemberServiceV1 memberService1;
 
     @Operation(summary = "닉네임 수정 API", description = "닉네임을 수정합니다.")
     @ApiResponses(value = {
@@ -55,8 +55,8 @@ public class MemberController {
         @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
     })
     @GetMapping("/app/member")
-    public ResponseEntity<GetMemberResV1> getMember(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(memberService1.getMember(userId));
+    public ResponseEntity<GetMemberResV2> getMember(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(memberService.getMember(userId));
     }
 
     @Operation(summary = "회원 탈퇴 API", description = "회원을 탈퇴합니다.")
@@ -94,7 +94,7 @@ public class MemberController {
     }
 
 
-    @Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
+    /*@Operation(summary = "마이페이지(3번 구간) 나의 투표 조회 API", description = "나의 투표를 조회합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 조회 성공"),
         @ApiResponse(responseCode = "404", description = "유저 존재하지 않음")
@@ -112,7 +112,7 @@ public class MemberController {
     @GetMapping("/app/member/my-question")
     public ResponseEntity<List<MyPageVoteRes>> getMpVote(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(memberService1.getMyVoteQuestion(userId));
-    }
+    }*/
 
 
 }
