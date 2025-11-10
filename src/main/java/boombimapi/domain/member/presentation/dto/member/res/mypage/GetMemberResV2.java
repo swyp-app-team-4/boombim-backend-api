@@ -20,7 +20,7 @@ public record GetMemberResV2(
         SocialProvider socialProvider,
 
         @Schema(description = "사용자 포인트", example = "12")
-        Long Point
+        Long point
 
 ) {
     public static GetMemberResV2 of(Member user, Long point) {
