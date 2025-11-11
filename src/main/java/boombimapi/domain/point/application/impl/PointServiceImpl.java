@@ -85,7 +85,7 @@ public class PointServiceImpl implements PointService {
         EventCampaign eventCampaign = eventCampaignRepository.findTopByOrderByCreatedAtDesc()
                 .orElseThrow(() -> new BoombimException(EVENT_NOT_EXIST));
 
-        List<EventLog> byEventLog = eventLogRepository.findByEventCampaign(eventCampaign);
+        List<EventLog> byEventLog = eventLogRepository.findByMemberAndEventCampaign(member, eventCampaign);
 
         return EventPageRes.of(eventCampaign, point.getBalance(), (long) byEventLog.size());
     }
