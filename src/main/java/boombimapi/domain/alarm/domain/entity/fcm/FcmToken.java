@@ -29,7 +29,7 @@ public class FcmToken {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false, length = 1024) // TEXT보다 VARCHAR 권장(인덱스 용이)
+    @Column(nullable = false, length = 512) // TEXT보다 VARCHAR 권장(인덱스 용이)
     private String token;
 
     @Enumerated(EnumType.STRING)
