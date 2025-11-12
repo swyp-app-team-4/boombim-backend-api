@@ -33,32 +33,49 @@ public interface OfficialPlaceRepository extends JpaRepository<OfficialPlace, Lo
     List<OfficialPlace> findEntitiesByNameContainingIgnoreCase(String keyword, Pageable pageable);
 
     @Query(value = """
-        WITH latest AS (
-          SELECT DISTINCT ON (oc.official_place_id)
-                 oc.official_place_id, oc.congestion_level_id, oc.observed_at
+        WITH latest_time AS (
+          SELECT
+            official_place_id,
+            MAX(observed_at) AS observed_at
+          FROM official_congestions
+          GROUP BY official_place_id
+        ),
+        latest AS (
+          SELECT
+            oc.official_place_id,
+            oc.congestion_level_id,
+            oc.observed_at
           FROM official_congestions oc
-          ORDER BY oc.official_place_id, oc.observed_at DESC
+          JOIN latest_time lt
+            ON lt.official_place_id = oc.official_place_id
+           AND lt.observed_at       = oc.observed_at
         ),
         filtered AS (
-          SELECT l.official_place_id, l.observed_at,
-                 cl.name AS levelName, cl.message AS levelMessage
+          SELECT
+            l.official_place_id,
+            l.observed_at,
+            cl.name    AS levelName,
+            cl.message AS levelMessage
           FROM latest l
-          JOIN congestion_levels cl ON cl.id = l.congestion_level_id
+          JOIN congestion_levels cl
+            ON cl.id = l.congestion_level_id
           WHERE cl.name IN ('여유','보통')
         )
-        SELECT p.id                  AS id,
-               p.name                AS name,
-               p.image_url           AS imageUrl,
-               6371000 * 2 * ASIN(SQRT(
-                 POWER(SIN(RADIANS(p.centroid_latitude  - :latitude ) / 2), 2) +
-                 COS(RADIANS(:latitude)) * COS(RADIANS(p.centroid_latitude)) *
-                 POWER(SIN(RADIANS(p.centroid_longitude - :longitude) / 2), 2)
-               ))                    AS distanceMeters,
-               f.levelName           AS congestionLevelName,
-               f.observed_at         AS observedAt,
-               p.legal_dong          AS legalDong
+        SELECT
+          p.id        AS id,
+          p.name      AS name,
+          p.image_url AS imageUrl,
+          6371000 * 2 * ASIN(SQRT(
+            POWER(SIN(RADIANS(p.centroid_latitude  - :latitude ) / 2), 2) +
+            COS(RADIANS(:latitude)) * COS(RADIANS(p.centroid_latitude)) *
+            POWER(SIN(RADIANS(p.centroid_longitude - :longitude) / 2), 2)
+          ))            AS distanceMeters,
+          f.levelName   AS congestionLevelName,
+          f.observed_at AS observedAt,
+          p.legal_dong  AS legalDong
         FROM official_places p
-        JOIN filtered f ON f.official_place_id = p.id
+        JOIN filtered f
+          ON f.official_place_id = p.id
         ORDER BY distanceMeters ASC, f.observed_at DESC, p.id ASC
         LIMIT :limit
         """, nativeQuery = true)

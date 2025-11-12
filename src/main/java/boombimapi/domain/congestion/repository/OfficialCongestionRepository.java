@@ -17,41 +17,51 @@ public interface OfficialCongestionRepository extends JpaRepository<OfficialCong
 
     @Query(value = """
         WITH latest AS (
-          SELECT DISTINCT ON (oc.official_place_id)
-                 oc.official_place_id,
-                 oc.congestion_level_id,
-                 oc.density_per_m2,
-                 oc.observed_at
+          SELECT
+            oc.official_place_id,
+            oc.congestion_level_id,
+            oc.density_per_m2,
+            oc.observed_at,
+            ROW_NUMBER() OVER (
+              PARTITION BY oc.official_place_id
+              ORDER BY oc.observed_at DESC
+            ) AS rn
           FROM official_congestions oc
-          ORDER BY oc.official_place_id, oc.observed_at DESC
         ),
         joined AS (
-          SELECT l.official_place_id,
-                 l.density_per_m2,
-                 l.observed_at,
-                 cl.name AS level_name,
-                 CASE cl.name
-                   WHEN '붐빔' THEN 1
-                   WHEN '약간 붐빔' THEN 2
-                   WHEN '보통' THEN 3
-                   WHEN '여유' THEN 4
-                   ELSE 5
-                 END AS level_priority
+          SELECT
+            l.official_place_id,
+            l.density_per_m2,
+            l.observed_at,
+            cl.name AS level_name,
+            CASE cl.name
+              WHEN '붐빔' THEN 1
+              WHEN '약간 붐빔' THEN 2
+              WHEN '보통' THEN 3
+              WHEN '여유' THEN 4
+              ELSE 5
+            END AS level_priority
           FROM latest l
-          JOIN congestion_levels cl ON cl.id = l.congestion_level_id
+          JOIN congestion_levels cl
+            ON cl.id = l.congestion_level_id
+          WHERE l.rn = 1
         )
-        SELECT p.id                    AS officialPlaceId,
-               p.name                  AS officialPlaceName,
-               p.legal_dong            AS legalDong,
-               p.image_url             AS imageUrl,
-               j.level_name            AS congestionLevelName,
-               j.density_per_m2        AS densityPerM2,
-               j.observed_at           AS observedAt
+        SELECT
+          p.id          AS officialPlaceId,
+          p.name        AS officialPlaceName,
+          p.legal_dong  AS legalDong,
+          p.image_url   AS imageUrl,
+          j.level_name  AS congestionLevelName,
+          j.density_per_m2 AS densityPerM2,
+          j.observed_at AS observedAt
         FROM joined j
-        JOIN official_places p ON p.id = j.official_place_id
-        ORDER BY j.level_priority ASC,
-                 j.density_per_m2 DESC NULLS LAST,
-                 p.id ASC
+        JOIN official_places p
+          ON p.id = j.official_place_id
+        ORDER BY
+          j.level_priority ASC,
+          (j.density_per_m2 IS NULL) ASC,  -- NULLS LAST 대체
+          j.density_per_m2 DESC,
+          p.id ASC
         LIMIT :limit
         """, nativeQuery = true)
     java.util.List<OfficialPlaceCongestionRankProjection> findTopCongestedOfficialPlace(@Param("limit") int limit);
