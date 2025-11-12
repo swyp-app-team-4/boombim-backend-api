@@ -12,7 +12,7 @@ import lombok.Getter;
 @MappedSuperclass
 public abstract class BaseExpiringEntity extends BaseEntity {
 
-    @Column(name = "expires_at", nullable = false, columnDefinition = "timestamptz")
+    @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
     protected Duration ttl() {

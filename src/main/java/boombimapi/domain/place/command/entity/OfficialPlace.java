@@ -39,7 +39,7 @@ public class OfficialPlace {
     @Column(name = "centroid_longitude", nullable = false)
     private Double centroidLongitude;   // 중심 경도
 
-    @Column(name = "polygon_coordinates", nullable = false, columnDefinition = "jsonb")
+    @Column(name = "polygon_coordinates", nullable = false, columnDefinition = "json")
     private String polygonCoordinates;
 
     @Column(name = "image_url", length = 500)
