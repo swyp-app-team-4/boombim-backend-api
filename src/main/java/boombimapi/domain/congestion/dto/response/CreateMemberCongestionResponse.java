@@ -4,15 +4,18 @@ import boombimapi.domain.congestion.entity.MemberCongestion;
 
 public record CreateMemberCongestionResponse(
     Long memberCongestionId,
-    String memberPlaceName
+    String memberPlaceName,
+    boolean pointReceived
 ) {
 
-    public static CreateMemberCongestionResponse from(
-        MemberCongestion memberCongestion
+    public static CreateMemberCongestionResponse of(
+        MemberCongestion memberCongestion,
+        boolean pointReceived
     ) {
         return new CreateMemberCongestionResponse(
             memberCongestion.getId(),
-            memberCongestion.getMemberPlace().getName()
+            memberCongestion.getMemberPlace().getName(),
+            pointReceived
         );
     }
 
