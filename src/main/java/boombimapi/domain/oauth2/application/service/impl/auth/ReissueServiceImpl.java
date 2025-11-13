@@ -28,6 +28,9 @@ public class ReissueServiceImpl implements ReissueService {
 
     @Override
     public LoginToken reissue(String refreshToken) {
+
+        log.info(">>> ReissueServiceImpl refreshToken: {}", refreshToken);
+
         if (!jwtUtil.jwtVerify(refreshToken, "refresh")) {
             log.info("Refresh token not valid");
             throw new BoombimException(INVALID_REFRESH_TOKEN);
