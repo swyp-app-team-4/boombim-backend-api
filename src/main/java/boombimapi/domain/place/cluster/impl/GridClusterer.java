@@ -34,7 +34,14 @@ public class GridClusterer implements Clusterer {
         final int baseCellPixel = properties.baseCellPixel();
         final double tileSize = properties.tileSize();
         final int maxZoomAtRefZ = properties.maxZoomAtRefZ();
-        final int shift = Math.max(0, zoomLevel - maxZoomAtRefZ);
+        int shift;
+
+        if (properties.invertedZoom()) {
+            shift = Math.max(0, maxZoomAtRefZ - zoomLevel);
+        } else {
+            shift = Math.max(0, zoomLevel - maxZoomAtRefZ);
+        }
+
         final int cellSizePixel = baseCellPixel << shift;
 
         log.info(">>> GridClusterer cellSizePixel: {}", cellSizePixel);
