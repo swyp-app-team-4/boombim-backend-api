@@ -22,7 +22,7 @@ spring:
       max-lifetime: 1700000 # 커넥션 최대 수명
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       jakarta.persistence.query.timeout: 2000
       hibernate.query.timeout: 2000
