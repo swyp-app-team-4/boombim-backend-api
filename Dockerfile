@@ -1,8 +1,12 @@
 FROM amazoncorretto:17
 
+RUN yum -y install tzdata && yum clean all
+ENV TZ=Asia/Seoul
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} /app.jar
 COPY env/prod.env /env/prod.env
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
