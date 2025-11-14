@@ -12,4 +12,8 @@ public sealed interface ClusterProperties
     double tileSize();
 
     int minClusterSize();
+
+    default boolean invertedZoom() {
+        return false;
+    }
 }
