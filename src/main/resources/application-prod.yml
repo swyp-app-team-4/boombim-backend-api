@@ -132,12 +132,11 @@ cluster:
     tile-size: 256.0
     min-cluster-size: 2
   app:
-    ref-z: 20
+    ref-z: 21
     max-zoom-at-ref-z: 21
     base-cell-pixel: 64
     tile-size: 256.0
     min-cluster-size: 2
-
 
 # S3
 cloud:
