@@ -11,4 +11,9 @@ public record AppClusterProperties(
     int minClusterSize
 ) implements ClusterProperties {
 
+    @Override
+    public boolean invertedZoom() {
+        return true;
+    }
+
 }
