@@ -3,8 +3,11 @@ package boombimapi.domain.place.query.api.dto.response.marker;
 import boombimapi.domain.place.query.api.dto.MarkerType;
 import boombimapi.domain.place.shared.type.PlaceType;
 import boombimapi.global.vo.Coordinate;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.LocalDateTime;
 
+@JsonInclude(Include.NON_NULL)
 public record ViewportPlaceMarkerResponse(
     MarkerType markerType,
     Long placeId,
@@ -15,7 +18,8 @@ public record ViewportPlaceMarkerResponse(
     String congestionLevelName,
     String congestionMessage,
     LocalDateTime createdAt,
-    boolean isFavorite
+    boolean isFavorite,
+    Boolean isExpired
 ) implements ViewportMarkerResponse {
 
     public static ViewportPlaceMarkerResponse of(
@@ -27,7 +31,8 @@ public record ViewportPlaceMarkerResponse(
         String congestionLevelName,
         String congestionMessage,
         LocalDateTime createdAt,
-        boolean isFavorite
+        boolean isFavorite,
+        Boolean isExpired
     ) {
         return new ViewportPlaceMarkerResponse(
             MarkerType.PLACE,
@@ -39,8 +44,8 @@ public record ViewportPlaceMarkerResponse(
             congestionLevelName,
             congestionMessage,
             createdAt,
-            isFavorite
+            isFavorite,
+            isExpired
         );
     }
-
 }
