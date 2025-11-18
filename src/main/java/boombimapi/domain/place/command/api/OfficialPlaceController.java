@@ -30,25 +30,6 @@ public class OfficialPlaceController {
 
     private final OfficialPlaceService officialPlaceService;
 
-    // TODO: deprecated됨 -> 프론트에 전달 후 삭제 예정
-//    @Operation(summary = "뷰포트 내 공식 장소 조회", description = "뷰포트 내 공식 장소들의 정보를 리스트로 반환합니다.")
-//    @ApiResponses(value = {
-//        @ApiResponse(responseCode = "200", description = "뷰포트 내 공식 장소 조회 성공")
-//    })
-//    @PostMapping
-//    public ResponseEntity<BaseResponse<List<ViewportResponse>>> getOfficialPlacesInViewport(
-//        @AuthenticationPrincipal String memberId,
-//        @RequestBody ViewportRequest request
-//    ) {
-//        return ResponseEntity.ok(
-//            BaseResponse.of(
-//                HttpStatus.OK,
-//                GET_OFFICIAL_PLACES_IN_VIEWPORT_SUCCESS,
-//                officialPlaceService.getOfficialPlacesInViewport(memberId, request)
-//            )
-//        );
-//    }
-
     @Operation(summary = "[APP] 특정 공식 장소 정보 조회", description = "특정 공식 장소의 인구 통계 및 예상 혼잡도를 반환합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "특정 공식 장소의 정보 조회 성공"),
