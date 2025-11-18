@@ -39,12 +39,6 @@ public class MemberPlaceController {
 
     private final MemberPlaceService memberPlaceService;
 
-    private final Clusterer webClusterer;
-    private final Clusterer appClusterer;
-
-    private final WebClusterProperties webClusterProperties;
-    private final AppClusterProperties appClusterProperties;
-
     @Operation(summary = "[APP] 사용자 장소 등록 및 등록 여부 확인", description = "사용자가 혼잡도를 등록하려는 장소가 이미 서버 단에 저장이 되어있는지 확인합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "사용자 장소 확인 성공")
@@ -75,56 +69,6 @@ public class MemberPlaceController {
                 HttpStatus.OK,
                 RESOLVE_MEMBER_PLACE_SUCCESS,
                 memberPlaceService.resolveMemberPlace(request)
-            )
-        );
-    }
-
-    @Operation(summary = "[APP] 뷰포트 내 사용자 장소 조회", description = "뷰포트 내 사용자 장소들 중 1시간 내 작성된 혼잡도가 존재하는 장소들을 리스트로 반환합니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "뷰포트 내 사용자 장소 조회 성공")
-    })
-    @PostMapping({"/app/public/member-place", "/app/member-place"})
-    public ResponseEntity<BaseResponse<List<ViewportMarkerResponse>>> getMemberPlacesInViewportApp(
-        @AuthenticationPrincipal String memberId,
-        @RequestBody ViewportRequest request
-    ) {
-        List<ViewportMarkerResponse> memberPlacesInViewport = memberPlaceService.getMemberPlacesInViewport(
-            memberId,
-            request,
-            appClusterer,
-            appClusterProperties
-        );
-
-        return ResponseEntity.ok(
-            BaseResponse.of(
-                HttpStatus.OK,
-                GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
-                memberPlacesInViewport
-            )
-        );
-    }
-
-    @Operation(summary = "[Web] 뷰포트 내 사용자 장소 조회", description = "뷰포트 내 사용자 장소들 중 1시간 내 작성된 혼잡도가 존재하는 장소들을 리스트로 반환합니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "뷰포트 내 사용자 장소 조회 성공")
-    })
-    @PostMapping("/web/public/member-place")
-    public ResponseEntity<BaseResponse<List<ViewportMarkerResponse>>> getMemberPlacesInViewportWeb(
-        @AuthenticationPrincipal String memberId,
-        @RequestBody ViewportRequest request
-    ) {
-        List<ViewportMarkerResponse> viewportMarkers = memberPlaceService.getMemberPlacesInViewport(
-            memberId,
-            request,
-            webClusterer,
-            webClusterProperties
-        );
-
-        return ResponseEntity.ok(
-            BaseResponse.of(
-                HttpStatus.OK,
-                GET_MEMBER_PLACES_IN_VIEWPORT_SUCCESS,
-                viewportMarkers
             )
         );
     }

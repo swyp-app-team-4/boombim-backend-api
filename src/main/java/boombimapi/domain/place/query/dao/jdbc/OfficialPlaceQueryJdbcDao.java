@@ -3,7 +3,7 @@ package boombimapi.domain.place.query.dao.jdbc;
 import static boombimapi.domain.place.query.dao.mapper.OfficialPlaceRowMapper.*;
 
 import boombimapi.domain.place.query.dao.OfficialPlaceQueryDao;
-import boombimapi.domain.place.query.dao.param.OfficialPlaceViewportParam;
+import boombimapi.domain.place.query.dao.param.ViewportParam;
 import boombimapi.domain.place.query.dao.row.OfficialPlaceViewportRow;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
 
     @Override
     public List<OfficialPlaceViewportRow> findInViewport(
-        OfficialPlaceViewportParam param
+        ViewportParam param
     ) {
         String sql = """
             SELECT

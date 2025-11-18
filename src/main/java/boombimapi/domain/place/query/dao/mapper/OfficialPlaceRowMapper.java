@@ -9,8 +9,8 @@ public final class OfficialPlaceRowMapper {
     private OfficialPlaceRowMapper() {
     }
 
-    public static final RowMapper<OfficialPlaceViewportRow> OFFICIAL_PLACE_VIEWPORT = (resultSet, i) ->
-        new OfficialPlaceViewportRow(
+    public static final RowMapper<OfficialPlaceViewportRow> OFFICIAL_PLACE_VIEWPORT =
+        (resultSet, rowNumber) -> new OfficialPlaceViewportRow(
             resultSet.getLong("id"),
             resultSet.getString("name"),
             resultSet.getString("legal_dong"),
