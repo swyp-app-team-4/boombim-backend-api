@@ -10,7 +10,7 @@ import boombimapi.domain.place.query.api.dto.response.marker.ViewportClusterMark
 import boombimapi.domain.place.query.api.dto.response.marker.ViewportMarkerResponse;
 import boombimapi.domain.place.query.api.dto.response.marker.ViewportPlaceMarkerResponse;
 import boombimapi.domain.place.query.dao.OfficialPlaceQueryDao;
-import boombimapi.domain.place.query.dao.param.OfficialPlaceViewportParam;
+import boombimapi.domain.place.query.dao.param.ViewportParam;
 import boombimapi.domain.place.query.dao.row.OfficialPlaceViewportRow;
 import boombimapi.domain.place.shared.type.PlaceType;
 import boombimapi.global.geo.GeoDistance;
@@ -38,7 +38,7 @@ public class OfficialPlaceQueryService {
         String memberId,
         ViewportRequest request
     ) {
-        OfficialPlaceViewportParam param = OfficialPlaceViewportParam.from(memberId, request);
+        ViewportParam param = ViewportParam.from(memberId, request);
 
         List<OfficialPlaceViewportRow> viewportRows = officialPlaceQueryDao.findInViewport(param);
 
@@ -89,9 +89,9 @@ public class OfficialPlaceQueryService {
         ClusterProperties properties
     ) {
 
-        OfficialPlaceViewportParam param = OfficialPlaceViewportParam.from(memberId, request);
+        ViewportParam viewportParam = ViewportParam.from(memberId, request);
 
-        List<OfficialPlaceViewportRow> rows = officialPlaceQueryDao.findInViewport(param);
+        List<OfficialPlaceViewportRow> rows = officialPlaceQueryDao.findInViewport(viewportParam);
         if (rows.isEmpty())
             return List.of();
 
@@ -123,7 +123,8 @@ public class OfficialPlaceQueryService {
                         row.congestionLevelName(),
                         row.congestionMessage(),
                         row.observedAt(),
-                        Boolean.TRUE.equals(row.isFavorite())
+                        Boolean.TRUE.equals(row.isFavorite()),
+                        null
                     )
                 );
             }
@@ -208,7 +209,8 @@ public class OfficialPlaceQueryService {
                         row.congestionLevelName(),
                         row.congestionMessage(),
                         row.observedAt(),
-                        Boolean.TRUE.equals(row.isFavorite())
+                        Boolean.TRUE.equals(row.isFavorite()),
+                        null
                     )
                 );
             }
