@@ -25,7 +25,7 @@ public class AiAttemptTokenBucketLimiter {
         int cost
     ) {
 
-        final String tokenBucketKey = tokenBucketKey(memberId);
+        final String tokenBucketKey = "ai:token-bucket:" + memberId;
 
         try {
             String json = redisTemplate.execute(
@@ -37,11 +37,6 @@ public class AiAttemptTokenBucketLimiter {
                 String.valueOf(properties.idleTtlSeconds())
             );
 
-            if (json == null) {
-                log.warn("[RateLimit] Redis returned null. Degrading to OPEN. memberId={}", memberId);
-                return new AiAttemptRateLimitDecision(true, 0L, properties.capacity());
-            }
-
             return objectMapper.readValue(json, AiAttemptRateLimitDecision.class);
 
         } catch (Exception e) {
@@ -49,12 +44,6 @@ public class AiAttemptTokenBucketLimiter {
             return new AiAttemptRateLimitDecision(true, 0L, properties.capacity());
         }
 
-    }
-
-    private String tokenBucketKey(
-        String memberId
-    ) {
-        return "ai:token-bucket:" + memberId;
     }
 
 }
