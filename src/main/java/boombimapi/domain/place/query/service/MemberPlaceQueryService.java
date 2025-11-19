@@ -48,14 +48,14 @@ public class MemberPlaceQueryService {
 
         final int zoomLevel = request.zoomLevel();
         final boolean isMaxZoom = zoomLevel == properties.maxZoomAtRefZ();
-
-        final double memberLatitude = request.memberCoordinate().latitude();
-        final double memberLongitude = request.memberCoordinate().longitude();
+        final LocalDateTime now = LocalDateTime.now();
 
         // 1. 최대 줌 레벨에서는 클러스터링 X
         if (isMaxZoom) {
             List<ViewportMarkerResponse> markers = new ArrayList<>(rows.size());
             for (MemberPlaceViewportRow row : rows) {
+
+                Boolean isExpired = resolveIsExpired(row, now);
 
                 markers.add(
                     ViewportPlaceMarkerResponse.of(
@@ -68,7 +68,7 @@ public class MemberPlaceQueryService {
                         row.congestionMessage(),
                         row.createdAt(),
                         row.isFavorite(),
-                        row.expiresAt().isBefore(LocalDateTime.now())
+                        isExpired
                     )
                 );
             }
@@ -134,6 +134,8 @@ public class MemberPlaceQueryService {
                 if (row == null)
                     continue;
 
+                Boolean isExpired = resolveIsExpired(row, now);
+
                 markers.add(
                     ViewportPlaceMarkerResponse.of(
                         row.id(),
@@ -145,12 +147,23 @@ public class MemberPlaceQueryService {
                         row.congestionMessage(),
                         row.createdAt(),
                         row.isFavorite(),
-                        row.expiresAt().isBefore(LocalDateTime.now())
+                        isExpired
                     )
                 );
             }
         }
 
         return markers;
+    }
+
+    private Boolean resolveIsExpired(
+        MemberPlaceViewportRow row,
+        LocalDateTime now
+    ) {
+        if (row.expiresAt() == null) {
+            return null;
+        }
+
+        return row.expiresAt().isBefore(now);
     }
 }
