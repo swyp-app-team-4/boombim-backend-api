@@ -161,7 +161,7 @@ public class MemberPlaceQueryService {
         LocalDateTime now
     ) {
         if (row.expiresAt() == null) {
-            return null;
+            return Boolean.TRUE;
         }
 
         return row.expiresAt().isBefore(now);
