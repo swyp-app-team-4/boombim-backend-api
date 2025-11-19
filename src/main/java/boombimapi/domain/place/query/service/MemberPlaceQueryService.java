@@ -111,9 +111,17 @@ public class MemberPlaceQueryService {
 
                 for (Long placeId : clusterResult.placeIds()) {
                     MemberPlaceViewportRow row = rowHashMap.get(placeId);
+
                     if (row == null)
                         continue;
+
+                    Boolean isExpired = resolveIsExpired(row, now);
+                    if (Boolean.TRUE.equals(isExpired)) {
+                        continue;
+                    }
+
                     String level = row.congestionLevelName();
+
                     if (level != null)
                         levelCounts.merge(level, 1, Integer::sum);
                 }
