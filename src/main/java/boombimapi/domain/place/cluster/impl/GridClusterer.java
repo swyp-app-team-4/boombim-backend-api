@@ -2,6 +2,7 @@ package boombimapi.domain.place.cluster.impl;
 
 import boombimapi.domain.place.cluster.CellAccumulator;
 import boombimapi.domain.place.cluster.Clusterer;
+import boombimapi.domain.place.cluster.DisjointSet;
 import boombimapi.domain.place.cluster.WebMercator;
 import boombimapi.domain.place.cluster.vo.Cell;
 import boombimapi.domain.place.cluster.vo.ClusterInput;
@@ -44,8 +45,6 @@ public class GridClusterer implements Clusterer {
 
         final int cellSizePixel = baseCellPixel << shift;
 
-        log.info(">>> GridClusterer cellSizePixel: {}", cellSizePixel);
-
         Map<Cell, CellAccumulator> cellAccumulators = new HashMap<>();
 
         for (ClusterInput clusterInput : clusterInputs) {
@@ -71,18 +70,98 @@ public class GridClusterer implements Clusterer {
                 .add(clusterInput.id(), worldPixelX, worldPixelY);
         }
 
-        List<ClusterResult> clusterResults = new ArrayList<>(cellAccumulators.size());
 
-        for (Map.Entry<Cell, CellAccumulator> entry : cellAccumulators.entrySet()) {
-            Cell cell = entry.getKey();
-            CellAccumulator cellAccumulator = entry.getValue();
+
+        return mergeNeighbors(
+            cellAccumulators,
+            cellSizePixel
+        );
+    }
+
+    private List<ClusterResult> mergeNeighbors(
+        Map<Cell, CellAccumulator> cellAccumulators,
+        int cellSizePixel
+    ) {
+        if (cellAccumulators.isEmpty()) {
+            return List.of();
+        }
+
+        int n = cellAccumulators.size();
+
+        List<Cell> cells = new ArrayList<>(cellAccumulators.keySet());
+        Map<Cell, Integer> indexByCell = new HashMap<>(n);
+
+        for (int i = 0; i < n; i++) {
+            indexByCell.put(cells.get(i), i);
+        }
+
+        DisjointSet disjointSet = new DisjointSet(n);
+
+        double mergeDistance = cellSizePixel;
+
+        for (int i = 0; i < n; i++) {
+            Cell cell = cells.get(i);
+            CellAccumulator cellAccumulator = cellAccumulators.get(cell);
+
+            double cellX = cellAccumulator.centroidWorldPixelX();
+            double cellY = cellAccumulator.centroidWorldPixelY();
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (dx == 0 && dy == 0) {
+                        continue;
+                    }
+
+                    Cell neighborCell = new Cell(cell.x() + dx, cell.y() + dy);
+                    CellAccumulator neighborAccumulator = cellAccumulators.get(neighborCell);
+
+                    if (neighborAccumulator == null) {
+                        continue;
+                    }
+
+                    Integer j = indexByCell.get(neighborCell);
+                    if (j == null) {
+                        continue;
+                    }
+
+                    double neighborX = neighborAccumulator.centroidWorldPixelX();
+                    double neighborY = neighborAccumulator.centroidWorldPixelY();
+
+                    double distance = Math.hypot(cellX - neighborX, cellY - neighborY);
+                    if (distance <= mergeDistance) {
+                        disjointSet.union(i, j);
+                    }
+                }
+            }
+        }
+
+        Map<Integer, CellAccumulator> mergedAccumulators = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            int root = disjointSet.findRoot(i);
+
+            Cell cell = cells.get(i);
+            CellAccumulator original = cellAccumulators.get(cell);
+
+            CellAccumulator merged = mergedAccumulators.computeIfAbsent(
+                root,
+                r -> new CellAccumulator(cell.x(), cell.y())
+            );
+
+            merged.merge(original);
+        }
+
+        List<ClusterResult> clusterResults = new ArrayList<>(mergedAccumulators.size());
+
+        for (CellAccumulator accumulator : mergedAccumulators.values()) {
+            Cell cell = new Cell(accumulator.getCellX(), accumulator.getCellY());
 
             clusterResults.add(ClusterResult.of(
                 cell,
-                cellAccumulator.centroidWorldPixelX(),
-                cellAccumulator.centroidWorldPixelY(),
-                cellAccumulator.getCount(),
-                cellAccumulator.getPlaceIds()
+                accumulator.centroidWorldPixelX(),
+                accumulator.centroidWorldPixelY(),
+                accumulator.getCount(),
+                accumulator.getPlaceIds()
             ));
         }
 

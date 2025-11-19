@@ -42,4 +42,13 @@ public final class CellAccumulator {
         return sumWorldPixelY / count;
     }
 
+    public void merge(
+        CellAccumulator other
+    ) {
+        this.sumWorldPixelX += other.sumWorldPixelX;
+        this.sumWorldPixelY += other.sumWorldPixelY;
+        this.count += other.count;
+        this.placeIds.addAll(other.placeIds);
+    }
+
 }
