@@ -134,7 +134,7 @@ cluster:
   app:
     ref-z: 21
     max-zoom-at-ref-z: 21
-    base-cell-pixel: 64
+    base-cell-pixel: 32
     tile-size: 256.0
     min-cluster-size: 2
 
