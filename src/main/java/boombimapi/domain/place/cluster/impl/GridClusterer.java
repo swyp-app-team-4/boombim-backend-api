@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GridClusterer implements Clusterer {
 
+    private static final double MERGE_DISTANCE_RATIO = 0.98;
+
     private final ClusterProperties properties;
 
     @Override
@@ -70,8 +72,6 @@ public class GridClusterer implements Clusterer {
                 .add(clusterInput.id(), worldPixelX, worldPixelY);
         }
 
-
-
         return mergeNeighbors(
             cellAccumulators,
             cellSizePixel
@@ -86,50 +86,54 @@ public class GridClusterer implements Clusterer {
             return List.of();
         }
 
-        int n = cellAccumulators.size();
+        int cellCount = cellAccumulators.size();
 
         List<Cell> cells = new ArrayList<>(cellAccumulators.keySet());
-        Map<Cell, Integer> indexByCell = new HashMap<>(n);
+        Map<Cell, Integer> indexByCell = new HashMap<>(cellCount);
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < cellCount; i++) {
             indexByCell.put(cells.get(i), i);
         }
 
-        DisjointSet disjointSet = new DisjointSet(n);
+        DisjointSet disjointSet = new DisjointSet(cellCount);
 
-        double mergeDistance = cellSizePixel * 0.95;
+        double mergeDistance = cellSizePixel * MERGE_DISTANCE_RATIO;
 
-        for (int i = 0; i < n; i++) {
-            Cell cell = cells.get(i);
-            CellAccumulator cellAccumulator = cellAccumulators.get(cell);
+        for (int currentCellIndex = 0; currentCellIndex < cellCount; currentCellIndex++) {
+            Cell currentCell = cells.get(currentCellIndex);
+            CellAccumulator cellAccumulator = cellAccumulators.get(currentCell);
 
-            double cellX = cellAccumulator.centroidWorldPixelX();
-            double cellY = cellAccumulator.centroidWorldPixelY();
+            double currentCellX = cellAccumulator.centroidWorldPixelX();
+            double currentCellY = cellAccumulator.centroidWorldPixelY();
 
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    if (dx == 0 && dy == 0) {
+            for (int offsetX = -1; offsetX <= 1; offsetX++) {
+                for (int offsetY = -1; offsetY <= 1; offsetY++) {
+                    if (offsetX == 0 && offsetY == 0) {
                         continue;
                     }
 
-                    Cell neighborCell = new Cell(cell.x() + dx, cell.y() + dy);
-                    CellAccumulator neighborAccumulator = cellAccumulators.get(neighborCell);
+                    Cell neighborCell = new Cell(currentCell.x() + offsetX, currentCell.y() + offsetY);
+                    CellAccumulator neighborCellAccumulator = cellAccumulators.get(neighborCell);
 
-                    if (neighborAccumulator == null) {
+                    if (neighborCellAccumulator == null) {
                         continue;
                     }
 
-                    Integer j = indexByCell.get(neighborCell);
-                    if (j == null) {
+                    Integer neighborCellIndex = indexByCell.get(neighborCell);
+                    if (neighborCellIndex == null) {
                         continue;
                     }
 
-                    double neighborX = neighborAccumulator.centroidWorldPixelX();
-                    double neighborY = neighborAccumulator.centroidWorldPixelY();
+                    double neighborCellX = neighborCellAccumulator.centroidWorldPixelX();
+                    double neighborCellY = neighborCellAccumulator.centroidWorldPixelY();
 
-                    double distance = Math.hypot(cellX - neighborX, cellY - neighborY);
+                    double distance = Math.hypot(
+                        currentCellX - neighborCellX,
+                        currentCellY - neighborCellY
+                    );
+
                     if (distance <= mergeDistance) {
-                        disjointSet.union(i, j);
+                        disjointSet.union(currentCellIndex, neighborCellIndex);
                     }
                 }
             }
@@ -137,14 +141,14 @@ public class GridClusterer implements Clusterer {
 
         Map<Integer, CellAccumulator> mergedAccumulators = new HashMap<>();
 
-        for (int i = 0; i < n; i++) {
-            int root = disjointSet.findRoot(i);
+        for (int i = 0; i < cellCount; i++) {
+            int rootIndex = disjointSet.findRoot(i);
 
             Cell cell = cells.get(i);
             CellAccumulator original = cellAccumulators.get(cell);
 
             CellAccumulator merged = mergedAccumulators.computeIfAbsent(
-                root,
+                rootIndex,
                 r -> new CellAccumulator(cell.x(), cell.y())
             );
 
