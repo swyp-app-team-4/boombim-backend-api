@@ -97,7 +97,7 @@ public class GridClusterer implements Clusterer {
 
         DisjointSet disjointSet = new DisjointSet(n);
 
-        double mergeDistance = cellSizePixel;
+        double mergeDistance = cellSizePixel * 0.95;
 
         for (int i = 0; i < n; i++) {
             Cell cell = cells.get(i);
