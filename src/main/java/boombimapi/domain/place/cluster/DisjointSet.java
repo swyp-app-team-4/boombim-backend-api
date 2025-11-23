@@ -3,47 +3,43 @@ package boombimapi.domain.place.cluster;
 public final class DisjointSet {
 
     private final int[] parent;
-    private final int[] size;
 
     public DisjointSet(
-        int n
+        int count
     ) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("DisjointSet size must be positive. n:" + n);
+        if (count <= 0) {
+            throw new IllegalArgumentException("DisjointSet size must be positive. count:" + count);
         }
 
-        this.parent = new int[n];
-        this.size = new int[n];
+        this.parent = new int[count];
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < count; i++) {
             parent[i] = i;
-            size[i] = 1;
         }
     }
 
     public int findRoot(
-        int x
+        int index
     ) {
-        if (parent[x] != x) {
-            parent[x] = findRoot(parent[x]);
+        if (parent[index] != index) {
+            parent[index] = findRoot(parent[index]);
         }
 
-        return parent[x];
+        return parent[index];
     }
 
     public void union(
-        int a,
-        int b
+        int first,
+        int second
     ) {
-        int rootA = findRoot(a);
-        int rootB = findRoot(b);
+        int rootFirst = findRoot(first);
+        int rootSecond = findRoot(second);
 
-        if (rootA == rootB) {
+        if (rootFirst == rootSecond) {
             return;
         }
 
-        parent[rootB] = rootA;
-        size[rootA] += size[rootB];
+        parent[rootSecond] = rootFirst;
     }
 
 }
