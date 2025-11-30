@@ -72,10 +72,28 @@ public class GridClusterer implements Clusterer {
                 .add(clusterInput.id(), worldPixelX, worldPixelY);
         }
 
-        return mergeNeighbors(
-            cellAccumulators,
-            cellSizePixel
-        );
+        // 기존: 인접 셀 병합 (Union-Find)
+        // return mergeNeighbors(
+        //     cellAccumulators,
+        //     cellSizePixel
+        // );
+
+        // 임시: mergeNeighbors() 적용 없이, 셀 단위 그대로 클러스터 결과 생성
+        List<ClusterResult> clusterResults = new ArrayList<>(cellAccumulators.size());
+
+        for (CellAccumulator accumulator : cellAccumulators.values()) {
+            Cell cell = new Cell(accumulator.getCellX(), accumulator.getCellY());
+
+            clusterResults.add(ClusterResult.of(
+                cell,
+                accumulator.centroidWorldPixelX(),
+                accumulator.centroidWorldPixelY(),
+                accumulator.getCount(),
+                accumulator.getPlaceIds()
+            ));
+        }
+
+        return clusterResults;
     }
 
     private List<ClusterResult> mergeNeighbors(
