@@ -69,6 +69,66 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
 //        );
 //    }
 
+//    @Override
+//    public List<OfficialPlaceViewportRow> findInViewport(
+//        ViewportParam param
+//    ) {
+//        String sql = """
+//            SELECT
+//                op.id,
+//                op.name,
+//                op.legal_dong,
+//                op.image_url,
+//                op.centroid_latitude,
+//                op.centroid_longitude,
+//                cl.name        AS congestion_level_name,
+//                cl.message     AS congestion_message,
+//                oc.observed_at AS observed_at,
+//                CASE
+//                    WHEN :memberId IS NULL THEN FALSE
+//                    WHEN f.place_id IS NOT NULL THEN TRUE
+//                    ELSE FALSE
+//                END AS is_favorite
+//            FROM official_places op
+//            LEFT JOIN (
+//                SELECT *
+//                FROM (
+//                    SELECT
+//                        oc.*,
+//                        ROW_NUMBER() OVER (
+//                            PARTITION BY oc.official_place_id
+//                            ORDER BY oc.observed_at DESC
+//                        ) AS rn
+//                    FROM official_congestions oc
+//                ) t
+//                WHERE t.rn = 1
+//            ) oc
+//                ON oc.official_place_id = op.id
+//            LEFT JOIN congestion_levels cl
+//                ON cl.id = oc.congestion_level_id
+//            LEFT JOIN favorites f
+//                ON f.member_id = :memberId
+//               AND f.place_id  = op.id
+//               AND f.place_type = 'OFFICIAL_PLACE'
+//            WHERE op.centroid_latitude  BETWEEN :minLat AND :maxLat
+//              AND op.centroid_longitude BETWEEN :minLng AND :maxLng
+//            """;
+//
+//        Map<String, Object> params = Map.of(
+//            "memberId", param.memberId(),
+//            "minLat", param.minLatitude(),
+//            "maxLat", param.maxLatitude(),
+//            "minLng", param.minLongitude(),
+//            "maxLng", param.maxLongitude()
+//        );
+//
+//        return jdbcTemplate.query(
+//            sql,
+//            params,
+//            OFFICIAL_PLACE_VIEWPORT
+//        );
+//    }
+
     @Override
     public List<OfficialPlaceViewportRow> findInViewport(
         ViewportParam param
@@ -91,24 +151,24 @@ public class OfficialPlaceQueryJdbcDao implements OfficialPlaceQueryDao {
                 END AS is_favorite
             FROM official_places op
             LEFT JOIN (
-                SELECT *
-                FROM (
+                SELECT oc.*
+                FROM official_congestions oc
+                JOIN (
                     SELECT
-                        oc.*,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY oc.official_place_id
-                            ORDER BY oc.observed_at DESC
-                        ) AS rn
-                    FROM official_congestions oc
-                ) t
-                WHERE t.rn = 1
+                        official_place_id,
+                        MAX(observed_at) AS max_observed_at
+                    FROM official_congestions
+                    GROUP BY official_place_id
+                ) latest
+                  ON latest.official_place_id = oc.official_place_id
+                 AND latest.max_observed_at   = oc.observed_at
             ) oc
                 ON oc.official_place_id = op.id
             LEFT JOIN congestion_levels cl
                 ON cl.id = oc.congestion_level_id
             LEFT JOIN favorites f
-                ON f.member_id = :memberId
-               AND f.place_id  = op.id
+                ON f.member_id  = :memberId
+               AND f.place_id   = op.id
                AND f.place_type = 'OFFICIAL_PLACE'
             WHERE op.centroid_latitude  BETWEEN :minLat AND :maxLat
               AND op.centroid_longitude BETWEEN :minLng AND :maxLng
