@@ -18,7 +18,7 @@ spring:
       max-lifetime: 1700000 # 커넥션 최대 수명
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       jakarta.persistence.query.timeout: 2000
       hibernate.query.timeout: 2000
@@ -51,23 +51,6 @@ spring:
         core-size: 2
         max-size: 10
         queue-capacity: 100
-
-#  rabbitmq:
-#    host: ${RABBITMQ_HOST}
-#    port: ${RABBITMQ_PORT}
-#    username: ${RABBITMQ_USER}
-#    password: ${RABBITMQ_PASSWORD}
-#    publisher-confirm-type: correlated
-#    publisher-returns: true
-#    template:
-#      mandatory: true
-#    cache:
-#      channel:
-#        size: 50
-#      connection:
-#        mode: channel
-#    requested-heartbeat: 30
-#    connection-timeout: 5000
 
 jwt:
   secret: ${JWT_SECRET}
@@ -163,24 +146,6 @@ rate-limit:
       refill-per-second: 0.0016666667
       idle-ttl-seconds: 7200
       default-cost: 1
-
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: health, info, metrics, prometheus  # 👈 metrics 추가
-#  endpoint:
-#    prometheus:
-#      enabled: true
-#
-#  metrics:
-#    tags:
-#      application: boombim-api   # 👈 공통 라벨 추가 (Grafana 호환)
-#    web:
-#      server:
-#        request:
-#          autotime:
-#            enabled: true        # 👈 status 라벨 포함된 http_server_requests 메트릭 활성화
 
 static-map:
   base-url: https://maps.apigw.ntruss.com
